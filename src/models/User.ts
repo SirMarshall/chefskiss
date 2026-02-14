@@ -1,4 +1,4 @@
-import mongoose, { Schema, model, models } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 //User constructor for TS
 export interface IUser {
@@ -14,6 +14,7 @@ export interface IUser {
     updatedAt: Date;
 }
 
+//User schema for MongoDB
 const UserSchema = new Schema<IUser>({
     name: {
         type: String,
@@ -22,7 +23,6 @@ const UserSchema = new Schema<IUser>({
     email: {
         type: String,
         required: true,
-        //Might disable later
         unique: true
     },
     preferences: {
@@ -42,16 +42,10 @@ const UserSchema = new Schema<IUser>({
             type: String,
             default: "medium"
         }
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now
     }
-})
+}, {
+    timestamps: true
+});
 
 const User = models.User || model<IUser>("User", UserSchema);
 
