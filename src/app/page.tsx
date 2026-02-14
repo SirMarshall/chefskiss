@@ -64,24 +64,33 @@ export default function App() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center max-w-lg mx-auto w-full">
-        <div className="mb-10">
-          <h2 className="font-serif italic text-3xl md:text-4xl text-black dark:text-white mb-2">
-            {authMode === 'signup' ? 'Start Your Culinary Journey' : 'Welcome Back, Chef'}
-          </h2>
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
-            {authMode === 'signup' ? 'Create your personalized taste profile' : 'Sign in to access your menu'}
-          </p>
-        </div>
+      <div className="flex-1 flex flex-col justify-center max-w-lg mx-auto w-full h-[500px]">
+        <div className="transition-all duration-500 ease-in-out">
+          <div className="mb-10">
+            <h2 className="font-serif italic text-3xl md:text-4xl text-black dark:text-white mb-2 transition-all duration-300">
+              {authMode === 'signup' ? 'Start Your Culinary Journey' : 'Welcome Back, Chef'}
+            </h2>
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+              {authMode === 'signup' ? 'Create your personalized taste profile' : 'Sign in to access your menu'}
+            </p>
+          </div>
 
-        {authMode === 'signup' ? <SignupForm /> : <SigninForm />}
+          <div className="relative min-h-[350px]">
+            <div className={`transition-all duration-500 ${authMode === 'signup' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none absolute inset-0'}`}>
+              <SignupForm />
+            </div>
+            <div className={`transition-all duration-500 ${authMode === 'signin' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none absolute inset-0'}`}>
+              <SigninForm />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
 
   return (
     <AuthLayout>
-      <div className={`transition-all duration-1000 ease-out transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+      <div className={`w-full flex justify-center transition-all duration-1000 ease-out transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
         <AuthCard leftPanel={LeftPanel} rightPanel={RightPanel} />
       </div>
     </AuthLayout>

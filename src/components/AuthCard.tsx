@@ -8,15 +8,7 @@ interface AuthCardProps {
 
 export default function AuthCard({ leftPanel, rightPanel }: AuthCardProps) {
     return (
-        <div
-            className={`
-        relative z-10 w-full max-w-5xl overflow-hidden flex flex-col md:flex-row rounded-3xl 
-        shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)]
-        bg-white/90 backdrop-blur-3xl
-        border border-[var(--card-border)]
-      `}
-            style={{ minHeight: '600px' }}
-        >
+        <div className="relative z-10 w-full md:w-[1024px] max-w-[95vw] overflow-hidden flex flex-col md:flex-row rounded-3xl shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)] bg-white/90 backdrop-blur-3xl border border-[var(--card-border)] h-auto md:h-[750px] transition-none">
             {/* Left Panel */}
             <div className="w-full md:w-5/12 bg-gray-100/90 dark:bg-zinc-900/90 backdrop-blur-3xl p-12 flex flex-col justify-between relative border-r border-black/5 dark:border-white/5">
                 <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply"
