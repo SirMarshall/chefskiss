@@ -20,8 +20,11 @@ export default function SignupForm() {
         e.preventDefault();
         setLoading(true);
 
+        // Force delay for user gratification
+        const minLoadingPromise = new Promise(resolve => setTimeout(resolve, 800));
+
         try {
-            const response = await fetch("/api/users", {
+            const responsePromise = fetch("/api/users", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -29,11 +32,11 @@ export default function SignupForm() {
                 body: JSON.stringify(formData),
             });
 
+            const [response] = await Promise.all([responsePromise, minLoadingPromise]);
             const data = await response.json();
 
             if (data.success) {
                 toast("Welcome to the Kitchen! You've successfully signed up.", "success");
-                // Clear form
                 setFormData({
                     name: "",
                     email: "",
@@ -116,7 +119,6 @@ export default function SignupForm() {
             </div>
 
             <div className="pt-8 flex flex-col md:flex-row items-center md:items-end justify-between gap-8 border-t border-black/5">
-                {/* Spice Level Section */}
                 <fieldset className="space-y-3 w-full md:w-auto">
                     <legend className="text-[10px] uppercase tracking-widest font-black text-black/40 block text-center md:text-left mb-2">Spice Level</legend>
                     <div className="flex bg-black/5 p-1 rounded-sm justify-center md:justify-start">
@@ -134,7 +136,8 @@ export default function SignupForm() {
                   block px-5 py-2 text-[10px] uppercase tracking-widest transition-all duration-300
                   ${formData.spiceLevel === lvl
                                         ? 'bg-black text-white shadow-lg'
-                                        : 'bg-transparent text-black/60 hover:text-black hover:bg-black/5'} 
+                                        : 'bg-transparent text-black/60 hover:text-black hover:bg-black/5'
+                                    } 
                 `}>
                                     {lvl}
                                 </span>
@@ -153,11 +156,25 @@ export default function SignupForm() {
             text-[11px] uppercase tracking-[0.3em] font-black 
             shadow-[0_15px_35px_-5px_rgba(217,79,4,0.4)]
             hover:shadow-[0_20px_45px_-5px_rgba(217,79,4,0.6)]
-            hover:-translate-y-1 transition-all active:scale-95 active:translate-y-0
+            hover:-translate-y-1 active:scale-95 transition-all
             disabled:opacity-50
+            relative overflow-hidden group
           "
                 >
-                    {loading ? "Preparing..." : "Join"}
+                    {/* Ghost text for layout sizing */}
+                    <span className="invisible pointer-events-none block whitespace-nowrap">
+                        <span className="mr-[-0.3em]">Preparing...</span>
+                    </span>
+
+                    {/* Animated labels */}
+                    <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <span className={`transition-all duration-500 ease-out flex items-center ${loading ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}>
+                            <span className="mr-[-0.3em]">Join</span>
+                        </span>
+                        <span className={`absolute transition-all duration-500 ease-out flex items-center ${loading ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                            <span className="mr-[-0.3em]">Preparing...</span>
+                        </span>
+                    </span>
                 </button>
             </div>
         </form>

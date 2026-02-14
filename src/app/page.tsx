@@ -1,56 +1,77 @@
-import CheckerboardSidebar from "@/components/CheckerboardSidebar";
-import GlassCard from "@/components/GlassCard";
-import SignupForm from "@/components/SignupForm";
+"use client";
 
-export default function SignupPage() {
+import React, { useState, useEffect } from 'react';
+import SignupForm from '@/components/SignupForm';
+
+export default function App() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+
   return (
-    <div className="h-screen w-full flex font-sans overflow-hidden bg-neutral-900">
+    <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center font-sans selection:bg-orange-200 selection:text-orange-900 bg-black">
 
-      <CheckerboardSidebar />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `
+            conic-gradient(
+              #000000 90deg, 
+              #ffffff 90deg 180deg, 
+              #000000 180deg 270deg, 
+              #ffffff 270deg
+            )
+          `,
+          backgroundSize: '200px 200px',
+          backgroundPosition: 'center',
+        }}
+      />
 
-      <div className="flex-1 relative flex items-center justify-center">
+      <div className="absolute inset-0 z-0 bg-radial-gradient from-transparent via-transparent to-black/80 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%)' }}></div>
 
-        <div
-          className="absolute inset-0 z-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1556910103-1c02745aae4d?q=80&w=2070')`,
-            filter: 'grayscale(100%) contrast(1.2) brightness(0.7)'
-          }}
-        ></div>
+      <div
+        className={`
+          relative z-10 w-full max-w-5xl overflow-hidden flex flex-col md:flex-row rounded-3xl shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)]
+          transition-all duration-1000 ease-out transform
+          border border-white/20
+          ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}
+        `}
+        style={{ minHeight: '600px' }}
+      >
 
-        {/* Aesthetic Overlays */}
-        <div className="absolute inset-0 z-10 bg-gradient-to-br from-black/40 via-transparent to-black/60"></div>
+        <div className="w-full md:w-5/12 bg-gray-100/90 backdrop-blur-3xl p-12 flex flex-col justify-between relative border-r border-black/5">
+          <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
 
-        <div className="absolute inset-0 z-10 pointer-events-none opacity-20"
-          style={{ backgroundImage: `url('https://www.transparenttextures.com/patterns/stardust.png')` }}>
-        </div>
+          <div>
 
-        <GlassCard>
-          <div className="p-10 md:w-[38%] flex flex-col justify-between border-b md:border-b-0 md:border-r border-black/5 bg-gray-50/50">
-            <div>
-              <span className="material-symbols-outlined text-4xl text-black mb-6 block">skillet</span>
-              <h1 className="text-5xl md:text-6xl font-extralight tracking-tighter uppercase text-black leading-[0.85] mb-2">
-                Chef&apos;s<br /><span className="font-serif font-bold italic tracking-tight">Kiss</span>
+            <div className="mb-12">
+              <h1 className="text-6xl tracking-tight leading-none text-black">
+                <span className="block font-light font-sans tracking-wide">CHEF'S</span>
+                <span className="block font-serif font-black italic ml-1">KISS</span>
               </h1>
-              <div className="h-[2px] w-12 bg-black my-8"></div>
-
-              <p className="text-[10px] tracking-[0.15em] text-black font-black uppercase leading-relaxed opacity-80">
-                Generative Personal <br /> Meal Prep AI
-              </p>
             </div>
 
-            {/* Subtext */}
-            <div className="mt-12 md:mt-0">
-              <p className="text-[13px] leading-relaxed text-black/60 italic font-serif">
-                &quot;Your palate is unique. <br /> Your menu should be too.&quot;
-              </p>
-            </div>
+            <div className="w-12 h-0.5 bg-black mb-6"></div>
+
+            <p className="font-mono text-xs tracking-[0.2em] font-bold text-gray-800 uppercase leading-relaxed">
+              Generative Personal <br />
+              Meal Prep AI
+            </p>
           </div>
 
-          <div className="p-8 md:p-12 md:w-[62%] bg-white">
-            <SignupForm />
+          <div className="mt-12 md:mt-0">
+            <p className="font-serif italic text-gray-900 text-lg leading-relaxed">
+              "Your palate is unique.<br />
+              Your menu should be too."
+            </p>
           </div>
-        </GlassCard>
+        </div>
+        <div className="w-full md:w-7/12 bg-white/90 backdrop-blur-3xl p-12 flex flex-col justify-center">
+          <SignupForm />
+        </div>
       </div>
     </div>
   );
