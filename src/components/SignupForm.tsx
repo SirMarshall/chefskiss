@@ -7,11 +7,9 @@ export default function SignupForm() {
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
+        username: "",
         email: "",
-        dietaryRestrictions: "",
-        allergens: "",
-        favorites: "",
-        spiceLevel: "none",
+        password: "",
     });
 
     const { toast } = useToast();
@@ -39,11 +37,9 @@ export default function SignupForm() {
                 toast("Welcome to the Kitchen! You've successfully signed up.", "success");
                 setFormData({
                     name: "",
+                    username: "",
                     email: "",
-                    dietaryRestrictions: "",
-                    allergens: "",
-                    favorites: "",
-                    spiceLevel: "none",
+                    password: "",
                 });
             } else {
                 toast(`Error: ${data.error}`, "error");
@@ -57,124 +53,58 @@ export default function SignupForm() {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <label htmlFor="name" className="text-[10px] uppercase tracking-widest font-black text-black/40">Full Name</label>
-                    <input
-                        id="name"
-                        required
-                        placeholder="Gordon Ramsay"
-                        className="w-full bg-gray-50 border border-black/10 rounded-none px-4 py-3 text-sm text-black placeholder:text-black/20 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        value={formData.name}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label htmlFor="email" className="text-[10px] uppercase tracking-widest font-black text-black/40">Email Address</label>
-                    <input
-                        id="email"
-                        required
-                        type="email"
-                        placeholder="chef@kitchen.com"
-                        className="w-full bg-gray-50 border border-black/10 rounded-none px-4 py-3 text-sm text-black placeholder:text-black/20 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        value={formData.email}
-                    />
-                </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <label htmlFor="dietaryRestrictions" className="text-[10px] uppercase tracking-widest font-black text-black/40">Dietary Needs</label>
-                    <input
-                        id="dietaryRestrictions"
-                        placeholder="e.g. Keto, Vegan"
-                        className="w-full bg-gray-50 border border-black/10 rounded-none px-4 py-3 text-sm text-black placeholder:text-black/20 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
-                        onChange={(e) => setFormData({ ...formData, dietaryRestrictions: e.target.value })}
-                        value={formData.dietaryRestrictions}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <label htmlFor="allergens" className="text-[10px] uppercase tracking-widest font-black text-black/40">Allergens</label>
-                    <input
-                        id="allergens"
-                        placeholder="e.g. Peanuts"
-                        className="w-full bg-gray-50 border border-black/10 rounded-none px-4 py-3 text-sm text-black placeholder:text-black/20 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
-                        onChange={(e) => setFormData({ ...formData, allergens: e.target.value })}
-                        value={formData.allergens}
-                    />
-                </div>
-            </div>
-
+        <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-                <label htmlFor="favorites" className="text-[10px] uppercase tracking-widest font-black text-black/40">Favorite Ingredients</label>
+                <label className="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400" htmlFor="first-name">First Name</label>
                 <input
-                    id="favorites"
-                    placeholder="Truffle oil, Wagyu beef, Saffron..."
-                    className="w-full bg-gray-50 border border-black/10 rounded-none px-4 py-3 text-sm text-black placeholder:text-black/20 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-all"
-                    onChange={(e) => setFormData({ ...formData, favorites: e.target.value })}
-                    value={formData.favorites}
+                    className="w-full bg-white dark:bg-zinc-800 border border-[var(--input-border)] focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-4 px-5 text-black dark:text-white placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light"
+                    id="first-name"
+                    placeholder="Gordon"
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 />
             </div>
-
-            <div className="pt-8 flex flex-col md:flex-row items-center md:items-end justify-between gap-8 border-t border-black/5">
-                <fieldset className="space-y-3 w-full md:w-auto">
-                    <legend className="text-[10px] uppercase tracking-widest font-black text-black/40 block text-center md:text-left mb-2">Spice Level</legend>
-                    <div className="flex bg-black/5 p-1 rounded-sm justify-center md:justify-start">
-                        {['none', 'mild', 'medium', 'hot'].map((lvl) => (
-                            <label key={lvl} className="cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="spice"
-                                    value={lvl}
-                                    checked={formData.spiceLevel === lvl}
-                                    onChange={(e) => setFormData({ ...formData, spiceLevel: e.target.value })}
-                                    className="hidden"
-                                />
-                                <span className={`
-                  block px-5 py-2 text-[10px] uppercase tracking-widest transition-all duration-300
-                  ${formData.spiceLevel === lvl
-                                        ? 'bg-black text-white shadow-lg'
-                                        : 'bg-transparent text-black/60 hover:text-black hover:bg-black/5'
-                                    } 
-                `}>
-                                    {lvl}
-                                </span>
-                            </label>
-                        ))}
-                    </div>
-                </fieldset>
-
+            <div className="space-y-2">
+                <label className="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400" htmlFor="user-name">User Name</label>
+                <input
+                    className="w-full bg-white dark:bg-zinc-800 border border-[var(--input-border)] focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-4 px-5 text-black dark:text-white placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light"
+                    id="user-name"
+                    placeholder="chef_ramsay"
+                    type="text"
+                    value={formData.username}
+                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                />
+            </div>
+            <div className="space-y-2">
+                <label className="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400" htmlFor="signup-email">Email Address</label>
+                <input
+                    className="w-full bg-white dark:bg-zinc-800 border border-[var(--input-border)] focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-4 px-5 text-black dark:text-white placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light"
+                    id="signup-email"
+                    placeholder="chef@kitchen.com"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                />
+            </div>
+            <div className="space-y-2">
+                <label className="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400" htmlFor="password">Password</label>
+                <input
+                    className="w-full bg-white dark:bg-zinc-800 border border-[var(--input-border)] focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-4 px-5 text-black dark:text-white placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light"
+                    id="password"
+                    placeholder="••••••••"
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                />
+            </div>
+            <div className="pt-6">
                 <button
+                    className="w-full bg-[#D65A0C] hover:bg-[#B5490A] text-white font-mono font-bold text-xs tracking-[0.2em] uppercase py-5 px-6 rounded-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50"
                     type="submit"
                     disabled={loading}
-                    className="
-            w-full md:w-auto
-            bg-[#D94F04] text-white 
-            px-14 py-4 
-            text-[11px] uppercase tracking-[0.3em] font-black 
-            shadow-[0_15px_35px_-5px_rgba(217,79,4,0.4)]
-            hover:shadow-[0_20px_45px_-5px_rgba(217,79,4,0.6)]
-            hover:-translate-y-1 active:scale-95 transition-all
-            disabled:opacity-50
-            relative overflow-hidden group
-          "
                 >
-                    {/* Ghost text for layout sizing */}
-                    <span className="invisible pointer-events-none block whitespace-nowrap">
-                        <span className="mr-[-0.3em]">Preparing...</span>
-                    </span>
-
-                    {/* Animated labels */}
-                    <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                        <span className={`transition-all duration-500 ease-out flex items-center ${loading ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}>
-                            <span className="mr-[-0.3em]">Join</span>
-                        </span>
-                        <span className={`absolute transition-all duration-500 ease-out flex items-center ${loading ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                            <span className="mr-[-0.3em]">Preparing...</span>
-                        </span>
-                    </span>
+                    {loading ? "PREPARING..." : "CREATE ACCOUNT"}
                 </button>
             </div>
         </form>

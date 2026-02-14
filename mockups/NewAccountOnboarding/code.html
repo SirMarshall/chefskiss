@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chef's Kiss Refined Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-orange: #d64d08;
+            --bg-light-grey: #e9e9e9;
+            --text-dark: #1a1a1a;
+        }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #1a1a1a;
+            background-image: linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111), 
+                              linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .serif-italic {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+        .sidebar-bg {
+            background-color: #e5e5e5;
+            background-image: linear-gradient(to bottom right, #f0f0f0, #e0e0e0);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .tag-pill {
+            @apply px-3 py-1.5 rounded-full border border-gray-200 text-[9px] font-bold uppercase tracking-widest transition-all cursor-pointer hover:border-[var(--primary-orange)] hover:text-[var(--primary-orange)];
+        }
+        .tag-pill.active {
+            @apply bg-[var(--primary-orange)] border-[var(--primary-orange)] text-white shadow-md;
+        }
+        .dashboard-card {
+            @apply bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 h-screen overflow-hidden">
+<div class="w-full max-w-[1600px] h-full max-h-[900px] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+<aside class="sidebar-bg w-full md:w-[320px] lg:w-[400px] flex-shrink-0 flex flex-col p-8 md:p-10 border-r border-gray-200/50 overflow-hidden">
+<div class="mb-8">
+<h1 class="text-3xl tracking-widest font-light text-gray-900 uppercase leading-none mb-1">CHEF'S</h1>
+<h1 class="text-4xl serif-italic font-bold text-gray-900 leading-none">KISS</h1>
+<div class="w-10 h-0.5 bg-gray-800 mt-4 mb-3"></div>
+<p class="text-[9px] font-bold tracking-[0.2em] text-gray-800 uppercase">
+                Generative Personal<br/>Meal Prep AI
+            </p>
+</div>
+<div class="mb-10 italic text-gray-500 text-sm leading-relaxed border-l-2 border-gray-300 pl-4 py-1">
+            "The secret of success is to eat what you like and let the food fight it out inside."
+        </div>
+<div class="flex-1 flex flex-col min-h-0">
+<h2 class="text-[10px] font-bold text-gray-400 tracking-[0.3em] uppercase mb-4">Sample Weekly Menu</h2>
+<div class="flex-1 overflow-y-auto space-y-4 pr-2 hide-scrollbar pb-8">
+<div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm opacity-80 scale-95 origin-left">
+<div class="flex justify-between items-center mb-3">
+<span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Monday</span>
+</div>
+<div class="flex gap-2">
+<div class="w-10 h-10 bg-gray-100 rounded-lg"></div>
+<div class="w-10 h-10 bg-gray-100 rounded-lg"></div>
+<div class="w-10 h-10 bg-gray-100 rounded-lg"></div>
+</div>
+</div>
+<div class="bg-white rounded-2xl p-4 border-2 border-[var(--primary-orange)] shadow-lg">
+<div class="flex justify-between items-center mb-3">
+<span class="text-[9px] font-bold text-[var(--primary-orange)] uppercase tracking-widest">Tuesday (Focus)</span>
+</div>
+<div class="flex gap-2 items-center">
+<div class="w-12 h-12 bg-gray-100 rounded-lg"></div>
+<div>
+<div class="text-[10px] font-bold text-gray-900">Miso Glazed Salmon</div>
+<div class="text-[8px] text-gray-400 uppercase tracking-widest">24g Protein • 420 Cal</div>
+</div>
+</div>
+</div>
+<div class="bg-white rounded-2xl p-4 border border-gray-200 shadow-sm opacity-80 scale-95 origin-left">
+<div class="flex justify-between items-center mb-3">
+<span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Wednesday</span>
+</div>
+<div class="flex gap-2">
+<div class="w-10 h-10 bg-gray-100 rounded-lg"></div>
+<div class="w-10 h-10 bg-gray-100 rounded-lg"></div>
+<div class="w-10 h-10 bg-gray-100 rounded-lg"></div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<main class="flex-1 bg-[#F9FAFB] relative overflow-hidden flex flex-col">
+<div class="flex-1 overflow-y-auto hide-scrollbar">
+<div class="p-6 md:p-10 lg:p-12 max-w-[1200px] mx-auto w-full">
+<section class="mb-10">
+<div class="flex justify-between items-end mb-6">
+<div>
+<span class="text-[10px] font-bold text-[var(--primary-orange)] tracking-[0.3em] uppercase mb-2 block">Step 01</span>
+<h2 class="text-2xl font-light text-gray-900">Build Your Family</h2>
+</div>
+</div>
+<div class="flex flex-wrap gap-6 items-start">
+<div class="flex flex-col items-center space-y-2">
+<div class="relative group">
+<div class="w-16 h-16 rounded-full border-4 border-[var(--primary-orange)] p-0.5 ring-2 ring-transparent group-hover:ring-[var(--primary-orange)]/20 transition-all cursor-pointer">
+<div class="w-full h-full rounded-full bg-gray-100 flex items-center justify-center text-gray-900 font-serif italic text-2xl">G</div>
+</div>
+<div class="absolute -top-1 -right-1 bg-[var(--primary-orange)] text-white p-0.5 rounded-full shadow-md">
+<span class="material-symbols-outlined text-[10px] block">check</span>
+</div>
+</div>
+<span class="text-[10px] font-bold text-gray-900 uppercase tracking-widest">Gordon</span>
+</div>
+<div class="flex flex-col items-center space-y-2">
+<button class="w-16 h-16 rounded-full border-2 border-dashed border-gray-200 flex flex-col items-center justify-center text-gray-300 hover:border-[var(--primary-orange)] hover:text-[var(--primary-orange)] transition-all group">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+</div>
+</section>
+<hr class="border-gray-200/60 mb-10"/>
+<section class="mb-12">
+<div class="mb-8">
+<span class="text-[10px] font-bold text-[var(--primary-orange)] tracking-[0.3em] uppercase mb-2 block">Step 02</span>
+<h2 class="text-3xl font-light text-gray-900 uppercase tracking-tight">Gordon's Preferences</h2>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<div class="flex flex-col gap-4">
+<div class="dashboard-card">
+<label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Dietary Preferences</label>
+<div class="flex flex-wrap gap-1.5">
+<div class="tag-pill active">Keto</div>
+<div class="tag-pill">Vegan</div>
+<div class="tag-pill">Paleo</div>
+<div class="tag-pill">Vegetarian</div>
+<div class="tag-pill">Pescatarian</div>
+<div class="tag-pill">Low Carb</div>
+<div class="tag-pill">Gluten-Free</div>
+</div>
+</div>
+<div class="dashboard-card">
+<label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Spice Level</label>
+<div class="flex items-center justify-between bg-gray-50 p-1 rounded-full border border-gray-100">
+<button class="flex-1 py-2 text-[9px] font-bold uppercase tracking-widest rounded-full transition-all text-gray-400 hover:text-gray-600">None</button>
+<button class="flex-1 py-2 text-[9px] font-bold uppercase tracking-widest rounded-full transition-all text-gray-400 hover:text-gray-600">Mild</button>
+<button class="flex-1 py-2 text-[9px] font-bold uppercase tracking-widest rounded-full transition-all bg-white shadow-sm text-[var(--primary-orange)]">Medium</button>
+<button class="flex-1 py-2 text-[9px] font-bold uppercase tracking-widest rounded-full transition-all text-gray-400 hover:text-gray-600">Hot</button>
+</div>
+</div>
+<div class="dashboard-card">
+<label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Favorite Ingredients</label>
+<div class="relative group">
+<input class="w-full bg-white border border-gray-200 rounded-xl text-xs px-3 py-3 focus:outline-none focus:border-[var(--primary-orange)] focus:ring-0 transition-colors placeholder-gray-300" placeholder="e.g. Avocado, Salmon, Basil" type="text"/>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="dashboard-card">
+<label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Common Allergens</label>
+<div class="flex flex-wrap gap-1.5">
+<div class="tag-pill">Peanuts</div>
+<div class="tag-pill">Shellfish</div>
+<div class="tag-pill active">Dairy</div>
+<div class="tag-pill">Soy</div>
+<div class="tag-pill">Tree Nuts</div>
+<div class="tag-pill">Wheat</div>
+</div>
+</div>
+<div class="dashboard-card">
+<label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Custom Allergens</label>
+<div class="relative group">
+<input class="w-full bg-white border border-gray-200 rounded-xl text-xs px-3 py-3 focus:outline-none focus:border-[var(--primary-orange)] focus:ring-0 transition-colors placeholder-gray-300" placeholder="Type and press enter to add..." type="text"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2">
+<span class="material-symbols-outlined text-gray-300 text-sm">keyboard_return</span>
+</div>
+</div>
+</div>
+<div class="dashboard-card">
+<label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Disliked Ingredients</label>
+<div class="relative group">
+<input class="w-full bg-white border border-gray-200 rounded-xl text-xs px-3 py-3 focus:outline-none focus:border-[var(--primary-orange)] focus:ring-0 transition-colors placeholder-gray-300" placeholder="e.g. Cilantro, Olives" type="text"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<div class="p-6 border-t border-gray-100 bg-white/90 backdrop-blur-md flex justify-end items-center">
+<button class="bg-[var(--primary-orange)] hover:bg-[#b54006] text-white font-bold tracking-[0.3em] uppercase text-[10px] px-12 py-5 rounded-full shadow-xl hover:shadow-orange-500/30 transition-all duration-300 transform active:scale-95 flex items-center space-x-3">
+<span>Continue</span>
+<span class="material-symbols-outlined text-base">arrow_forward</span>
+</button>
+</div>
+</main>
+</div>
+
+</body></html>

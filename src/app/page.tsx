@@ -1,78 +1,89 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import AuthLayout from '@/components/AuthLayout';
+import AuthCard from '@/components/AuthCard';
 import SignupForm from '@/components/SignupForm';
+import SigninForm from '@/components/SigninForm';
 
 export default function App() {
   const [mounted, setMounted] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signup');
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-
-  return (
-    <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center font-sans selection:bg-orange-200 selection:text-orange-900 bg-black">
-
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: `
-            conic-gradient(
-              #000000 90deg, 
-              #ffffff 90deg 180deg, 
-              #000000 180deg 270deg, 
-              #ffffff 270deg
-            )
-          `,
-          backgroundSize: '200px 200px',
-          backgroundPosition: 'center',
-        }}
-      />
-
-      <div className="absolute inset-0 z-0 bg-radial-gradient from-transparent via-transparent to-black/80 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%)' }}></div>
-
-      <div
-        className={`
-          relative z-10 w-full max-w-5xl overflow-hidden flex flex-col md:flex-row rounded-3xl shadow-[0_35px_60px_-15px_rgba(0,0,0,0.6)]
-          transition-all duration-1000 ease-out transform
-          border border-white/20
-          ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}
-        `}
-        style={{ minHeight: '600px' }}
-      >
-
-        <div className="w-full md:w-5/12 bg-gray-100/90 backdrop-blur-3xl p-12 flex flex-col justify-between relative border-r border-black/5">
-          <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}></div>
-
-          <div>
-
-            <div className="mb-12">
-              <h1 className="text-6xl tracking-tight leading-none text-black">
-                <span className="block font-light font-sans tracking-wide">CHEF'S</span>
-                <span className="block font-serif font-black italic ml-1">KISS</span>
-              </h1>
-            </div>
-
-            <div className="w-12 h-0.5 bg-black mb-6"></div>
-
-            <p className="font-mono text-xs tracking-[0.2em] font-bold text-gray-800 uppercase leading-relaxed">
-              Generative Personal <br />
-              Meal Prep AI
-            </p>
-          </div>
-
-          <div className="mt-12 md:mt-0">
-            <p className="font-serif italic text-gray-900 text-lg leading-relaxed">
-              "Your palate is unique.<br />
-              Your menu should be too."
-            </p>
-          </div>
+  const LeftPanel = (
+    <>
+      <div>
+        <div className="mb-0">
+          <h1 className="font-sans text-5xl md:text-5xl font-light tracking-wider text-black dark:text-white mb-0 leading-[0.8]">
+            CHEF'S
+          </h1>
+          <h1 className="font-serif italic text-6xl md:text-6xl font-bold text-black dark:text-white mt-2">
+            KISS
+          </h1>
         </div>
-        <div className="w-full md:w-7/12 bg-white/90 backdrop-blur-3xl p-12 flex flex-col justify-center">
-          <SignupForm />
+
+        <div className="w-16 h-0.5 bg-black dark:bg-white mt-10 mb-6"></div>
+
+        <p className="font-mono text-xs font-bold tracking-[0.2em] uppercase text-black dark:text-white leading-relaxed max-w-[200px]">
+          Generative Personal Meal Prep AI
+        </p>
+      </div>
+
+      <div className="mt-16 md:mt-0">
+        <p className="font-serif italic text-xl md:text-2xl text-black dark:text-white leading-snug">
+          "Your palate is unique.<br />
+          Your menu should be too."
+        </p>
+      </div>
+    </>
+  );
+
+  const RightPanel = (
+    <div className="flex flex-col h-full">
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-8 -mx-12 -mt-12">
+        <div
+          onClick={() => setAuthMode('signup')}
+          className={`flex-1 text-center py-6 cursor-pointer transition-all ${authMode === 'signup' ? 'border-b-2 border-primary' : 'opacity-40 hover:opacity-70'}`}
+        >
+          <span className="font-mono text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase text-black dark:text-white">
+            New to Chef's Kiss?
+          </span>
+        </div>
+        <div
+          onClick={() => setAuthMode('signin')}
+          className={`flex-1 text-center py-6 cursor-pointer transition-all ${authMode === 'signin' ? 'border-b-2 border-primary' : 'opacity-40 hover:opacity-70'}`}
+        >
+          <span className="font-mono text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase text-gray-500 dark:text-gray-400">
+            Already a Member?
+          </span>
         </div>
       </div>
+
+      <div className="flex-1 flex flex-col justify-center max-w-lg mx-auto w-full">
+        <div className="mb-10">
+          <h2 className="font-serif italic text-3xl md:text-4xl text-black dark:text-white mb-2">
+            {authMode === 'signup' ? 'Start Your Culinary Journey' : 'Welcome Back, Chef'}
+          </h2>
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
+            {authMode === 'signup' ? 'Create your personalized taste profile' : 'Sign in to access your menu'}
+          </p>
+        </div>
+
+        {authMode === 'signup' ? <SignupForm /> : <SigninForm />}
+      </div>
     </div>
+  );
+
+  return (
+    <AuthLayout>
+      <div className={`transition-all duration-1000 ease-out transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+        <AuthCard leftPanel={LeftPanel} rightPanel={RightPanel} />
+      </div>
+    </AuthLayout>
   );
 }

@@ -1,0 +1,159 @@
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chef's Kiss - Generative Personal Meal Prep AI</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&amp;family=Playfair+Display:ital,wght@1,700&amp;family=Work+Sans:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#D65A0C",
+                        "primary-dark": "#B5490A",
+                        "background-light": "#EAEAEA",
+                        "background-dark": "#121212",
+                        "panel-left-light": "#E5E5E5",
+                        "panel-left-dark": "#1E1E1E",
+                        "panel-right-light": "#F2F2F2",
+                        "panel-right-dark": "#2A2A2A",
+                        "input-bg-light": "#FFFFFF",
+                        "input-bg-dark": "#333333",
+                        "text-main-light": "#1A1A1A",
+                        "text-main-dark": "#F0F0F0",
+                        "text-muted-light": "#737373",
+                        "text-muted-dark": "#A3A3A3",
+                    },
+                    fontFamily: {
+                        sans: ["'Work Sans'", "sans-serif"],
+                        mono: ["'DM Mono'", "monospace"],
+                        serif: ["'Playfair Display'", "serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "4px",
+                        'xl': '20px',
+                        '2xl': '24px',
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        .bg-checkers {
+            background-color: #808080;
+            background-image: 
+                linear-gradient(45deg, #000000 25%, transparent 25%, transparent 75%, #000000 75%, #000000),
+                linear-gradient(45deg, #000000 25%, transparent 25%, transparent 75%, #000000 75%, #000000);
+            background-position: 0 0, 50px 50px;
+            background-size: 100px 100px;
+        }
+        ::placeholder {
+            color: #A0A0A0; 
+            opacity: 1; 
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+            border-radius: 4px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex items-center justify-center relative overflow-hidden bg-background-light dark:bg-background-dark font-sans selection:bg-primary selection:text-white">
+<div class="absolute inset-0 z-0 bg-checkers opacity-100 dark:opacity-80"></div>
+<div class="absolute inset-0 z-10 pointer-events-none bg-[radial-gradient(circle_at_center,transparent_20%,rgba(0,0,0,0.85)_100%)]"></div>
+<div class="relative z-20 w-full max-w-[1100px] h-auto min-h-[600px] flex flex-col md:flex-row shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] rounded-2xl overflow-hidden mx-4">
+<div class="w-full md:w-[38%] bg-panel-left-light dark:bg-panel-left-dark p-10 md:p-14 flex flex-col justify-between relative">
+<div class="mt-4">
+<h1 class="font-sans text-5xl md:text-5xl font-light tracking-wider text-text-main-light dark:text-text-main-dark mb-0 leading-[0.8]">
+                    CHEF'S
+                </h1>
+<h1 class="font-serif italic text-6xl md:text-6xl font-bold text-text-main-light dark:text-text-main-dark mt-2">
+                    KISS
+                </h1>
+<div class="w-16 h-0.5 bg-black dark:bg-white mt-10 mb-6"></div>
+<p class="font-mono text-xs font-bold tracking-[0.2em] uppercase text-text-main-light dark:text-text-main-dark leading-relaxed max-w-[200px]">
+                    Generative Personal Meal Prep AI
+                </p>
+</div>
+<div class="mt-16 md:mt-0">
+<p class="font-serif italic text-xl md:text-2xl text-text-main-light dark:text-text-main-dark leading-snug">
+                    "Your palate is unique.<br/>
+                    Your menu should be too."
+                </p>
+</div>
+<div class="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-multiply"></div>
+</div>
+<div class="w-full md:w-[62%] bg-panel-right-light dark:bg-panel-right-dark flex flex-col">
+<div class="flex border-b border-gray-200 dark:border-gray-700">
+<div class="flex-1 text-center py-6 border-b-2 border-primary cursor-default">
+<span class="font-mono text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase text-text-main-light dark:text-text-main-dark">
+                        New to Chef's Kiss?
+                    </span>
+</div>
+<div class="flex-1 text-center py-6 cursor-not-allowed opacity-40">
+<span class="font-mono text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase text-text-muted-light dark:text-text-muted-dark">
+                        Already a Member?
+                    </span>
+</div>
+</div>
+<div class="p-8 md:p-16 flex-1 flex flex-col justify-center max-w-lg mx-auto w-full">
+<div class="mb-10">
+<h2 class="font-serif italic text-3xl md:text-4xl text-text-main-light dark:text-text-main-dark mb-2">
+                        Start Your Culinary Journey
+                    </h2>
+<p class="font-mono text-[10px] uppercase tracking-[0.2em] text-text-muted-light dark:text-text-muted-dark">
+                        Create your personalized taste profile
+                    </p>
+</div>
+<form action="#" class="space-y-5">
+<div class="space-y-2">
+<label class="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-text-muted-light dark:text-text-muted-dark" for="first-name">First Name</label>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-4 px-5 text-text-main-light dark:text-text-main-dark placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light" id="first-name" placeholder="Gordon" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-text-muted-light dark:text-text-muted-dark" for="user-name">User Name</label>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-4 px-5 text-text-main-light dark:text-text-main-dark placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light" id="user-name" placeholder="chef_ramsay" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-text-muted-light dark:text-text-muted-dark" for="signup-email">Email Address</label>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-4 px-5 text-text-main-light dark:text-text-main-dark placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light" id="signup-email" placeholder="chef@kitchen.com" type="email"/>
+</div>
+<div class="space-y-2">
+<label class="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-text-muted-light dark:text-text-muted-dark" for="password">Password</label>
+<input class="w-full bg-input-bg-light dark:bg-input-bg-dark border-none focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-4 px-5 text-text-main-light dark:text-text-main-dark placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light" id="password" placeholder="••••••••" type="password"/>
+</div>
+<div class="pt-6">
+<button class="w-full bg-primary hover:bg-primary-dark text-white font-mono font-bold text-xs tracking-[0.2em] uppercase py-5 px-6 rounded-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5" type="submit">
+                            CREATE ACCOUNT
+                        </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+<script>
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+            if (event.matches) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        });
+    </script>
+
+</body></html>

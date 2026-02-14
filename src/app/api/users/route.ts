@@ -6,7 +6,9 @@ import { z } from 'zod';
 // Define the validation schema
 const UserSchema = z.object({
     name: z.string().min(1, "Name is required"),
+    username: z.string().min(1, "Username is required"),
     email: z.string().email("Invalid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
     dietaryRestrictions: z.string().optional(),
     allergens: z.string().optional(),
     favorites: z.string().optional(),
@@ -31,10 +33,24 @@ export async function POST(request: Request) {
 
         const data = validationResult.data;
 
+        // Check for existing username or email
+        const existingUser = await User.findOne({
+            $or: [{ email: data.email }, { username: data.username }]
+        });
+
+        if (existingUser) {
+            return NextResponse.json({
+                success: false,
+                error: existingUser.email === data.email ? "Email already exists" : "Username already taken"
+            }, { status: 409 });
+        }
+
         // Create the user in the database
         const user = await User.create({
             name: data.name,
+            username: data.username,
             email: data.email,
+            password: data.password, // In a real app, hash this!
             dietaryRestrictions: data.dietaryRestrictions ? data.dietaryRestrictions.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0) : [],
             allergens: data.allergens ? data.allergens.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0) : [],
             favorites: data.favorites ? data.favorites.split(',').map((s: string) => s.trim()).filter((s: string) => s.length > 0) : [],

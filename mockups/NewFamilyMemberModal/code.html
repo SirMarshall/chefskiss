@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chef's Kiss Family Management Updated</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-orange: #d64d08;
+            --bg-light-grey: #e9e9e9;
+            --text-dark: #1a1a1a;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #1a1a1a;
+            background-image: linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111), 
+                              linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .serif-italic {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+        .sidebar-bg {
+            background-color: #e5e5e5;
+            background-image: linear-gradient(to bottom right, #f0f0f0, #e0e0e0);
+        }
+        .nav-item:hover {
+            color: var(--primary-orange);
+        }
+        .nav-item.active {
+            color: var(--primary-orange);
+            border-right: 3px solid var(--primary-orange);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+        input[type="range"] {
+            accent-color: var(--primary-orange);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 h-screen overflow-hidden text-gray-900">
+<div class="w-full max-w-[1600px] h-full max-h-[900px] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+<aside class="sidebar-bg w-full md:w-80 flex-shrink-0 flex flex-col justify-between p-8 md:p-12 border-r border-gray-200/50">
+<div>
+<div class="mb-12">
+<h1 class="text-4xl tracking-widest font-light text-gray-900 uppercase leading-none mb-1">CHEF'S</h1>
+<h1 class="text-5xl serif-italic font-bold text-gray-900 leading-none">KISS</h1>
+<div class="w-12 h-0.5 bg-gray-800 mt-6 mb-4"></div>
+<p class="text-[10px] font-bold tracking-[0.2em] text-gray-800 uppercase">
+                        Generative Personal<br/>Meal Prep AI
+                    </p>
+</div>
+<nav class="space-y-6 hidden md:block">
+<a class="nav-item flex items-center space-x-3 text-gray-500 hover:text-gray-900 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>DASHBOARD</span>
+</a>
+<a class="nav-item flex items-center space-x-3 text-gray-500 hover:text-gray-900 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span>MEAL PLAN</span>
+</a>
+<a class="nav-item flex items-center space-x-3 text-gray-500 hover:text-gray-900 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">kitchen</span>
+<span>PANTRY</span>
+</a>
+<a class="nav-item active flex items-center space-x-3 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+<span>FAMILY</span>
+</a>
+<a class="nav-item flex items-center space-x-3 text-gray-500 hover:text-gray-900 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span>SETTINGS</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto hidden md:block">
+<blockquote class="text-gray-800 font-serif italic text-lg leading-relaxed">
+                    "Family means nobody gets left behind or forgotten"
+                </blockquote>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-hidden bg-white">
+<header class="p-8 md:px-12 md:py-8 border-b border-gray-100 flex justify-between items-center">
+<div>
+<h2 class="text-xs font-bold text-gray-400 tracking-widest uppercase mb-1">Household Management</h2>
+<h3 class="text-3xl font-light text-gray-900">Family Profiles</h3>
+</div>
+<div class="flex items-center space-x-4">
+<button class="text-gray-400 hover:text-gray-600">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto p-8 md:p-12 hide-scrollbar">
+<section class="max-w-4xl mb-16">
+<h4 class="text-xl font-bold text-gray-900 mb-6">Global Household Preferences</h4>
+<div class="space-y-8">
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Common Allergens (Applied to all AI suggestions)</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-xl border border-[var(--primary-orange)] bg-orange-50 text-[var(--primary-orange)] text-xs font-bold flex items-center space-x-2">
+<span>Peanuts</span>
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+<button class="px-4 py-2 rounded-xl border border-[var(--primary-orange)] bg-orange-50 text-[var(--primary-orange)] text-xs font-bold flex items-center space-x-2">
+<span>Dairy</span>
+<span class="material-symbols-outlined text-sm">close</span>
+</button>
+<button class="px-4 py-2 rounded-xl border border-gray-100 bg-gray-50 text-gray-400 text-xs font-bold flex items-center space-x-2 hover:border-gray-300">
+<span class="material-symbols-outlined text-sm">add</span>
+<span>Add Allergen</span>
+</button>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Disliked Ingredients</label>
+<div class="relative max-w-lg">
+<input class="w-full px-4 py-3 bg-gray-50 border-gray-100 rounded-xl text-sm focus:ring-[var(--primary-orange)] focus:border-[var(--primary-orange)] border-none ring-1 ring-gray-100" placeholder="e.g. Mushrooms, Cilantro, Olives..." type="text"/>
+</div>
+<p class="text-[10px] text-gray-400 mt-2 italic">Separate multiple items with commas.</p>
+</div>
+<div class="max-w-md">
+<div class="flex justify-between items-center mb-3">
+<label class="text-xs font-bold text-gray-400 uppercase tracking-widest">Family Spice Tolerance</label>
+<span class="text-xs font-bold text-[var(--primary-orange)] bg-orange-50 px-2 py-0.5 rounded uppercase">Medium Heat</span>
+</div>
+<input class="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer" max="5" min="1" type="range" value="3"/>
+<div class="flex justify-between mt-2 px-1">
+<span class="text-[10px] text-gray-400 font-bold uppercase">Mild</span>
+<span class="text-[10px] text-gray-400 font-bold uppercase">Inferno</span>
+</div>
+</div>
+</div>
+</section>
+<section class="mb-16">
+<h4 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                        Family Members
+                        <span class="ml-3 text-xs font-normal text-gray-400 uppercase tracking-widest bg-gray-50 px-2 py-0.5 rounded">4 active</span>
+</h4>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
+<div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center mb-4 mx-auto border-2 border-white shadow-sm ring-2 ring-orange-100 group-hover:ring-[var(--primary-orange)] transition-all">
+<span class="material-symbols-outlined text-3xl text-[var(--primary-orange)]">face_3</span>
+</div>
+<h5 class="text-center font-bold text-gray-900 mb-2">Mom</h5>
+<div class="flex flex-wrap justify-center gap-1.5">
+<span class="px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-bold uppercase rounded">Vegetarian</span>
+</div>
+</div>
+<div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
+<div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mb-4 mx-auto border-2 border-white shadow-sm ring-2 ring-blue-100 group-hover:ring-blue-400 transition-all">
+<span class="material-symbols-outlined text-3xl text-blue-600">face</span>
+</div>
+<h5 class="text-center font-bold text-gray-900 mb-2">Dad</h5>
+<div class="flex flex-wrap justify-center gap-1.5">
+<span class="px-2 py-0.5 bg-orange-50 text-orange-700 text-[10px] font-bold uppercase rounded">Keto</span>
+</div>
+</div>
+<div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
+<div class="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mb-4 mx-auto border-2 border-white shadow-sm ring-2 ring-purple-100 group-hover:ring-purple-400 transition-all">
+<span class="material-symbols-outlined text-3xl text-purple-600">child_care</span>
+</div>
+<h5 class="text-center font-bold text-gray-900 mb-2">Leo</h5>
+<div class="flex flex-wrap justify-center gap-1.5">
+<span class="px-2 py-0.5 bg-red-50 text-red-700 text-[10px] font-bold uppercase rounded">Nut Allergy</span>
+</div>
+</div>
+<div class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow group cursor-pointer">
+<div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mb-4 mx-auto border-2 border-white shadow-sm ring-2 ring-amber-100 group-hover:ring-amber-400 transition-all">
+<span class="material-symbols-outlined text-3xl text-amber-600">face_2</span>
+</div>
+<h5 class="text-center font-bold text-gray-900 mb-2">Sarah</h5>
+<div class="flex flex-wrap justify-center gap-1.5">
+<span class="px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-bold uppercase rounded">Vegan</span>
+</div>
+</div>
+<div class="border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-[var(--primary-orange)] hover:text-[var(--primary-orange)] transition-all cursor-pointer group">
+<span class="material-symbols-outlined text-4xl mb-2 group-hover:scale-110 transition-transform">add_circle</span>
+<span class="text-sm font-bold uppercase tracking-widest">Add Member</span>
+</div>
+</div>
+</section>
+</div>
+<footer class="p-8 md:px-12 md:py-6 border-t border-gray-100 bg-white/80 backdrop-blur-sm flex justify-end items-center">
+<div class="flex items-center space-x-6">
+<button class="text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors uppercase tracking-widest">Cancel</button>
+<button class="bg-[var(--primary-orange)] hover:bg-[#b54006] text-white px-10 py-4 rounded-2xl shadow-lg hover:shadow-orange-500/30 transition-all flex items-center space-x-3 font-bold uppercase text-sm tracking-widest">
+<span class="material-symbols-outlined text-xl">save</span>
+<span>SAVE CHANGES</span>
+</button>
+</div>
+</footer>
+</main>
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+<div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
+<div class="relative w-full max-w-lg bg-white rounded-[2.5rem] overflow-hidden shadow-2xl">
+<div class="p-10 md:p-12">
+<div class="mb-10">
+<h4 class="text-3xl serif-italic font-bold text-gray-900 mb-1">New Family Member</h4>
+<div class="w-12 h-1 bg-[var(--primary-orange)] mt-4"></div>
+</div>
+<form class="space-y-8">
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-4">Choose Avatar</label>
+<div class="flex justify-between items-center gap-2">
+<button class="w-12 h-12 rounded-full bg-orange-50 text-[var(--primary-orange)] flex items-center justify-center ring-2 ring-[var(--primary-orange)]" type="button">
+<span class="material-symbols-outlined">face_3</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center hover:ring-2 hover:ring-blue-100 transition-all" type="button">
+<span class="material-symbols-outlined">face</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center hover:ring-2 hover:ring-purple-100 transition-all" type="button">
+<span class="material-symbols-outlined">child_care</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center hover:ring-2 hover:ring-amber-100 transition-all" type="button">
+<span class="material-symbols-outlined">face_2</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-teal-50 text-teal-500 flex items-center justify-center hover:ring-2 hover:ring-teal-100 transition-all" type="button">
+<span class="material-symbols-outlined">face_4</span>
+</button>
+<button class="w-12 h-12 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center hover:ring-2 hover:ring-pink-100 transition-all" type="button">
+<span class="material-symbols-outlined">face_5</span>
+</button>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-3">Name</label>
+<input class="w-full px-5 py-4 bg-gray-50 border-none ring-1 ring-gray-100 rounded-2xl text-sm focus:ring-2 focus:ring-[var(--primary-orange)] focus:bg-white transition-all" placeholder="e.g. Grandma, Oliver..." type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-3">Dietary Type</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-2 rounded-xl text-xs font-bold bg-white ring-1 ring-gray-200 text-gray-500 hover:ring-[var(--primary-orange)] hover:text-[var(--primary-orange)] transition-all" type="button">No Restrictions</button>
+<button class="px-4 py-2 rounded-xl text-xs font-bold bg-green-50 text-green-700 ring-1 ring-green-100" type="button">Vegan</button>
+<button class="px-4 py-2 rounded-xl text-xs font-bold bg-white ring-1 ring-gray-200 text-gray-500 hover:ring-[var(--primary-orange)] hover:text-[var(--primary-orange)] transition-all" type="button">Vegetarian</button>
+<button class="px-4 py-2 rounded-xl text-xs font-bold bg-white ring-1 ring-gray-200 text-gray-500 hover:ring-[var(--primary-orange)] hover:text-[var(--primary-orange)] transition-all" type="button">Keto</button>
+<button class="px-4 py-2 rounded-xl text-xs font-bold bg-white ring-1 ring-gray-200 text-gray-500 hover:ring-[var(--primary-orange)] hover:text-[var(--primary-orange)] transition-all" type="button">Paleo</button>
+</div>
+</div>
+<div>
+<label class="block text-xs font-bold text-gray-400 uppercase tracking-[0.2em] mb-3">Specific Allergies or Dislikes</label>
+<textarea class="w-full px-5 py-4 bg-gray-50 border-none ring-1 ring-gray-100 rounded-2xl text-sm focus:ring-2 focus:ring-[var(--primary-orange)] focus:bg-white transition-all resize-none" placeholder="Any specific foods they must avoid?" rows="3"></textarea>
+</div>
+<div class="pt-4 flex items-center justify-end space-x-6">
+<button class="text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors uppercase tracking-widest" type="button">Cancel</button>
+<button class="bg-[var(--primary-orange)] hover:bg-[#b54006] text-white px-8 py-4 rounded-2xl shadow-lg hover:shadow-orange-500/30 transition-all flex items-center space-x-3 font-bold uppercase text-sm tracking-widest" type="submit">
+<span>Add Member</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</div>
+
+</body></html>

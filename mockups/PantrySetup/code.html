@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Chef's Kiss Pantry Import Setup</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style type="text/tailwindcss">
+        :root {
+            --primary-orange: #d64d08;
+            --bg-light-grey: #e9e9e9;
+            --text-dark: #1a1a1a;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background-color: #1a1a1a;
+            background-image: linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111), 
+                              linear-gradient(45deg, #111 25%, transparent 25%, transparent 75%, #111 75%, #111);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .serif-italic {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+        .sidebar-bg {
+            background-color: #e5e5e5;
+            background-image: linear-gradient(to bottom right, #f0f0f0, #e0e0e0);
+        }
+        .nav-item:hover {
+            color: var(--primary-orange);
+        }
+        .nav-item.active {
+            color: var(--primary-orange);
+            border-right: 3px solid var(--primary-orange);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .option-card:hover {
+            border-color: var(--primary-orange);
+            transform: translateY(-2px);
+        }
+        .option-card:hover .icon-bg {
+            background-color: var(--primary-orange);
+            color: white;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 h-screen overflow-hidden">
+<div class="w-full max-w-[1600px] h-full max-h-[900px] bg-white rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+<aside class="sidebar-bg w-full md:w-80 flex-shrink-0 flex flex-col justify-between p-8 md:p-12 border-r border-gray-200/50">
+<div>
+<div class="mb-12">
+<h1 class="text-4xl tracking-widest font-light text-gray-900 uppercase leading-none mb-1">CHEF'S</h1>
+<h1 class="text-5xl serif-italic font-bold text-gray-900 leading-none">KISS</h1>
+<div class="w-12 h-0.5 bg-gray-800 mt-6 mb-4"></div>
+<p class="text-[10px] font-bold tracking-[0.2em] text-gray-800 uppercase">
+                    Generative Personal<br/>Meal Prep AI
+                </p>
+</div>
+<nav class="space-y-6 hidden md:block">
+<a class="nav-item flex items-center space-x-3 text-gray-500 hover:text-gray-900 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+<span>DASHBOARD</span>
+</a>
+<a class="nav-item flex items-center space-x-3 text-gray-500 hover:text-gray-900 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+<span>MEAL PLAN</span>
+</a>
+<a class="nav-item active flex items-center space-x-3 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">kitchen</span>
+<span>PANTRY</span>
+</a>
+<a class="nav-item flex items-center space-x-3 text-gray-500 hover:text-gray-900 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">groups</span>
+<span>FAMILY</span>
+</a>
+<a class="nav-item flex items-center space-x-3 text-gray-500 hover:text-gray-900 text-sm font-medium tracking-wide transition-colors py-1" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span>SETTINGS</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto hidden md:block">
+<blockquote class="text-gray-800 font-serif italic text-lg leading-relaxed">
+                "A well-stocked pantry<br/>is a chef's canvas."
+            </blockquote>
+</div>
+</aside>
+<main class="flex-1 flex flex-col overflow-y-auto bg-white relative">
+<header class="p-8 md:px-12 md:py-8 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+<div>
+<h2 class="text-xs font-bold text-gray-400 tracking-widest uppercase mb-1">Getting Started</h2>
+<h3 class="text-3xl font-light text-gray-900">Pantry Setup</h3>
+</div>
+<div class="w-1/3 bg-gray-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-[var(--primary-orange)] h-full w-1/4 rounded-full"></div>
+</div>
+</header>
+<div class="flex-1 flex flex-col items-center justify-center p-8 md:p-12">
+<div class="max-w-4xl w-full text-center mb-10">
+<h1 class="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Build your digital pantry</h1>
+<p class="text-gray-500 text-lg font-light max-w-2xl mx-auto">Importing your current stock helps our AI suggest recipes you can cook right now. Choose how you'd like to begin.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl w-full mb-12">
+<button class="option-card group bg-white border border-gray-200 rounded-2xl p-8 shadow-sm transition-all duration-300 flex flex-col items-center text-center h-full">
+<div class="icon-bg w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-[var(--primary-orange)] mb-6 transition-colors duration-300">
+<span class="material-symbols-outlined text-4xl">photo_camera</span>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-2">Scan with Camera</h3>
+<p class="text-sm text-gray-500 leading-relaxed">Take photos of your shelves or receipts. Our AI will identify items automatically.</p>
+<div class="mt-auto pt-6 w-full">
+<span class="text-[var(--primary-orange)] text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
+                        Launch Camera <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</span>
+</div>
+</button>
+<div class="relative flex flex-col h-full">
+<button class="option-card group bg-white border border-gray-200 rounded-2xl p-8 shadow-sm transition-all duration-300 flex flex-col items-center text-center h-full z-10 relative">
+<div class="icon-bg w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-[var(--primary-orange)] mb-6 transition-colors duration-300">
+<span class="material-symbols-outlined text-4xl">upload_file</span>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-2">Upload CSV or Image</h3>
+<p class="text-sm text-gray-500 leading-relaxed">Have a spreadsheet or a photo file? Drop it here to bulk import your inventory.</p>
+<div class="mt-6 w-full border-2 border-dashed border-gray-200 rounded-xl bg-gray-50 p-4 group-hover:border-[var(--primary-orange)] group-hover:bg-orange-50/30 transition-colors">
+<span class="text-gray-400 text-xs font-medium block">Drop files here or click to browse</span>
+</div>
+</button>
+</div>
+<button class="option-card group bg-white border border-gray-200 rounded-2xl p-8 shadow-sm transition-all duration-300 flex flex-col items-center text-center h-full">
+<div class="icon-bg w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center text-[var(--primary-orange)] mb-6 transition-colors duration-300">
+<span class="material-symbols-outlined text-4xl">edit_note</span>
+</div>
+<h3 class="text-xl font-bold text-gray-900 mb-2">Start from Scratch</h3>
+<p class="text-sm text-gray-500 leading-relaxed">Manually add your core staples. Best for starting fresh with a clean slate.</p>
+<div class="mt-auto pt-6 w-full">
+<span class="text-[var(--primary-orange)] text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-1 group-hover:gap-2 transition-all">
+                        Manual Entry <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</span>
+</div>
+</button>
+</div>
+<div class="mt-auto">
+<button class="text-gray-400 hover:text-gray-600 text-sm font-medium transition-colors border-b border-transparent hover:border-gray-400 pb-0.5">
+                    I'll do this later / Disable tracking
+                </button>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>
