@@ -3,9 +3,15 @@ import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { clientPromise } from "./db";
 
+const getDatabaseName = () => {
+    const authUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "";
+    const isLocal = authUrl.includes("localhost");
+    return isLocal ? "chefskiss_dev" : (process.env.MONGODB_DB_NAME || "chefskiss");
+};
+
 export const auth = betterAuth({
     database: mongodbAdapter(
-        (await clientPromise).db(process.env.MONGODB_DB_NAME || "chefskiss")
+        (await clientPromise).db(getDatabaseName())
     ),
     emailAndPassword: {
         enabled: true,
