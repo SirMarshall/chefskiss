@@ -31,10 +31,19 @@ export default function DashboardPage() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isConfigOpen, setIsConfigOpen] = useState(false);
 
-    // Middleware handles redirection now
+    // Redirect logic
     useEffect(() => {
-        if (!isPending && !session) {
-            router.push("/");
+        if (!isPending) {
+            if (!session) {
+                router.push("/");
+            } else if (session.user) {
+                const user = session.user as any;
+                if (!user.termsAccepted) {
+                    router.push("/terms");
+                } else if (!user.onboardingComplete) {
+                    router.push("/onboarding");
+                }
+            }
         }
     }, [session, isPending, router]);
 
