@@ -15,6 +15,7 @@ export interface IUser {
     dislikes?: string[];
     spiceLevel?: string;
     householdSize?: number;
+    planDuration?: number;
 
     // Onboarding & Terms
     onboardingComplete?: boolean;
@@ -47,6 +48,7 @@ const UserSchema = new Schema<IUser>(
         dislikes: { type: [String], default: [] },
         spiceLevel: { type: String, default: "medium" },
         householdSize: { type: Number, default: 1 },
+        planDuration: { type: Number, default: 7 },
 
         onboardingComplete: { type: Boolean, default: false },
         termsAccepted: { type: Boolean, default: false },

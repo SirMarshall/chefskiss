@@ -291,7 +291,7 @@ export async function getUserProfile() {
         throw new Error("Unauthorized");
     }
 
-    const user = await User.findById(session.user.id).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize');
+    const user = await User.findById(session.user.id).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize planDuration');
 
     if (!user) return null;
 

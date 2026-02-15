@@ -81,12 +81,16 @@ export default function OnboardingPage() {
         dislikes: string[];
         favorites: string[];
         spiceLevel: string;
+        householdSize: number;
+        numDays: number;
     }>({
         dietary: [],
         allergens: [],
         dislikes: [],
         favorites: [],
-        spiceLevel: 'Medium'
+        spiceLevel: 'Medium',
+        householdSize: 1,
+        numDays: 7
     });
 
     const [inputValue, setInputValue] = useState("");
@@ -138,24 +142,33 @@ export default function OnboardingPage() {
             [category]: prev[category].filter(i => i !== item)
         }));
     };
-
     const handleComplete = async () => {
         setLoading(true);
+
+        // Capture current input if any
+        let finalPreferences = { ...preferences };
+        if (inputValue.trim() && activeInput && ['favorites', 'dislikes', 'allergens'].includes(activeInput)) {
+            const category = activeInput as 'favorites' | 'dislikes' | 'allergens';
+            if (!finalPreferences[category].includes(inputValue.trim())) {
+                finalPreferences[category] = [...finalPreferences[category], inputValue.trim()];
+            }
+        }
+
         try {
             // First save the complex preferences to our DB via custom API
-            // (These fields are not in the default auth user schema managed by better-auth client directly in this setup)
             const response = await fetch('/api/user/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    onboardingComplete: true, // We send this here too for DB consistency
+                    onboardingComplete: true,
                     preferences: {
-                        dietaryRestrictions: preferences.dietary,
-                        allergens: preferences.allergens,
-                        favorites: preferences.favorites,
-                        dislikes: preferences.dislikes,
-                        spiceLevel: preferences.spiceLevel.toLowerCase(),
-                        householdSize: familyMembers.length
+                        dietaryRestrictions: finalPreferences.dietary,
+                        allergens: finalPreferences.allergens,
+                        favorites: finalPreferences.favorites,
+                        dislikes: finalPreferences.dislikes,
+                        spiceLevel: finalPreferences.spiceLevel.toLowerCase(),
+                        householdSize: finalPreferences.householdSize,
+                        planDuration: finalPreferences.numDays
                     }
                 })
             });
@@ -208,7 +221,7 @@ export default function OnboardingPage() {
             </header>
 
             {/* Full Screen Container */}
-            <div className="flex-1 w-full h-full flex flex-col md:flex-row relative overflow-hidden">
+            <div className="flex-1 w-full flex flex-col md:flex-row relative overflow-hidden">
                 {/* Sidebar */}
                 <aside className={`
                     fixed inset-y-0 left-0 z-40 w-[320px] transform transition-transform duration-300 ease-in-out bg-panel-left-light dark:bg-panel-left-dark border-r border-gray-200/50 dark:border-gray-800/50 p-8 flex flex-col
@@ -322,7 +335,33 @@ export default function OnboardingPage() {
                                         >
                                             <span className="material-symbols-outlined text-2xl">add</span>
                                         </button>
-                                        <span className="text-[10px] sm:text-xs font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest font-mono group-hover:text-primary transition-colors">Add</span>
+                                        <span className="text-[10px] sm:text-xs font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest font-mono group-hover:text-primary transition-colors">Add Member</span>
+                                    </div>
+                                </div>
+
+                                {/* Household Size Quick Selection */}
+                                <div className="mt-8 bg-white dark:bg-zinc-800 p-6 sm:p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm max-w-xl">
+                                    <div className="flex justify-between items-center mb-6">
+                                        <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest font-mono">Household Size</label>
+                                        <span className="text-primary font-bold font-mono text-base">{preferences.householdSize} {preferences.householdSize === 1 ? 'Chef' : 'People'}</span>
+                                    </div>
+                                    <div className="relative pt-2">
+                                        <input
+                                            value={preferences.householdSize}
+                                            onChange={(e) => setPreferences(prev => ({ ...prev, householdSize: Math.max(1, parseInt(e.target.value) || 1) }))}
+                                            type="range"
+                                            min="1"
+                                            max="10"
+                                            step="1"
+                                            className="w-full accent-primary cursor-pointer"
+                                        />
+                                        <div className="flex justify-between mt-2 px-1">
+                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                                <span key={n} className={`text-[9px] font-bold font-mono ${preferences.householdSize === n ? 'text-primary' : 'text-gray-300 dark:text-gray-600'}`}>
+                                                    {n}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </section>
@@ -480,19 +519,51 @@ export default function OnboardingPage() {
                                     </div>
                                 </div>
                             </section>
+
+                            <hr className="border-gray-200 dark:border-gray-800 mb-10" />
+
+                            {/* Step 3: Plan Config */}
+                            <section className="mb-20">
+                                <div className="mb-8">
+                                    <span className="text-xs font-bold text-primary tracking-[0.3em] uppercase mb-3 block font-mono">Step 03</span>
+                                    <h2 className="text-3xl sm:text-4xl font-light text-gray-900 dark:text-white uppercase tracking-tight font-sans">Kitchen Setup</h2>
+                                </div>
+                                <div className="max-w-xl">
+                                    <div className="bg-white dark:bg-zinc-800 p-6 sm:p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
+                                        <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Plan Duration</label>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 font-sans">How many days should your first custom meal plan cover?</p>
+                                        <div className="grid grid-cols-4 gap-3">
+                                            {[1, 3, 5, 7].map((days) => (
+                                                <button
+                                                    key={days}
+                                                    onClick={() => setPreferences(prev => ({ ...prev, numDays: days }))}
+                                                    className={`py-4 text-xs font-bold tracking-[0.2em] uppercase rounded-xl border-2 transition-all font-mono ${preferences.numDays === days
+                                                        ? 'bg-primary border-primary text-white shadow-lg shadow-orange-500/20 scale-105'
+                                                        : 'bg-white dark:bg-zinc-700 text-gray-500 dark:text-gray-400 border-gray-100 dark:border-gray-700 hover:border-primary/50 hover:text-primary'
+                                                        }`}
+                                                >
+                                                    {days}D
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
 
                     {/* Footer / Continue */}
-                    <div className="p-4 sm:p-6 border-t border-gray-100 dark:border-gray-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md flex justify-end items-center mt-auto z-10 sticky bottom-0 transition-colors">
-                        <button
-                            onClick={handleComplete}
-                            disabled={loading}
-                            className="bg-primary hover:bg-primary-dark text-white font-bold tracking-[0.3em] uppercase text-[10px] sm:text-xs px-8 py-4 sm:px-12 sm:py-5 rounded-full shadow-lg hover:shadow-orange-500/30 transition-all duration-300 transform active:scale-95 flex items-center space-x-3 font-mono disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
-                        >
-                            <span>{loading ? "SAVING..." : "CONTINUE"}</span>
-                            <span className="material-symbols-outlined text-base">arrow_forward</span>
-                        </button>
+                    <div className="p-4 sm:p-8 border-t border-gray-100 dark:border-gray-800 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-xl flex justify-end items-center mt-auto z-10 sticky bottom-0 transition-colors shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+                        <div className="max-w-[1200px] mx-auto w-full flex justify-end">
+                            <button
+                                onClick={handleComplete}
+                                disabled={loading}
+                                className="bg-primary hover:bg-primary-dark text-white font-bold tracking-[0.3em] uppercase text-xs sm:text-sm px-10 py-5 sm:px-16 sm:py-6 rounded-full shadow-2xl hover:shadow-orange-500/40 transition-all duration-300 transform active:scale-95 flex items-center space-x-4 font-mono disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto justify-center"
+                            >
+                                <span className="drop-shadow-sm">{loading ? "MASTERING YOUR KITCHEN..." : "COMPLETE SETUP"}</span>
+                                {!loading && <span className="material-symbols-outlined text-xl">chef_hat</span>}
+                            </button>
+                        </div>
                     </div>
                 </main>
             </div>

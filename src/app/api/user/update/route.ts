@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
             if (preferences.dislikes) updateData.dislikes = preferences.dislikes;
             if (preferences.spiceLevel) updateData.spiceLevel = preferences.spiceLevel;
             if (preferences.householdSize) updateData.householdSize = preferences.householdSize;
+            if (preferences.planDuration) updateData.planDuration = preferences.planDuration;
             if (preferences.generatedMenu) updateData.generatedMenu = preferences.generatedMenu;
         }
 

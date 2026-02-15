@@ -81,6 +81,7 @@ export default function DashboardPage() {
                     setDislikes(profile.dislikes?.join(", ") || "");
                     if (profile.spiceLevel) setSpiceLevel(profile.spiceLevel.charAt(0).toUpperCase() + profile.spiceLevel.slice(1).toLowerCase());
                     if (profile.householdSize) setHouseholdSize(profile.householdSize);
+                    if (profile.planDuration) setNumDays(profile.planDuration);
                 }
             });
         }
