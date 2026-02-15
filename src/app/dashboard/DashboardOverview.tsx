@@ -43,6 +43,11 @@ export default function DashboardOverview({ mealPlan }: DashboardOverviewProps) 
                                     style={{ backgroundImage: meal.data.imageUrl ? `url('${meal.data.imageUrl}')` : 'none', backgroundColor: meal.data.imageColor || '' }}
                                 >
                                     <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">{meal.type}</span>
+                                    {meal.data.imageUserName && (
+                                        <div className="absolute bottom-2 left-2 text-[8px] text-white/50 font-mono tracking-tighter">
+                                            {meal.data.imageUserName} / Unsplash
+                                        </div>
+                                    )}
                                 </div>
                                 <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.data.name}</h5>
                             </div>
@@ -76,6 +81,11 @@ export default function DashboardOverview({ mealPlan }: DashboardOverviewProps) 
                                     <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">
                                         {meal.type}
                                     </span>
+                                    {meal.data.imageUserName && (
+                                        <div className="absolute bottom-2 left-2 text-[8px] text-white/50 font-mono tracking-tighter">
+                                            {meal.data.imageUserName} / Unsplash
+                                        </div>
+                                    )}
                                 </div>
                                 <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.data.name}</h5>
                             </div>

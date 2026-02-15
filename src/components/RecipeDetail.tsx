@@ -67,7 +67,7 @@ export default function RecipeDetail({ recipe, onClose }: RecipeDetailProps) {
 
                         {/* Attribution */}
                         {recipe.imageUserName && (
-                            <div className="absolute top-4 left-4 text-[10px] text-white/70 bg-black/30 px-2 py-1 rounded backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute top-4 left-4 text-[10px] text-white/70 bg-black/30 px-2 py-1 rounded backdrop-blur-sm z-20">
                                 Photo by <a href={`${recipe.imageUserLink}?utm_source=chefskiss&utm_medium=referral`} target="_blank" rel="noopener noreferrer" className="hover:text-white underline">{recipe.imageUserName}</a> on <a href="https://unsplash.com/?utm_source=chefskiss&utm_medium=referral" target="_blank" rel="noopener noreferrer" className="hover:text-white underline">Unsplash</a>
                             </div>
                         )}
