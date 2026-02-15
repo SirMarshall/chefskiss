@@ -5,9 +5,12 @@ import { useState } from "react";
 import { updateUserName, deleteUserAccount } from "@/app/actions/user";
 import { useRouter } from "next/navigation";
 
+import { useTheme } from "@/context/ThemeContext";
+
 export default function SettingsView() {
     const { data: session } = useSession();
     const router = useRouter();
+    const { theme, setTheme } = useTheme();
     const [name, setName] = useState(session?.user?.name || "");
     const [isUpdating, setIsUpdating] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -117,6 +120,37 @@ export default function SettingsView() {
                         )}
                         {isLoggingOut ? "SIGNING OUT..." : "SIGN OUT"}
                     </button>
+                </div>
+            </section>
+
+            <section className="space-y-6">
+                <div className="border-b border-gray-200 dark:border-gray-800 pb-2">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white font-serif italic">Appearance</h3>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-800/50 border border-gray-200 dark:border-gray-800/50 rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-1">Theme Mode</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Choose between light and dark interface.
+                        </p>
+                    </div>
+                    <div className="flex bg-gray-100 dark:bg-zinc-900 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <button
+                            onClick={() => setTheme('light')}
+                            className={`px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${theme === 'light' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                        >
+                            <span className="material-symbols-outlined text-sm">light_mode</span>
+                            Light
+                        </button>
+                        <button
+                            onClick={() => setTheme('dark')}
+                            className={`px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${theme === 'dark' ? 'bg-zinc-800 shadow-sm text-primary' : 'text-gray-500 dark:text-gray-400 hover:text-gray-300'}`}
+                        >
+                            <span className="material-symbols-outlined text-sm">dark_mode</span>
+                            Dark
+                        </button>
+                    </div>
                 </div>
             </section>
 

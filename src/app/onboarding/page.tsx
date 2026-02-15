@@ -4,6 +4,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, updateUser } from '@/lib/auth-client';
 import { useToast } from '@/context/ToastContext';
+import { useTheme } from '@/context/ThemeContext';
+
+const CUISINE_SUGGESTIONS = ['Japanese', 'Mexican', 'Italian', 'French', 'Indian', 'Thai', 'Mediterranean', 'American'];
 
 // Define Sample Meals Structure
 type MealType = 'breakfast' | 'lunch' | 'dinner';
@@ -37,6 +40,7 @@ export default function OnboardingPage() {
     const router = useRouter();
     const { data: session } = useSession();
     const { toast } = useToast();
+    const { theme, toggleTheme } = useTheme();
     const [loading, setLoading] = useState(false);
 
     // UI State
@@ -129,9 +133,11 @@ export default function OnboardingPage() {
     const handleAddItem = (category: 'favorites' | 'dislikes' | 'allergens') => {
         if (!inputValue.trim()) return;
 
+        const newItems = inputValue.split(',').map(item => item.trim()).filter(item => item !== "" && !preferences[category].includes(item));
+
         setPreferences(prev => ({
             ...prev,
-            [category]: [...prev[category], inputValue.trim()]
+            [category]: [...prev[category], ...newItems]
         }));
         setInputValue("");
     };
@@ -255,7 +261,7 @@ export default function OnboardingPage() {
                                         : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                                         }`}
                                 >
-                                    {meal.charAt(0)}
+                                    {meal}
                                 </button>
                             ))}
                         </div>
@@ -282,9 +288,20 @@ export default function OnboardingPage() {
                         </div>
                     </div>
 
-                    <div className="mt-auto pt-8 border-t border-gray-300/50 italic text-gray-500 dark:text-gray-400 text-lg leading-relaxed font-serif">
-                        "The secret of success is to eat what you like and let the food fight it out inside."
+                    <div className="mt-auto pt-8 border-t border-gray-300/50 text-gray-500 dark:text-gray-400 leading-relaxed font-serif">
+                        <div className="text-xl italic mb-2">"Anyone can cook"</div>
+                        <div className="text-sm uppercase tracking-[0.2em] font-bold font-mono">— Chef Auguste Gusteau</div>
                     </div>
+
+                    <button
+                        onClick={toggleTheme}
+                        className="mt-6 flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors font-mono"
+                    >
+                        <span className="material-symbols-outlined text-xl">
+                            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+                        </span>
+                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                    </button>
                 </aside>
 
                 {/* Mobile Sidebar Overlay */}
@@ -340,12 +357,15 @@ export default function OnboardingPage() {
                                 </div>
 
                                 {/* Household Size Quick Selection */}
-                                <div className="mt-8 bg-white dark:bg-zinc-800 p-6 sm:p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm max-w-xl">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest font-mono">Household Size</label>
-                                        <span className="text-primary font-bold font-mono text-base">{preferences.householdSize} {preferences.householdSize === 1 ? 'Chef' : 'People'}</span>
+                                <div className="mt-8 bg-white dark:bg-zinc-800 p-8 sm:p-10 rounded-3xl border-2 border-gray-100 dark:border-gray-800 shadow-xl max-w-xl transition-all">
+                                    <div className="flex justify-between items-center mb-8">
+                                        <label className="block text-sm font-bold text-gray-900 dark:text-white uppercase tracking-[0.2em] font-mono">Household Size</label>
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-3xl font-light text-primary font-sans">{preferences.householdSize}</span>
+                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">{preferences.householdSize === 1 ? 'Chef' : 'People'}</span>
+                                        </div>
                                     </div>
-                                    <div className="relative pt-2">
+                                    <div className="relative pt-4 pb-8">
                                         <input
                                             value={preferences.householdSize}
                                             onChange={(e) => setPreferences(prev => ({ ...prev, householdSize: Math.max(1, parseInt(e.target.value) || 1) }))}
@@ -353,13 +373,16 @@ export default function OnboardingPage() {
                                             min="1"
                                             max="10"
                                             step="1"
-                                            className="w-full accent-primary cursor-pointer"
+                                            className="w-full h-3 bg-gray-200 dark:bg-zinc-700 rounded-lg appearance-none cursor-pointer accent-primary"
                                         />
-                                        <div className="flex justify-between mt-2 px-1">
+                                        <div className="flex justify-between mt-6 px-1">
                                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                                <span key={n} className={`text-[9px] font-bold font-mono ${preferences.householdSize === n ? 'text-primary' : 'text-gray-300 dark:text-gray-600'}`}>
-                                                    {n}
-                                                </span>
+                                                <div key={n} className="flex flex-col items-center gap-2">
+                                                    <div className={`w-1 h-3 rounded-full transition-colors ${preferences.householdSize === n ? 'bg-primary' : 'bg-gray-300 dark:bg-zinc-600'}`}></div>
+                                                    <span className={`text-xs font-bold font-mono transition-all ${preferences.householdSize === n ? 'text-primary scale-110' : 'text-gray-400 dark:text-gray-500'}`}>
+                                                        {n}
+                                                    </span>
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
@@ -412,12 +435,31 @@ export default function OnboardingPage() {
                                         {/* Favorites as Cuisines */}
                                         <div className="bg-white dark:bg-zinc-800 p-6 sm:p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
                                             <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Favorite Cuisines</label>
+
+                                            {/* Suggestions */}
+                                            <div className="mb-6">
+                                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 block font-mono">Suggestions</span>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {CUISINE_SUGGESTIONS.filter(s => !preferences.favorites.includes(s)).map(suggestion => (
+                                                        <button
+                                                            key={suggestion}
+                                                            onClick={() => {
+                                                                setPreferences(prev => ({ ...prev, favorites: [...prev.favorites, suggestion] }));
+                                                            }}
+                                                            className="px-3 py-1.5 rounded-full border border-gray-200 dark:border-gray-700 text-[10px] font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400 hover:border-primary hover:text-primary transition-all font-mono"
+                                                        >
+                                                            + {suggestion}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
                                             <div className="flex flex-wrap gap-2 mb-4">
                                                 {preferences.favorites.map(cuisine => (
-                                                    <div key={cuisine} className="bg-orange-50 dark:bg-primary/10 text-primary dark:text-primary px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-orange-100 dark:border-primary/20">
+                                                    <div key={cuisine} className="bg-primary dark:bg-primary text-white px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-orange-500/20 flex items-center gap-2 border border-primary animate-in fade-in zoom-in duration-300">
                                                         {cuisine}
-                                                        <button onClick={() => handleRemoveItem('favorites', cuisine)} className="hover:text-red-500 transition-colors">
-                                                            <span className="material-symbols-outlined text-xs">close</span>
+                                                        <button onClick={() => handleRemoveItem('favorites', cuisine)} className="hover:text-white/70 transition-colors">
+                                                            <span className="material-symbols-outlined text-sm">close</span>
                                                         </button>
                                                     </div>
                                                 ))}
@@ -542,7 +584,7 @@ export default function OnboardingPage() {
                                                         : 'bg-white dark:bg-zinc-700 text-gray-500 dark:text-gray-400 border-gray-100 dark:border-gray-700 hover:border-primary/50 hover:text-primary'
                                                         }`}
                                                 >
-                                                    {days}D
+                                                    {days} Days
                                                 </button>
                                             ))}
                                         </div>

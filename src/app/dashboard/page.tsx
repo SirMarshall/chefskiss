@@ -431,7 +431,7 @@ export default function DashboardPage() {
                                                 />
                                                 <div className="flex justify-between mt-2 px-1">
                                                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                                        <span key={n} className={`text-[8px] font-bold font-mono ${householdSize === n ? 'text-primary' : 'text-gray-300 dark:text-gray-600'}`}>
+                                                        <span key={n} className={`text-xs font-bold font-mono ${householdSize === n ? 'text-primary' : 'text-gray-400 dark:text-gray-600'}`}>
                                                             {n}
                                                         </span>
                                                     ))}
@@ -451,7 +451,7 @@ export default function DashboardPage() {
                                                             : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'
                                                             } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     >
-                                                        {days}d
+                                                        {days} Days
                                                     </button>
                                                 ))}
                                             </div>
