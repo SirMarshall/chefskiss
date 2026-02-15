@@ -48,4 +48,9 @@ async function dbConnect() {
     return cached.conn;
 }
 
+// Export a client promise for Better Auth
+// We use the dbConnect function to ensure the connection is established
+// and then return the native client.
+export const clientPromise = dbConnect().then((mongoose) => mongoose.connection.getClient());
+
 export default dbConnect;
