@@ -28,6 +28,9 @@ export default function DashboardPage() {
     const [spiceLevel, setSpiceLevel] = useState("Medium");
     const [householdSize, setHouseholdSize] = useState(1);
 
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isConfigOpen, setIsConfigOpen] = useState(false);
+
     // Middleware handles redirection now
     useEffect(() => {
         if (!isPending && !session) {
@@ -88,6 +91,7 @@ export default function DashboardPage() {
             });
             setMealPlan(newPlan);
             setHasPlan(true);
+            setIsConfigOpen(false); // Close drawer after generation
         } catch (error) {
             console.error("Failed to generate plan:", error);
             alert("Failed to generate plan. Please try again.");
@@ -112,12 +116,44 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="h-screen w-full overflow-hidden bg-background-light dark:bg-background-dark">
-            <div className="w-full h-full flex flex-col md:flex-row relative">
+        <div className="h-screen w-full overflow-hidden bg-background-light dark:bg-background-dark flex flex-col">
+            {/* Mobile Header */}
+            <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-800/50 bg-panel-left-light dark:bg-panel-left-dark z-50">
+                <div className="flex items-center space-x-3">
+                    <button
+                        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                        className="p-1 text-gray-900 dark:text-white"
+                    >
+                        <span className="material-symbols-outlined text-2xl">
+                            {isSidebarOpen ? 'close' : 'menu'}
+                        </span>
+                    </button>
+                    <div className="flex flex-col">
+                        <h1 className="text-lg tracking-widest font-light text-gray-900 dark:text-white uppercase leading-none font-sans">CHEF'S</h1>
+                        <h1 className="text-xl font-serif italic font-bold text-gray-900 dark:text-white leading-none">KISS</h1>
+                    </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                    {activeTab === 'dashboard' && (
+                        <button
+                            onClick={() => setIsConfigOpen(!isConfigOpen)}
+                            className={`p-2 rounded-full transition-colors ${isConfigOpen ? 'bg-primary text-white shadow-lg shadow-orange-500/20' : 'text-gray-900 dark:text-white bg-white/10'}`}
+                        >
+                            <span className="material-symbols-outlined text-2xl">tune</span>
+                        </button>
+                    )}
+                </div>
+            </header>
+
+            <div className="flex-1 flex flex-col md:flex-row relative overflow-hidden">
                 {/* Sidebar */}
-                <aside className="w-full md:w-80 flex-shrink-0 flex flex-col justify-between p-8 md:p-12 border-r border-gray-200/50 dark:border-gray-800/50 bg-panel-left-light dark:bg-panel-left-dark transition-colors duration-500">
-                    <div>
-                        <div className="mb-12">
+                <aside className={`
+                    fixed inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out bg-panel-left-light dark:bg-panel-left-dark border-r border-gray-200/50 dark:border-gray-800/50 p-8 md:p-12 flex flex-col justify-between
+                    md:relative md:translate-x-0
+                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                `}>
+                    <div className="pt-16 md:pt-0">
+                        <div className="mb-12 hidden md:block">
                             <h1 className="text-5xl tracking-widest font-light text-gray-900 dark:text-white uppercase leading-none mb-1 font-sans">CHEF'S</h1>
                             <h1 className="text-6xl font-serif italic font-bold text-gray-900 dark:text-white leading-none">KISS</h1>
                             <div className="w-12 h-0.5 bg-gray-800 dark:bg-gray-200 mt-6 mb-4"></div>
@@ -125,7 +161,7 @@ export default function DashboardPage() {
                                 Generative Personal<br />Meal Prep AI
                             </p>
                         </div>
-                        <nav className="space-y-6 hidden md:block">
+                        <nav className="space-y-6">
                             {[
                                 { id: 'dashboard', label: 'DASHBOARD', icon: 'dashboard' },
                                 { id: 'meal-plan', label: 'MEAL PLAN', icon: 'calendar_month' },
@@ -136,7 +172,11 @@ export default function DashboardPage() {
                                 <a
                                     key={item.id}
                                     href="#"
-                                    onClick={(e) => { e.preventDefault(); setActiveTab(item.id); }}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        setActiveTab(item.id);
+                                        setIsSidebarOpen(false);
+                                    }}
                                     className={`flex items-center space-x-3 text-sm font-medium tracking-wide transition-colors py-1 ${activeTab === item.id ? 'text-primary border-r-2 border-primary' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
                                 >
                                     <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
@@ -152,10 +192,19 @@ export default function DashboardPage() {
                     </div>
                 </aside>
 
+                {/* Mobile Sidebar Overlay */}
+                {isSidebarOpen && (
+                    <div
+                        className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm transition-opacity"
+                        onClick={() => setIsSidebarOpen(false)}
+                    />
+                )}
+
+
                 {/* Main Content */}
                 <main className="flex-1 flex overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-500">
                     <div className={`w-full ${activeTab === 'dashboard' ? 'lg:w-3/5' : ''} p-6 md:p-12 overflow-y-auto border-r border-gray-100 dark:border-gray-800 flex flex-col`}>
-                        <div className="flex justify-between items-end mb-10 flex-shrink-0">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-10 flex-shrink-0">
                             <div>
                                 <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 tracking-widest uppercase mb-1 font-mono">
                                     {activeTab === 'dashboard' ? 'Weekly Calendar' : 'Weekly Forecast'}
@@ -163,24 +212,24 @@ export default function DashboardPage() {
                                 <h3 className="text-3xl font-light text-gray-900 dark:text-white font-sans">Your Menu</h3>
                             </div>
                             {/* Action Buttons */}
-                            <div className="flex items-center space-x-6">
+                            <div className="flex items-center justify-between w-full sm:w-auto gap-4">
                                 {activeTab === 'meal-plan' && (
-                                    <div className="hidden xl:flex items-center space-x-2">
-                                        <button className="bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                                    <div className="flex items-center gap-2">
+                                        <button className="hidden sm:flex bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 text-[10px] font-bold uppercase tracking-wider px-3 py-2 rounded-lg transition-colors items-center space-x-2">
                                             <span className="material-symbols-outlined text-sm">print</span>
-                                            <span>Print List</span>
+                                            <span>Print</span>
                                         </button>
                                         <button
                                             onClick={handleGeneratePlan}
                                             disabled={isGenerating || hasPlan}
-                                            className="bg-primary hover:bg-primary-dark text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                            className="bg-primary hover:bg-primary-dark text-white text-[10px] font-bold uppercase tracking-wider px-3 py-2 rounded-lg transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
                                         >
                                             {isGenerating ? (
                                                 <div className="animate-spin h-3 w-3 border-2 border-white rounded-full border-t-transparent"></div>
                                             ) : (
                                                 <span className="material-symbols-outlined text-sm">auto_awesome</span>
                                             )}
-                                            <span>{isGenerating ? "Generating..." : (hasPlan ? "Plan Active" : "Generate New")}</span>
+                                            <span>{isGenerating ? "..." : (hasPlan ? "Active" : "New")}</span>
                                         </button>
                                     </div>
                                 )}
@@ -234,170 +283,195 @@ export default function DashboardPage() {
 
                     {/* Right Panel - Configuration */}
                     {activeTab === 'dashboard' && (
-                        <div className="hidden lg:flex w-2/5 flex-col bg-gray-50 dark:bg-zinc-900/50 overflow-y-auto transition-colors duration-500">
-                            <div className="p-8 md:p-12 space-y-10">
-                                <div>
-                                    <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 tracking-[0.3em] uppercase mb-1 font-mono">Configuration Panel</h2>
-                                    <h3 className="text-3xl font-light text-gray-900 dark:text-white font-sans">Preferences & Crew</h3>
-                                </div>
+                        <>
+                            {/* Mobile Config Drawer Overlay */}
+                            {isConfigOpen && (
+                                <div
+                                    className="fixed inset-0 bg-black/60 z-30 lg:hidden backdrop-blur-sm transition-opacity"
+                                    onClick={() => setIsConfigOpen(false)}
+                                />
+                            )}
 
-                                {/* Family Profiles */}
-                                <section>
-                                    <div className="flex justify-between items-center mb-6">
-                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Family Profiles</label>
-                                        <button className="flex items-center space-x-1 text-primary hover:text-primary-dark transition-colors text-xs font-bold uppercase font-mono">
-                                            <span className="material-symbols-outlined text-sm">add</span>
-                                            <span>New Profile</span>
+                            <div className={`
+                                fixed inset-y-0 right-0 z-40 w-[90%] sm:w-80 lg:relative lg:inset-auto lg:z-0 lg:w-2/5 transform transition-transform duration-300 ease-in-out
+                                bg-gray-50 dark:bg-zinc-900/40 border-l border-gray-200/50 dark:border-gray-800/50 lg:border-l-0 overflow-y-auto lg:flex flex-col transition-colors duration-500
+                                ${isConfigOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+                            `}>
+                                <div className="p-8 md:p-12 space-y-10">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 tracking-[0.3em] uppercase mb-1 font-mono">Configuration Panel</h2>
+                                            <h3 className="text-3xl font-light text-gray-900 dark:text-white font-sans">Preferences & Crew</h3>
+                                        </div>
+                                        <button
+                                            onClick={() => setIsConfigOpen(false)}
+                                            className="lg:hidden p-2 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                                        >
+                                            <span className="material-symbols-outlined">close</span>
                                         </button>
                                     </div>
-                                    <div className="flex items-center space-x-6 overflow-x-auto pb-4 hide-scrollbar">
-                                        <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
-                                            <div className="w-14 h-14 rounded-full bg-white dark:bg-zinc-800 border-2 border-primary flex items-center justify-center text-primary font-serif italic text-xl shadow-md transition-transform group-hover:scale-105 overflow-hidden">
-                                                {session?.user?.image ? (
-                                                    <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'G'
-                                                )}
-                                            </div>
-                                            <span className="text-xs font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider font-mono">{session?.user?.name?.split(' ')[0] || 'Chef'}</span>
-                                        </button>
-                                        {/* Placeholders */}
-                                        <button className="flex flex-col items-center space-y-2 flex-shrink-0 group opacity-40 hover:opacity-100 transition-opacity">
-                                            <div className="w-14 h-14 rounded-full bg-gray-200 border-2 border-transparent flex items-center justify-center text-gray-500 font-serif italic text-xl transition-transform group-hover:scale-105">
-                                                <span className="material-symbols-outlined">add</span>
-                                            </div>
-                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Add</span>
-                                        </button>
-                                    </div>
-                                </section>
 
-                                {/* Form Fields */}
-                                <section className="space-y-6">
-                                    <div className="group">
-                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Dietary Needs (Global)</label>
-                                        <input
-                                            value={dietaryRestrictions}
-                                            onChange={(e) => setDietaryRestrictions(e.target.value)}
-                                            className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                            placeholder="e.g. Keto, Vegan"
-                                            type="text"
-                                        />
-                                    </div>
-                                    <div className="group">
-                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Allergens</label>
-                                        <input
-                                            value={allergens}
-                                            onChange={(e) => setAllergens(e.target.value)}
-                                            className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                            placeholder="e.g. Peanuts, Shellfish"
-                                            type="text"
-                                        />
-                                    </div>
-                                    <div className="group">
-                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Favorite Cuisines</label>
-                                        <input
-                                            value={favorites}
-                                            onChange={(e) => setFavorites(e.target.value)}
-                                            className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                            placeholder="Japanese, Mexican, Soul Food..."
-                                            type="text"
-                                        />
-                                    </div>
-                                    <div className="group">
-                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Dislikes</label>
-                                        <input
-                                            value={dislikes}
-                                            onChange={(e) => setDislikes(e.target.value)}
-                                            className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                            placeholder="Mushrooms, Cilantro..."
-                                            type="text"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Spice Level</label>
-                                        <div className="flex rounded-sm overflow-hidden bg-gray-100 dark:bg-zinc-800 p-1 gap-1">
-                                            {["None", "Mild", "Medium", "Hot"].map((level) => (
-                                                <button
-                                                    key={level}
-                                                    onClick={() => setSpiceLevel(level)}
-                                                    className={`flex-1 py-3 text-xs font-bold tracking-wider uppercase rounded-sm font-mono transition-all ${spiceLevel === level
-                                                        ? "bg-black dark:bg-white dark:text-black text-white shadow-sm"
-                                                        : "text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700"
-                                                        }`}
-                                                >
-                                                    {level}
-                                                </button>
-                                            ))}
+                                    {/* Family Profiles */}
+                                    <section>
+                                        <div className="flex justify-between items-center mb-6">
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Family Profiles</label>
+                                            <button
+                                                onClick={() => alert("Multi-profile support coming soon!")}
+                                                className="flex items-center space-x-1 text-primary hover:text-primary-dark transition-colors text-xs font-bold uppercase font-mono"
+                                            >
+                                                <span className="material-symbols-outlined text-sm">add</span>
+                                                <span>New Profile</span>
+                                            </button>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <div className="flex justify-between items-center mb-3">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Household Size</label>
-                                            <span className="text-primary font-bold font-mono text-sm">{householdSize} {householdSize === 1 ? 'PERSON' : 'PEOPLE'}</span>
+                                        <div className="flex items-center space-x-6 overflow-x-auto pb-4 hide-scrollbar">
+                                            <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
+                                                <div className="w-14 h-14 rounded-full bg-white dark:bg-zinc-800 border-2 border-primary flex items-center justify-center text-primary font-serif italic text-xl shadow-md transition-transform group-hover:scale-105 overflow-hidden">
+                                                    {session?.user?.image ? (
+                                                        <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'G'
+                                                    )}
+                                                </div>
+                                                <span className="text-xs font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider font-mono">{session?.user?.name?.split(' ')[0] || 'Chef'}</span>
+                                            </button>
+                                            {/* Placeholders */}
+                                            <button className="flex flex-col items-center space-y-2 flex-shrink-0 group opacity-40 hover:opacity-100 transition-opacity">
+                                                <div className="w-14 h-14 rounded-full bg-gray-200 border-2 border-transparent flex items-center justify-center text-gray-500 font-serif italic text-xl transition-transform group-hover:scale-105">
+                                                    <span className="material-symbols-outlined">add</span>
+                                                </div>
+                                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Add</span>
+                                            </button>
                                         </div>
-                                        <div className="relative pt-2">
+                                    </section>
+
+                                    {/* Form Fields */}
+                                    <section className="space-y-6">
+                                        <div className="group">
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Dietary Needs (Global)</label>
                                             <input
-                                                value={householdSize}
-                                                onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
-                                                type="range"
-                                                min="1"
-                                                max="10"
-                                                step="1"
-                                                className="w-full"
+                                                value={dietaryRestrictions}
+                                                onChange={(e) => setDietaryRestrictions(e.target.value)}
+                                                className="w-full bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
+                                                placeholder="e.g. Keto, Vegan"
+                                                type="text"
                                             />
-                                            <div className="flex justify-between mt-2 px-1">
-                                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                                    <span key={n} className={`text-[8px] font-bold font-mono ${householdSize === n ? 'text-primary' : 'text-gray-300 dark:text-gray-600'}`}>
-                                                        {n}
-                                                    </span>
+                                        </div>
+                                        <div className="group">
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Allergens</label>
+                                            <input
+                                                value={allergens}
+                                                onChange={(e) => setAllergens(e.target.value)}
+                                                className="w-full bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
+                                                placeholder="e.g. Peanuts, Shellfish"
+                                                type="text"
+                                            />
+                                        </div>
+                                        <div className="group">
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Favorite Cuisines</label>
+                                            <input
+                                                value={favorites}
+                                                onChange={(e) => setFavorites(e.target.value)}
+                                                className="w-full bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
+                                                placeholder="Japanese, Mexican, Soul Food..."
+                                                type="text"
+                                            />
+                                        </div>
+                                        <div className="group">
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Dislikes</label>
+                                            <input
+                                                value={dislikes}
+                                                onChange={(e) => setDislikes(e.target.value)}
+                                                className="w-full bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
+                                                placeholder="Mushrooms, Cilantro..."
+                                                type="text"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Spice Level</label>
+                                            <div className="flex rounded-sm overflow-hidden bg-gray-100 dark:bg-zinc-800 p-1 gap-1">
+                                                {["None", "Mild", "Medium", "Hot"].map((level) => (
+                                                    <button
+                                                        key={level}
+                                                        onClick={() => setSpiceLevel(level)}
+                                                        className={`flex-1 py-3 text-xs font-bold tracking-wider uppercase rounded-sm font-mono transition-all ${spiceLevel === level
+                                                            ? "bg-black dark:bg-white dark:text-black text-white shadow-sm"
+                                                            : "text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700"
+                                                            }`}
+                                                    >
+                                                        {level}
+                                                    </button>
                                                 ))}
                                             </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Plan Duration</label>
-                                        <div className="grid grid-cols-4 gap-2">
-                                            {[1, 3, 5, 7].map((days) => (
-                                                <button
-                                                    key={days}
-                                                    onClick={() => !hasPlan && setNumDays(days)}
-                                                    disabled={hasPlan}
-                                                    className={`py-2 text-xs font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
-                                                        ? (hasPlan ? 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent' : 'bg-primary text-white border-primary')
-                                                        : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'
-                                                        } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                >
-                                                    {days} {days === 1 ? 'Day' : 'Days'}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </section>
-
-                                <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
-                                    <button
-                                        onClick={handleGeneratePlan}
-                                        disabled={isGenerating || hasPlan}
-                                        className={`w-full font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl transition-all duration-300 transform flex items-center justify-center space-x-2 font-mono ${isGenerating || hasPlan
-                                            ? 'bg-gray-300 dark:bg-zinc-800 text-gray-500 dark:text-gray-500 cursor-not-allowed shadow-none'
-                                            : 'bg-primary hover:bg-primary-dark text-white hover:shadow-orange-500/30 active:scale-[0.97]'
-                                            }`}
-                                    >
-                                        {isGenerating ? (
-                                            <div className="flex items-center space-x-2">
-                                                <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
-                                                <span>Processing...</span>
+                                        <div>
+                                            <div className="flex justify-between items-center mb-3">
+                                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Household Size</label>
+                                                <span className="text-primary font-bold font-mono text-sm">{householdSize} {householdSize === 1 ? 'PERSON' : 'PEOPLE'}</span>
                                             </div>
-                                        ) : (
-                                            <>
-                                                <span className="material-symbols-outlined">auto_awesome</span>
-                                                <span>{hasPlan ? "Plan Active" : "Generate Meal Plan"}</span>
-                                            </>
-                                        )}
-                                    </button>
+                                            <div className="relative pt-2">
+                                                <input
+                                                    value={householdSize}
+                                                    onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
+                                                    type="range"
+                                                    min="1"
+                                                    max="10"
+                                                    step="1"
+                                                    className="w-full accent-primary"
+                                                />
+                                                <div className="flex justify-between mt-2 px-1">
+                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                                        <span key={n} className={`text-[8px] font-bold font-mono ${householdSize === n ? 'text-primary' : 'text-gray-300 dark:text-gray-600'}`}>
+                                                            {n}
+                                                        </span>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Plan Duration</label>
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {[1, 3, 5, 7].map((days) => (
+                                                    <button
+                                                        key={days}
+                                                        onClick={() => !hasPlan && setNumDays(days)}
+                                                        disabled={hasPlan}
+                                                        className={`py-2 text-[10px] font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
+                                                            ? (hasPlan ? 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent' : 'bg-primary text-white border-primary')
+                                                            : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'
+                                                            } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    >
+                                                        {days}d
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </section>
+
+                                    <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
+                                        <button
+                                            onClick={handleGeneratePlan}
+                                            disabled={isGenerating || hasPlan}
+                                            className={`w-full font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl transition-all duration-300 transform flex items-center justify-center space-x-2 font-mono ${isGenerating || hasPlan
+                                                ? 'bg-gray-300 dark:bg-zinc-800 text-gray-500 dark:text-gray-500 cursor-not-allowed shadow-none'
+                                                : 'bg-primary hover:bg-primary-dark text-white hover:shadow-orange-500/30 active:scale-[0.97]'
+                                                }`}
+                                        >
+                                            {isGenerating ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
+                                                    <span>Processing...</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <span className="material-symbols-outlined">auto_awesome</span>
+                                                    <span>{hasPlan ? "Plan Active" : "Generate Plan"}</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </>
                     )}
                 </main>
             </div>
