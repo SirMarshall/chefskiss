@@ -150,11 +150,17 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
         },
     };
 
+    // Get current date info
+    const now = new Date();
+    const todayISO = now.toISOString().split('T')[0];
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const todayName = daysOfWeek[now.getDay()];
+
     const DayPlanSchema: Schema = {
         type: Type.OBJECT,
-        required: ["day", "meals"],
+        required: ["day", "summary", "meals"],
         properties: {
-            day: { type: Type.STRING, enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
+            day: { type: Type.STRING }, // Removed enum to let AI specify the day name
             summary: { type: Type.STRING },
             meals: {
                 type: Type.OBJECT,
@@ -203,7 +209,9 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
         Spice Level: ${user.spiceLevel || "Medium"}
         Household Size: ${user.householdSize || 1}
 
-        The plan should cover the next ${days} days (e.g. starting Monday).
+        The plan MUST start from today (${todayName}, ${todayISO}).
+        The 'weekStartDate' in the response MUST be "${todayISO}".
+        For each day in the 'days' array, provide the correct day name (e.g. ${todayName} for the first day, then the next day, etc.).
         Provide colorful, appetizing color codes for 'imageColor' (hex).
         Ensure nutritional balance.
     `;
