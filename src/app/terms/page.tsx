@@ -22,8 +22,8 @@ export default function TermsPage() {
 
             if (!error) {
                 toast("Terms accepted. Welcome aboard!", "success");
-                // Force a navigation to the next step
-                router.push('/onboarding');
+                // Force a full navigation to ensure the session update is recognized
+                window.location.href = '/onboarding';
             } else {
                 console.error("Error accepting terms:", error);
                 toast("Failed to accept terms. Please try again.", "error");

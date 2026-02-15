@@ -195,8 +195,8 @@ export default function OnboardingPage() {
             }
 
             toast("Profile setup complete! Preparing your kitchen...", "success");
-            // Use router.push for smoother transition, session should be updated now
-            router.push('/dashboard');
+            // Use window.location.href to force a full reload and ensure the fresh session is loaded
+            window.location.href = '/dashboard';
 
         } catch (error) {
             console.error("Onboarding error:", error);

@@ -242,20 +242,7 @@ export default function DashboardPage() {
                                 </h3>
                             </div>
                             {/* Action Buttons */}
-                            <div className="flex items-center justify-between w-full sm:w-auto gap-4">
 
-
-                                <div className="flex space-x-4">
-                                    <button className="flex items-center space-x-2 text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors font-mono">
-                                        <span className="material-symbols-outlined text-lg">chevron_left</span>
-                                        <span>Previous</span>
-                                    </button>
-                                    <button className="flex items-center space-x-2 text-xs font-bold tracking-widest uppercase text-gray-900 dark:text-white font-mono">
-                                        <span>Next</span>
-                                        <span className="material-symbols-outlined text-lg">chevron_right</span>
-                                    </button>
-                                </div>
-                            </div>
                         </div>
 
                         {/* Content Area */}
