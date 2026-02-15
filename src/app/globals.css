@@ -71,3 +71,47 @@
 body {
   @apply bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark selection:bg-primary selection:text-white;
 }
+
+/* Premium Range Input / Slider Styles */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #d64d08;
+  border: 4px solid white;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(214, 77, 8, 0.3);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+  box-shadow: 0 6px 15px rgba(214, 77, 8, 0.4);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #d64d08;
+  border: 4px solid white;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(214, 77, 8, 0.3);
+  cursor: pointer;
+}
+
+input[type="range"]:focus {
+  background: #cbd5e1;
+}

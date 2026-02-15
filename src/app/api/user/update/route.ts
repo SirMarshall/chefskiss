@@ -43,7 +43,9 @@ export async function POST(req: NextRequest) {
             if (preferences.dietaryRestrictions) updateData.dietaryRestrictions = preferences.dietaryRestrictions;
             if (preferences.allergens) updateData.allergens = preferences.allergens;
             if (preferences.favorites) updateData.favorites = preferences.favorites;
+            if (preferences.dislikes) updateData.dislikes = preferences.dislikes;
             if (preferences.spiceLevel) updateData.spiceLevel = preferences.spiceLevel;
+            if (preferences.householdSize) updateData.householdSize = preferences.householdSize;
             if (preferences.generatedMenu) updateData.generatedMenu = preferences.generatedMenu;
         }
 

@@ -5,14 +5,16 @@ export interface IUser {
     name: string;
     email: string;
     image?: string;
-    emailVerified?: Date;
+    emailVerified?: Date | boolean;
 
     // The Chef Profile (All optional because they don't exist at login)
     username?: string;
     dietaryRestrictions?: string[];
     allergens?: string[];
     favorites?: string[];
+    dislikes?: string[];
     spiceLevel?: string;
+    householdSize?: number;
 
     // Onboarding & Terms
     onboardingComplete?: boolean;
@@ -34,7 +36,7 @@ const UserSchema = new Schema<IUser>(
         name: { type: String },
         email: { type: String, unique: true, required: true },
         image: { type: String },
-        emailVerified: { type: Date },
+        emailVerified: { type: Schema.Types.Mixed },
 
         // Make these OPTIONAL. 
         // They will be filled when the user completes the "Chef's Table" form.
@@ -42,7 +44,9 @@ const UserSchema = new Schema<IUser>(
         dietaryRestrictions: { type: [String], default: [] },
         allergens: { type: [String], default: [] },
         favorites: { type: [String], default: [] },
+        dislikes: { type: [String], default: [] },
         spiceLevel: { type: String, default: "medium" },
+        householdSize: { type: Number, default: 1 },
 
         onboardingComplete: { type: Boolean, default: false },
         termsAccepted: { type: Boolean, default: false },

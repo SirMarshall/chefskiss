@@ -122,6 +122,23 @@ export default function OnboardingPage() {
         toast("Multi-profile support is coming soon!");
     };
 
+    const handleAddItem = (category: 'favorites' | 'dislikes' | 'allergens') => {
+        if (!inputValue.trim()) return;
+
+        setPreferences(prev => ({
+            ...prev,
+            [category]: [...prev[category], inputValue.trim()]
+        }));
+        setInputValue("");
+    };
+
+    const handleRemoveItem = (category: 'favorites' | 'dislikes' | 'allergens', item: string) => {
+        setPreferences(prev => ({
+            ...prev,
+            [category]: prev[category].filter(i => i !== item)
+        }));
+    };
+
     const handleComplete = async () => {
         setLoading(true);
         try {
@@ -136,7 +153,9 @@ export default function OnboardingPage() {
                         dietaryRestrictions: preferences.dietary,
                         allergens: preferences.allergens,
                         favorites: preferences.favorites,
-                        spiceLevel: preferences.spiceLevel.toLowerCase()
+                        dislikes: preferences.dislikes,
+                        spiceLevel: preferences.spiceLevel.toLowerCase(),
+                        householdSize: familyMembers.length
                     }
                 })
             });
@@ -321,15 +340,36 @@ export default function OnboardingPage() {
                                             </div>
                                         </div>
 
-                                        {/* Favorites */}
+                                        {/* Favorites as Cuisines */}
                                         <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Favorite Ingredients</label>
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Favorite Cuisines</label>
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {preferences.favorites.map(cuisine => (
+                                                    <div key={cuisine} className="bg-orange-50 text-[#d64d08] px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-orange-100">
+                                                        {cuisine}
+                                                        <button onClick={() => handleRemoveItem('favorites', cuisine)} className="hover:text-red-500">
+                                                            <span className="material-symbols-outlined text-xs">close</span>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
                                             <div className="relative group">
                                                 <input
                                                     className="w-full bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-1 focus:ring-[#d64d08]/20 transition-all placeholder-gray-300 font-sans"
-                                                    placeholder="e.g. Avocado, Salmon, Basil"
+                                                    placeholder="e.g. Japanese, Mexican, American Soul"
                                                     type="text"
+                                                    value={activeInput === 'favorites' ? inputValue : ""}
+                                                    onFocus={() => { setActiveInput('favorites'); setInputValue(""); }}
+                                                    onChange={(e) => setInputValue(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            handleAddItem('favorites');
+                                                        }
+                                                    }}
                                                 />
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
+                                                    <span className="material-symbols-outlined text-lg">keyboard_return</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -354,14 +394,32 @@ export default function OnboardingPage() {
                                         {/* Custom Allergens */}
                                         <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                                             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Custom Allergens</label>
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {preferences.allergens.filter(a => !['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat'].includes(a)).map(allergen => (
+                                                    <div key={allergen} className="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-red-100">
+                                                        {allergen}
+                                                        <button onClick={() => handleRemoveItem('allergens', allergen)} className="hover:text-red-500">
+                                                            <span className="material-symbols-outlined text-xs">close</span>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
                                             <div className="relative group">
                                                 <input
                                                     className="w-full bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-1 focus:ring-[#d64d08]/20 transition-all placeholder-gray-300 font-sans"
                                                     placeholder="Type and press enter to add..."
                                                     type="text"
+                                                    value={activeInput === 'allergens' ? inputValue : ""}
+                                                    onFocus={() => { setActiveInput('allergens'); setInputValue(""); }}
+                                                    onChange={(e) => setInputValue(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            handleAddItem('allergens');
+                                                        }
+                                                    }}
                                                 />
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                    <span className="material-symbols-outlined text-gray-300 text-lg">keyboard_return</span>
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
+                                                    <span className="material-symbols-outlined text-lg">keyboard_return</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -369,12 +427,33 @@ export default function OnboardingPage() {
                                         {/* Disliked Ingredients */}
                                         <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                                             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Disliked Ingredients</label>
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                {preferences.dislikes.map(dislike => (
+                                                    <div key={dislike} className="bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-gray-200">
+                                                        {dislike}
+                                                        <button onClick={() => handleRemoveItem('dislikes', dislike)} className="hover:text-red-500">
+                                                            <span className="material-symbols-outlined text-xs">close</span>
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
                                             <div className="relative group">
                                                 <input
                                                     className="w-full bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-1 focus:ring-[#d64d08]/20 transition-all placeholder-gray-300 font-sans"
                                                     placeholder="e.g. Cilantro, Olives"
                                                     type="text"
+                                                    value={activeInput === 'dislikes' ? inputValue : ""}
+                                                    onFocus={() => { setActiveInput('dislikes'); setInputValue(""); }}
+                                                    onChange={(e) => setInputValue(e.target.value)}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            handleAddItem('dislikes');
+                                                        }
+                                                    }}
                                                 />
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
+                                                    <span className="material-symbols-outlined text-lg">keyboard_return</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

@@ -4,7 +4,7 @@
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan } from "@/app/actions/mealPlan";
+import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan, getUserProfile } from "@/app/actions/mealPlan";
 import DashboardOverview from "./DashboardOverview";
 import MealPlanView from "./MealPlanView";
 
@@ -19,6 +19,14 @@ export default function DashboardPage() {
     const [hasPlan, setHasPlan] = useState(false);
     const [mealPlan, setMealPlan] = useState<any>(null);
     const [numDays, setNumDays] = useState(7); // Default to 7 days
+
+    // Profile State
+    const [dietaryRestrictions, setDietaryRestrictions] = useState("");
+    const [allergens, setAllergens] = useState("");
+    const [favorites, setFavorites] = useState("");
+    const [dislikes, setDislikes] = useState("");
+    const [spiceLevel, setSpiceLevel] = useState("Medium");
+    const [householdSize, setHouseholdSize] = useState(1);
 
     // Middleware handles redirection now
     useEffect(() => {
@@ -51,6 +59,18 @@ export default function DashboardPage() {
 
         if (session && !isPending) {
             loadPlan();
+
+            // Load profile
+            getUserProfile().then(profile => {
+                if (profile) {
+                    setDietaryRestrictions(profile.dietaryRestrictions?.join(", ") || "");
+                    setAllergens(profile.allergens?.join(", ") || "");
+                    setFavorites(profile.favorites?.join(", ") || "");
+                    setDislikes(profile.dislikes?.join(", ") || "");
+                    if (profile.spiceLevel) setSpiceLevel(profile.spiceLevel.charAt(0).toUpperCase() + profile.spiceLevel.slice(1).toLowerCase());
+                    if (profile.householdSize) setHouseholdSize(profile.householdSize);
+                }
+            });
         }
     }, [session, isPending]);
 
@@ -58,7 +78,14 @@ export default function DashboardPage() {
         if (hasPlan) return; // Prevent generation if plan exists
         setIsGenerating(true);
         try {
-            const newPlan = await generateInitialMealPlan(numDays);
+            const newPlan = await generateInitialMealPlan(numDays, {
+                dietaryRestrictions: dietaryRestrictions.split(',').map(s => s.trim()).filter(Boolean),
+                allergens: allergens.split(',').map(s => s.trim()).filter(Boolean),
+                favorites: favorites.split(',').map(s => s.trim()).filter(Boolean),
+                dislikes: dislikes.split(',').map(s => s.trim()).filter(Boolean),
+                spiceLevel,
+                householdSize
+            });
             setMealPlan(newPlan);
             setHasPlan(true);
         } catch (error) {
@@ -251,23 +278,83 @@ export default function DashboardPage() {
                                 <section className="space-y-6">
                                     <div className="group">
                                         <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Dietary Needs (Global)</label>
-                                        <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="e.g. Keto, Vegan" type="text" />
+                                        <input
+                                            value={dietaryRestrictions}
+                                            onChange={(e) => setDietaryRestrictions(e.target.value)}
+                                            className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans"
+                                            placeholder="e.g. Keto, Vegan"
+                                            type="text"
+                                        />
                                     </div>
                                     <div className="group">
                                         <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Allergens</label>
-                                        <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="e.g. Peanuts, Shellfish" type="text" />
+                                        <input
+                                            value={allergens}
+                                            onChange={(e) => setAllergens(e.target.value)}
+                                            className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans"
+                                            placeholder="e.g. Peanuts, Shellfish"
+                                            type="text"
+                                        />
                                     </div>
                                     <div className="group">
-                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Favorite Ingredients</label>
-                                        <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="Truffle oil, Wagyu beef..." type="text" />
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Favorite Cuisines</label>
+                                        <input
+                                            value={favorites}
+                                            onChange={(e) => setFavorites(e.target.value)}
+                                            className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans"
+                                            placeholder="Japanese, Mexican, Soul Food..."
+                                            type="text"
+                                        />
+                                    </div>
+                                    <div className="group">
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Dislikes</label>
+                                        <input
+                                            value={dislikes}
+                                            onChange={(e) => setDislikes(e.target.value)}
+                                            className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans"
+                                            placeholder="Mushrooms, Cilantro..."
+                                            type="text"
+                                        />
                                     </div>
                                     <div>
                                         <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Spice Level</label>
                                         <div className="flex rounded-sm overflow-hidden bg-gray-100 p-1 gap-1">
-                                            <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase bg-black text-white rounded-sm shadow-sm font-mono transition-all">None</button>
-                                            <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Mild</button>
-                                            <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Med</button>
-                                            <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Hot</button>
+                                            {["None", "Mild", "Medium", "Hot"].map((level) => (
+                                                <button
+                                                    key={level}
+                                                    onClick={() => setSpiceLevel(level)}
+                                                    className={`flex-1 py-3 text-xs font-bold tracking-wider uppercase rounded-sm font-mono transition-all ${spiceLevel === level
+                                                        ? "bg-black text-white shadow-sm"
+                                                        : "text-gray-400 hover:text-gray-900 hover:bg-white"
+                                                        }`}
+                                                >
+                                                    {level}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="flex justify-between items-center mb-3">
+                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Household Size</label>
+                                            <span className="text-[#d64d08] font-bold font-mono text-sm">{householdSize} {householdSize === 1 ? 'PERSON' : 'PEOPLE'}</span>
+                                        </div>
+                                        <div className="relative pt-2">
+                                            <input
+                                                value={householdSize}
+                                                onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
+                                                type="range"
+                                                min="1"
+                                                max="10"
+                                                step="1"
+                                                className="w-full"
+                                            />
+                                            <div className="flex justify-between mt-2 px-1">
+                                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                                    <span key={n} className={`text-[8px] font-bold font-mono ${householdSize === n ? 'text-[#d64d08]' : 'text-gray-300'}`}>
+                                                        {n}
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                     <div>
@@ -279,8 +366,8 @@ export default function DashboardPage() {
                                                     onClick={() => !hasPlan && setNumDays(days)}
                                                     disabled={hasPlan}
                                                     className={`py-2 text-xs font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
-                                                            ? (hasPlan ? 'bg-gray-400 text-white border-transparent' : 'bg-[#d64d08] text-white border-[#d64d08]')
-                                                            : 'bg-white text-gray-500 border-gray-200 hover:border-[#d64d08] hover:text-[#d64d08]'
+                                                        ? (hasPlan ? 'bg-gray-400 text-white border-transparent' : 'bg-[#d64d08] text-white border-[#d64d08]')
+                                                        : 'bg-white text-gray-500 border-gray-200 hover:border-[#d64d08] hover:text-[#d64d08]'
                                                         } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 >
                                                     {days} {days === 1 ? 'Day' : 'Days'}
@@ -295,8 +382,8 @@ export default function DashboardPage() {
                                         onClick={handleGeneratePlan}
                                         disabled={isGenerating || hasPlan}
                                         className={`w-full font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl transition-all duration-300 transform flex items-center justify-center space-x-2 font-mono ${isGenerating || hasPlan
-                                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
-                                                : 'bg-[#d64d08] hover:bg-[#b54006] text-white hover:shadow-orange-500/30 active:scale-[0.97]'
+                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                                            : 'bg-[#d64d08] hover:bg-[#b54006] text-white hover:shadow-orange-500/30 active:scale-[0.97]'
                                             }`}
                                     >
                                         {isGenerating ? (

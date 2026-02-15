@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import dbConnect from "@/lib/db";
-import User from "@/models/User";
+import User, { IUser } from "@/models/User";
 import WeeklyMealPlan from "@/models/WeeklyMealPlan";
 import { headers } from "next/headers";
 import { GoogleGenAI, Type, Schema } from '@google/genai';
@@ -57,7 +57,7 @@ export async function getActiveMealPlan() {
 /**
  * Generates a meal plan for the user using Google GenAI.
  */
-export async function generateInitialMealPlan(days: number = 7) {
+export async function generateInitialMealPlan(days: number = 7, profileUpdates?: Partial<IUser>) {
     await dbConnect();
     const session = await auth.api.getSession({
         headers: await headers()
@@ -71,6 +71,17 @@ export async function generateInitialMealPlan(days: number = 7) {
     const user = await User.findById(session.user.id);
     if (!user) {
         throw new Error(`User not found: ${session.user.id}`);
+    }
+
+    // Apply profile updates if provided
+    if (profileUpdates) {
+        if (profileUpdates.dietaryRestrictions) user.dietaryRestrictions = profileUpdates.dietaryRestrictions;
+        if (profileUpdates.allergens) user.allergens = profileUpdates.allergens;
+        if (profileUpdates.dislikes) user.dislikes = profileUpdates.dislikes;
+        if (profileUpdates.favorites) user.favorites = profileUpdates.favorites;
+        if (profileUpdates.spiceLevel) user.spiceLevel = profileUpdates.spiceLevel;
+        if (profileUpdates.householdSize) user.householdSize = profileUpdates.householdSize;
+        await user.save();
     }
 
     if (user.mealPlanGenerated) {
@@ -187,9 +198,9 @@ export async function generateInitialMealPlan(days: number = 7) {
         Dietary Restrictions: ${user.dietaryRestrictions?.join(", ") || "None"}
         Allergens: ${user.allergens?.join(", ") || "None"}
         Dislikes: ${user.dislikes?.join(", ") || "None"}
-        Favorites: ${user.favorites?.join(", ") || "None"}
+        Favorite Cuisines: ${user.favorites?.join(", ") || "None"}
         Spice Level: ${user.spiceLevel || "Medium"}
-        Household Size: ${1} (defaulting to 1 for now if undefined)
+        Household Size: ${user.householdSize || 1}
 
         The plan should cover the next ${days} days (e.g. starting Monday).
         Provide colorful, appetizing color codes for 'imageColor' (hex).
@@ -198,7 +209,7 @@ export async function generateInitialMealPlan(days: number = 7) {
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-3-flash-preview', // Reverted to 1.5-flash as requested
+            model: 'gemini-flash-lite-latest',
             config: {
                 responseMimeType: 'application/json',
                 responseSchema: WeeklyPlanResponseSchema,
@@ -241,4 +252,25 @@ export async function generateInitialMealPlan(days: number = 7) {
         console.error("Error generating meal plan:", error);
         throw new Error("Failed to generate meal plan");
     }
+}
+
+/**
+ * Retrieves the user's dietary profile.
+ */
+export async function getUserProfile() {
+    await dbConnect();
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+
+    const user = await User.findById(session.user.id).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize');
+
+    if (!user) return null;
+
+    // Return as plain object
+    return JSON.parse(JSON.stringify(user));
 }
