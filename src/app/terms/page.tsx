@@ -5,6 +5,7 @@ import AuthLayout from '@/components/AuthLayout';
 import AuthCard from '@/components/AuthCard';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/context/ToastContext';
+import { updateUser } from '@/lib/auth-client';
 
 export default function TermsPage() {
     const router = useRouter();
@@ -14,21 +15,17 @@ export default function TermsPage() {
     const handleAccept = async () => {
         setLoading(true);
         try {
-            const response = await fetch('/api/user/update', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    termsAccepted: true,
-                }),
-            });
+            // Update user using auth client which also updates the session immediately
+            const { data, error } = await updateUser({
+                termsAccepted: true
+            } as any);
 
-            if (response.ok) {
+            if (!error) {
                 toast("Terms accepted. Welcome aboard!", "success");
-                // Force a hard reload to ensure session is updated
-                window.location.href = '/onboarding';
+                // Force a navigation to the next step
+                router.push('/onboarding');
             } else {
+                console.error("Error accepting terms:", error);
                 toast("Failed to accept terms. Please try again.", "error");
             }
         } catch (error) {

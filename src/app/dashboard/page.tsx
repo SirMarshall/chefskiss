@@ -10,20 +10,10 @@ export default function DashboardPage() {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("dashboard");
 
+    // Middleware handles redirection now
     useEffect(() => {
         if (!isPending && !session) {
             router.push("/");
-        } else if (session?.user) {
-            console.log("Dashboard Session User:", session.user);
-            // Safe navigation checks
-            const user = session.user as any; // Type assertion for custom fields
-            if (!user.termsAccepted) {
-                console.log("Redirecting to Terms. termsAccepted:", user.termsAccepted);
-                router.push("/terms");
-            } else if (!user.onboardingComplete) {
-                console.log("Redirecting to Onboarding. onboardingComplete:", user.onboardingComplete);
-                router.push("/onboarding");
-            }
         }
     }, [session, isPending, router]);
 

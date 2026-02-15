@@ -4,9 +4,8 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { clientPromise } from "./db";
 
 const getDatabaseName = () => {
-    const authUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || "";
-    const isLocal = authUrl.includes("localhost");
-    return isLocal ? "chefskiss_dev" : (process.env.MONGODB_DB_NAME || "chefskiss");
+    // robust check for dev vs prod using NODE_ENV
+    return process.env.NODE_ENV === "development" ? "chefskiss_dev" : (process.env.MONGODB_DB_NAME || "chefskiss");
 };
 
 export const auth = betterAuth({
