@@ -39,19 +39,19 @@ export default function TermsPage() {
     const LeftPanel = (
         <>
             <div>
-                <h1 className="font-sans text-4xl md:text-5xl font-light tracking-wider text-black dark:text-white mb-0 leading-[0.8]">
+                <h1 className="font-sans text-3xl md:text-5xl font-light tracking-wider text-black dark:text-white mb-0 leading-[0.8]">
                     CHEF'S
                 </h1>
-                <h1 className="font-serif italic text-5xl md:text-6xl font-bold text-black dark:text-white mt-2">
+                <h1 className="font-serif italic text-4xl md:text-6xl font-bold text-black dark:text-white mt-2">
                     KISS
                 </h1>
-                <div className="w-12 h-0.5 bg-black dark:bg-white mt-8 mb-6"></div>
+                <div className="w-12 h-0.5 bg-black dark:bg-white mt-4 mb-4 md:mt-8 md:mb-6"></div>
                 <p className="font-mono text-[10px] font-bold tracking-[0.2em] uppercase text-black dark:text-white leading-relaxed max-w-[180px]">
                     Generative Personal Meal Prep AI
                 </p>
             </div>
-            <div className="mt-12">
-                <p className="font-serif italic text-lg md:text-xl text-black dark:text-white leading-snug">
+            <div className="mt-6 md:mt-12">
+                <p className="font-serif italic text-base md:text-xl text-black dark:text-white leading-snug">
                     "Crafting your perfect plate, one byte at a time."
                 </p>
             </div>
@@ -59,8 +59,8 @@ export default function TermsPage() {
     );
 
     const RightPanel = (
-        <div className="flex flex-col h-full -m-8 md:-m-10">
-            <div className="px-8 md:px-16 pt-12 pb-6 border-b border-gray-100 dark:border-gray-800">
+        <div className="flex flex-col h-full -m-6 md:-m-10">
+            <div className="px-6 md:px-16 pt-6 md:pt-12 pb-6 border-b border-gray-100 dark:border-gray-800">
                 <h2 className="font-serif italic text-3xl md:text-4xl text-black dark:text-white mb-2">
                     Terms and Conditions
                 </h2>
@@ -68,7 +68,7 @@ export default function TermsPage() {
                     Last Updated: February 15, 2026
                 </p>
             </div>
-            <div className="flex-1 overflow-y-auto px-8 md:px-16 py-8 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto px-6 md:px-16 py-6 md:py-8 custom-scrollbar">
                 <div className="prose prose-sm max-w-none dark:prose-invert">
                     <section className="mb-10">
                         <h3 className="flex items-baseline gap-3 text-black dark:text-white">
@@ -134,7 +134,7 @@ export default function TermsPage() {
                     </section>
                 </div>
             </div>
-            <div className="px-8 md:px-16 py-8 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-zinc-900 flex flex-col sm:flex-row items-center gap-4">
+            <div className="px-6 md:px-16 py-6 md:py-8 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-zinc-900 flex flex-col sm:flex-row items-center gap-4">
                 <button
                     onClick={handleAccept}
                     disabled={loading}

@@ -18,23 +18,23 @@ export default function App() {
     <>
       <div>
         <div className="mb-0">
-          <h1 className="font-sans text-5xl md:text-5xl font-light tracking-wider text-black dark:text-white mb-0 leading-[0.8]">
+          <h1 className="font-sans text-3xl md:text-5xl font-light tracking-wider text-black dark:text-white mb-0 leading-[0.8]">
             CHEF'S
           </h1>
-          <h1 className="font-serif italic text-6xl md:text-6xl font-bold text-black dark:text-white mt-2">
+          <h1 className="font-serif italic text-4xl md:text-6xl font-bold text-black dark:text-white mt-2">
             KISS
           </h1>
         </div>
 
-        <div className="w-16 h-0.5 bg-black dark:bg-white mt-10 mb-6"></div>
+        <div className="w-16 h-0.5 bg-black dark:bg-white mt-4 mb-4 md:mt-10 md:mb-6"></div>
 
         <p className="font-mono text-xs font-bold tracking-[0.2em] uppercase text-black dark:text-white leading-relaxed max-w-[200px]">
           Generative Personal Meal Prep AI
         </p>
       </div>
 
-      <div className="mt-16 md:mt-0">
-        <p className="font-serif italic text-xl md:text-2xl text-black dark:text-white leading-snug">
+      <div className="mt-6 md:mt-0">
+        <p className="font-serif italic text-lg md:text-2xl text-black dark:text-white leading-snug">
           "Your palate is unique.<br />
           Your menu should be too."
         </p>
@@ -45,7 +45,7 @@ export default function App() {
   const RightPanel = (
     <div className="flex flex-col h-full">
       {/* Tabs */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 -mx-8 md:-mx-10 -mt-6 md:-mt-8">
+      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 -mx-6 md:-mx-10 -mt-6 md:-mt-8">
         <div
           onClick={() => setAuthMode('signup')}
           className={`flex-1 text-center py-6 cursor-pointer transition-all ${authMode === 'signup' ? 'border-b-2 border-primary' : 'opacity-40 hover:opacity-70'}`}
