@@ -5,6 +5,7 @@ import dbConnect from "@/lib/db";
 import User from "@/models/User";
 import WeeklyMealPlan from "@/models/WeeklyMealPlan";
 import { headers } from "next/headers";
+import { GoogleGenAI, Type, Schema } from '@google/genai';
 
 /**
  * Checks if the current user has a generated meal plan.
@@ -54,10 +55,9 @@ export async function getActiveMealPlan() {
 }
 
 /**
- * Generates a dummy meal plan for the user (for testing/MVP).
- * In the future, this will call the AI service.
+ * Generates a meal plan for the user using Google GenAI.
  */
-export async function generateInitialMealPlan() {
+export async function generateInitialMealPlan(days: number = 7) {
     await dbConnect();
     const session = await auth.api.getSession({
         headers: await headers()
@@ -67,45 +67,178 @@ export async function generateInitialMealPlan() {
         throw new Error("Unauthorized");
     }
 
-    // Check if one already exists to avoid duplicates for now?
-    // Or just always create new.
+    // Fetch full user profile for preferences
+    const user = await User.findById(session.user.id);
+    if (!user) {
+        throw new Error(`User not found: ${session.user.id}`);
+    }
 
-    // Load sample data
-    // We import the JSON directly or read it. 
-    // Since we are in server context, we can just use the sample data import if available or copy it.
-    // For now, I'll hardcode a simplified structure or try to read the file.
-    // Actually, let's just create a basic one.
+    if (user.mealPlanGenerated) {
+        throw new Error("Meal plan already exists.");
+    }
 
-    // Better: Import the sample JSON content here.
-    // Since I can't restart the server easily to add imports, I will read the file content I saw earlier.
-    // I previously read `src/data/sampleMealPlan.json`. Use that data.
+    // Initialize GenAI
+    const ai = new GoogleGenAI({
+        apiKey: process.env.GEMINI_API_KEY,
+    });
 
-    const samplePlan = await import("@/data/sampleMealPlan.json");
-
-    // Create the plan in DB
-    const newPlan = await WeeklyMealPlan.create({
-        userId: session.user.id,
-        weekStartDate: new Date().toISOString().split('T')[0], // Today
-        userProfile: {
-            name: session.user.name,
-            // In a real app, copy these from User model
-            dietaryRestrictions: [],
-            allergens: [],
-            dislikes: [],
-            favorites: [],
-            spiceLevel: "Medium",
-            householdSize: 1
+    // Define Schema
+    // Based on .genai.ts structure
+    const IngredientSchema: Schema = {
+        type: Type.OBJECT,
+        required: ["name", "quantity", "unit"],
+        properties: {
+            name: { type: Type.STRING },
+            quantity: { type: Type.NUMBER },
+            unit: { type: Type.STRING },
+            notes: { type: Type.STRING },
+            category: { type: Type.STRING },
         },
-        days: samplePlan.days, // Use sample days
-        shoppingList: [] // Empty for now
-    });
+    };
 
-    // Update User
-    await User.findByIdAndUpdate(session.user.id, {
-        mealPlanGenerated: true,
-        currentMealPlanId: newPlan._id
-    });
+    const InstructionSchema: Schema = {
+        type: Type.OBJECT,
+        required: ["stepNumber", "instruction"],
+        properties: {
+            stepNumber: { type: Type.INTEGER },
+            instruction: { type: Type.STRING },
+            timerSeconds: { type: Type.INTEGER },
+        },
+    };
 
-    // Revalidate?
-    return JSON.parse(JSON.stringify(newPlan));
+    const RecipeSchema: Schema = {
+        type: Type.OBJECT,
+        required: ["id", "name", "description", "prepTimeMinutes", "cookTimeMinutes", "totalTimeMinutes", "difficulty", "tags", "servings", "nutrition", "ingredients", "instructions"],
+        properties: {
+            id: { type: Type.STRING },
+            name: { type: Type.STRING },
+            description: { type: Type.STRING },
+            image: { type: Type.STRING },
+            imageColor: { type: Type.STRING }, // For UI placeholder hex codes
+            prepTimeMinutes: { type: Type.INTEGER },
+            cookTimeMinutes: { type: Type.INTEGER },
+            totalTimeMinutes: { type: Type.INTEGER },
+            difficulty: { type: Type.STRING, enum: ["Easy", "Medium", "Hard"] },
+            cuisine: { type: Type.STRING },
+            tags: { type: Type.ARRAY, items: { type: Type.STRING } },
+            rating: { type: Type.NUMBER },
+            servings: { type: Type.INTEGER },
+            nutrition: {
+                type: Type.OBJECT,
+                required: ["calories", "protein", "carbs", "fats"],
+                properties: {
+                    calories: { type: Type.NUMBER },
+                    protein: { type: Type.NUMBER },
+                    carbs: { type: Type.NUMBER },
+                    fats: { type: Type.NUMBER },
+                },
+            },
+            ingredients: { type: Type.ARRAY, items: IngredientSchema },
+            instructions: { type: Type.ARRAY, items: InstructionSchema },
+        },
+    };
+
+    const DayPlanSchema: Schema = {
+        type: Type.OBJECT,
+        required: ["day", "meals"],
+        properties: {
+            day: { type: Type.STRING, enum: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"] },
+            summary: { type: Type.STRING },
+            meals: {
+                type: Type.OBJECT,
+                required: ["breakfast", "lunch", "dinner"],
+                properties: {
+                    breakfast: RecipeSchema,
+                    lunch: RecipeSchema,
+                    dinner: RecipeSchema,
+                    snack: RecipeSchema,
+                },
+            },
+        },
+    };
+
+    const WeeklyPlanResponseSchema: Schema = {
+        type: Type.OBJECT,
+        required: ["weekStartDate", "userProfile", "days"],
+        properties: {
+            weekStartDate: { type: Type.STRING, format: "date" },
+            userProfile: {
+                type: Type.OBJECT,
+                required: ["name", "dietaryRestrictions", "allergens", "dislikes", "favorites", "spiceLevel", "householdSize"],
+                properties: {
+                    name: { type: Type.STRING },
+                    dietaryRestrictions: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    allergens: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    dislikes: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    favorites: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    spiceLevel: { type: Type.STRING },
+                    householdSize: { type: Type.INTEGER },
+                },
+            },
+            days: { type: Type.ARRAY, items: DayPlanSchema },
+            shoppingList: { type: Type.ARRAY, items: IngredientSchema },
+        },
+    };
+
+    // Construct Prompt
+    const prompt = `
+        Generate a meal plan for ${days} days for a user with the following profile:
+        Name: ${user.name}
+        Dietary Restrictions: ${user.dietaryRestrictions?.join(", ") || "None"}
+        Allergens: ${user.allergens?.join(", ") || "None"}
+        Dislikes: ${user.dislikes?.join(", ") || "None"}
+        Favorites: ${user.favorites?.join(", ") || "None"}
+        Spice Level: ${user.spiceLevel || "Medium"}
+        Household Size: ${1} (defaulting to 1 for now if undefined)
+
+        The plan should cover the next ${days} days (e.g. starting Monday).
+        Provide colorful, appetizing color codes for 'imageColor' (hex).
+        Ensure nutritional balance.
+    `;
+
+    try {
+        const response = await ai.models.generateContent({
+            model: 'gemini-3-flash-preview', // Reverted to 1.5-flash as requested
+            config: {
+                responseMimeType: 'application/json',
+                responseSchema: WeeklyPlanResponseSchema,
+            },
+            contents: [
+                {
+                    role: 'user',
+                    parts: [{ text: prompt }]
+                }
+            ]
+        });
+
+        const generatedText = response.text;
+        if (!generatedText) {
+            throw new Error("No response from AI");
+        }
+
+        const planData = JSON.parse(generatedText);
+
+        // Save to DB
+        // Force userId since schema doesn't have it
+        const newPlan = await WeeklyMealPlan.create({
+            userId: session.user.id,
+            weekStartDate: planData.weekStartDate || new Date().toISOString().split('T')[0],
+            userProfile: planData.userProfile,
+            days: planData.days,
+            shoppingList: planData.shoppingList || []
+        });
+
+        // Update User
+        await User.findByIdAndUpdate(session.user.id, {
+            mealPlanGenerated: true,
+            currentMealPlanId: newPlan._id,
+            generatedMenu: newPlan._id // Optional legacy field
+        });
+
+        return JSON.parse(JSON.stringify(newPlan));
+
+    } catch (error) {
+        console.error("Error generating meal plan:", error);
+        throw new Error("Failed to generate meal plan");
+    }
 }

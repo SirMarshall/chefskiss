@@ -29,8 +29,10 @@ async function dbConnect() {
     }
 
     if (!cached.promise) {
+        const dbName = process.env.NODE_ENV === "development" ? "chefskiss_dev" : (process.env.MONGODB_DB_NAME || "chefskiss");
         const opts = {
             bufferCommands: false,
+            dbName: dbName,
         };
 
         cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {

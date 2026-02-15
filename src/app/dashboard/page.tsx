@@ -1,9 +1,12 @@
+
 "use client";
 
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan } from "@/app/actions/mealPlan"; // Import server actions. Note: Next.js Client Components can import Server Actions.
+import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan } from "@/app/actions/mealPlan";
+import DashboardOverview from "./DashboardOverview";
+import MealPlanView from "./MealPlanView";
 
 export default function DashboardPage() {
     const { data: session, isPending } = useSession();
@@ -15,6 +18,7 @@ export default function DashboardPage() {
     const [isGenerating, setIsGenerating] = useState(false);
     const [hasPlan, setHasPlan] = useState(false);
     const [mealPlan, setMealPlan] = useState<any>(null);
+    const [numDays, setNumDays] = useState(7); // Default to 7 days
 
     // Middleware handles redirection now
     useEffect(() => {
@@ -51,9 +55,10 @@ export default function DashboardPage() {
     }, [session, isPending]);
 
     const handleGeneratePlan = async () => {
+        if (hasPlan) return; // Prevent generation if plan exists
         setIsGenerating(true);
         try {
-            const newPlan = await generateInitialMealPlan();
+            const newPlan = await generateInitialMealPlan(numDays);
             setMealPlan(newPlan);
             setHasPlan(true);
         } catch (error) {
@@ -125,14 +130,37 @@ export default function DashboardPage() {
 
                 {/* Main Content */}
                 <main className="flex-1 flex overflow-hidden">
-                    <div className="w-full lg:w-3/5 p-6 md:p-12 overflow-y-auto border-r border-gray-100 flex flex-col">
+                    <div className={`w-full ${activeTab === 'dashboard' ? 'lg:w-3/5' : ''} p-6 md:p-12 overflow-y-auto border-r border-gray-100 flex flex-col`}>
                         <div className="flex justify-between items-end mb-10 flex-shrink-0">
                             <div>
-                                <h2 className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-1 font-mono">Weekly Calendar</h2>
-                                <h3 className="text-4xl font-light text-gray-900 font-sans">Your Menu</h3>
+                                <h2 className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-1 font-mono">
+                                    {activeTab === 'dashboard' ? 'Weekly Calendar' : 'Weekly Forecast'}
+                                </h2>
+                                <h3 className="text-3xl font-light text-gray-900 font-sans">Your Menu</h3>
                             </div>
-                            {/* Navigation controls only show if we have data */}
-                            {hasPlan && (
+                            {/* Action Buttons */}
+                            <div className="flex items-center space-x-6">
+                                {activeTab === 'meal-plan' && (
+                                    <div className="hidden xl:flex items-center space-x-2">
+                                        <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                                            <span className="material-symbols-outlined text-sm">print</span>
+                                            <span>Print List</span>
+                                        </button>
+                                        <button
+                                            onClick={handleGeneratePlan}
+                                            disabled={isGenerating || hasPlan}
+                                            className="bg-[#d64d08] hover:bg-[#b54006] text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                                        >
+                                            {isGenerating ? (
+                                                <div className="animate-spin h-3 w-3 border-2 border-white rounded-full border-t-transparent"></div>
+                                            ) : (
+                                                <span className="material-symbols-outlined text-sm">auto_awesome</span>
+                                            )}
+                                            <span>{isGenerating ? "Generating..." : (hasPlan ? "Plan Active" : "Generate New")}</span>
+                                        </button>
+                                    </div>
+                                )}
+
                                 <div className="flex space-x-4">
                                     <button className="flex items-center space-x-2 text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-gray-900 transition-colors font-mono">
                                         <span className="material-symbols-outlined text-lg">chevron_left</span>
@@ -143,7 +171,7 @@ export default function DashboardPage() {
                                         <span className="material-symbols-outlined text-lg">chevron_right</span>
                                     </button>
                                 </div>
-                            )}
+                            </div>
                         </div>
 
                         {/* Content Area */}
@@ -160,8 +188,8 @@ export default function DashboardPage() {
                                 </p>
                                 <button
                                     onClick={handleGeneratePlan}
-                                    disabled={isGenerating}
-                                    className="bg-[#d64d08] hover:bg-[#b54006] text-white px-8 py-4 rounded-sm shadow-lg font-bold tracking-widest text-xs uppercase flex items-center gap-2 transition-all hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+                                    disabled={isGenerating || hasPlan}
+                                    className="bg-[#d64d08] hover:bg-[#b54006] text-white px-8 py-4 rounded-sm shadow-lg font-bold tracking-widest text-xs uppercase flex items-center gap-2 transition-all hover:scale-105 disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
                                 >
                                     {isGenerating ? (
                                         <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
@@ -172,153 +200,126 @@ export default function DashboardPage() {
                                 </button>
                             </div>
                         ) : (
-                            // LOADED MEAL PLAN
-                            <div className="space-y-8 pb-12">
-                                {/* Today - Featured (Hardcoded for now based on sample logic, needs complex mapping in real app) */}
-                                {/* For MVP, we map the first day from the DB plan */}
-                                {mealPlan && mealPlan.days && mealPlan.days.length > 0 && (
-                                    <div className="bg-white rounded-3xl p-8 border-2 border-[#d64d08] shadow-xl relative overflow-hidden group">
-                                        <div className="absolute top-0 right-0 bg-[#d64d08] text-white text-[10px] font-bold px-4 py-1 uppercase tracking-widest font-mono">Today</div>
-                                        <div className="mb-6">
-                                            <span className="text-[11px] font-black text-[#d64d08] uppercase tracking-tighter font-mono">Day 01</span>
-                                            <h4 className="text-2xl font-bold text-gray-900 font-sans">{mealPlan.days[0].day}</h4>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                            {[
-                                                { type: 'Breakfast', data: mealPlan.days[0].meals.breakfast },
-                                                { type: 'Lunch', data: mealPlan.days[0].meals.lunch },
-                                                { type: 'Dinner', data: mealPlan.days[0].meals.dinner }
-                                            ].map((meal, idx) => (
-                                                <div key={idx} className="flex flex-col space-y-3">
-                                                    <div className={`aspect-[4/3] ${meal.data.imageColor || 'bg-gray-100'} rounded-2xl relative overflow-hidden group-hover:brightness-95 transition-all`}>
-                                                        {/* Image would go here */}
-                                                        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 font-mono">{meal.type}</span>
-                                                    </div>
-                                                    <h5 className="text-xs font-bold text-gray-900 line-clamp-2 font-sans">{meal.data.name}</h5>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Other Days */}
-                                {mealPlan && mealPlan.days && mealPlan.days.slice(1).map((day: any, idx: number) => (
-                                    <div key={idx} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:border-gray-200 transition-all">
-                                        <div className="mb-6">
-                                            <span className="text-[11px] font-black text-gray-300 uppercase tracking-tighter font-mono">Day 0{idx + 2}</span>
-                                            <h4 className="text-2xl font-bold text-gray-900 font-sans">{day.day}</h4>
-                                        </div>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                            {[
-                                                { type: 'Breakfast', data: day.meals.breakfast },
-                                                { type: 'Lunch', data: day.meals.lunch },
-                                                { type: 'Dinner', data: day.meals.dinner }
-                                            ].map((meal, mIdx) => (
-                                                <div key={mIdx} className="flex flex-col space-y-3">
-                                                    <div className={`aspect-[4/3] ${meal.data.imageColor || 'bg-gray-100'} rounded-2xl relative overflow-hidden`}>
-                                                        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 font-mono">
-                                                            {meal.type}
-                                                        </span>
-                                                    </div>
-                                                    <h5 className="text-xs font-bold text-gray-900 line-clamp-2 font-sans">{meal.data.name}</h5>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            activeTab === 'dashboard' ? (
+                                <DashboardOverview mealPlan={mealPlan} />
+                            ) : (
+                                <MealPlanView mealPlan={mealPlan} />
+                            )
                         )}
                     </div>
 
                     {/* Right Panel - Configuration */}
-                    <div className="hidden lg:flex w-2/5 flex-col bg-gray-50 overflow-y-auto">
-                        <div className="p-8 md:p-12 space-y-10">
-                            <div>
-                                <h2 className="text-xs font-bold text-gray-400 tracking-[0.3em] uppercase mb-1 font-mono">Configuration Panel</h2>
-                                <h3 className="text-3xl font-light text-gray-900 font-sans">Preferences & Crew</h3>
-                            </div>
-
-                            {/* Family Profiles */}
-                            <section>
-                                <div className="flex justify-between items-center mb-6">
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Family Profiles</label>
-                                    <button className="flex items-center space-x-1 text-[#d64d08] hover:text-[#b54006] transition-colors text-xs font-bold uppercase font-mono">
-                                        <span className="material-symbols-outlined text-sm">add</span>
-                                        <span>New Profile</span>
-                                    </button>
-                                </div>
-                                <div className="flex items-center space-x-6 overflow-x-auto pb-4 hide-scrollbar">
-                                    <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
-                                        <div className="w-14 h-14 rounded-full bg-white border-2 border-[#d64d08] flex items-center justify-center text-[#d64d08] font-serif italic text-xl shadow-md transition-transform group-hover:scale-105 overflow-hidden">
-                                            {session?.user?.image ? (
-                                                <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
-                                            ) : (
-                                                session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'G'
-                                            )}
-                                        </div>
-                                        <span className="text-xs font-bold text-gray-900 uppercase tracking-wider font-mono">{session?.user?.name?.split(' ')[0] || 'Chef'}</span>
-                                    </button>
-                                    {/* Placeholders */}
-                                    <button className="flex flex-col items-center space-y-2 flex-shrink-0 group opacity-40 hover:opacity-100 transition-opacity">
-                                        <div className="w-14 h-14 rounded-full bg-gray-200 border-2 border-transparent flex items-center justify-center text-gray-500 font-serif italic text-xl transition-transform group-hover:scale-105">
-                                            <span className="material-symbols-outlined">add</span>
-                                        </div>
-                                        <span className="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Add</span>
-                                    </button>
-                                </div>
-                            </section>
-
-                            {/* Form Fields */}
-                            <section className="space-y-6">
-                                <div className="group">
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Dietary Needs (Global)</label>
-                                    <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="e.g. Keto, Vegan" type="text" />
-                                </div>
-                                <div className="group">
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Allergens</label>
-                                    <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="e.g. Peanuts, Shellfish" type="text" />
-                                </div>
-                                <div className="group">
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Favorite Ingredients</label>
-                                    <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="Truffle oil, Wagyu beef..." type="text" />
-                                </div>
+                    {activeTab === 'dashboard' && (
+                        <div className="hidden lg:flex w-2/5 flex-col bg-gray-50 overflow-y-auto">
+                            <div className="p-8 md:p-12 space-y-10">
                                 <div>
-                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Spice Level</label>
-                                    <div className="flex rounded-sm overflow-hidden bg-gray-100 p-1 gap-1">
-                                        <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase bg-black text-white rounded-sm shadow-sm font-mono transition-all">None</button>
-                                        <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Mild</button>
-                                        <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Med</button>
-                                        <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Hot</button>
-                                    </div>
+                                    <h2 className="text-xs font-bold text-gray-400 tracking-[0.3em] uppercase mb-1 font-mono">Configuration Panel</h2>
+                                    <h3 className="text-3xl font-light text-gray-900 font-sans">Preferences & Crew</h3>
                                 </div>
-                            </section>
 
-                            <div className="pt-8 border-t border-gray-200">
-                                <button
-                                    onClick={handleGeneratePlan}
-                                    disabled={isGenerating}
-                                    className="w-full bg-[#d64d08] hover:bg-[#b54006] text-white font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl hover:shadow-orange-500/30 transition-all duration-300 transform active:scale-[0.97] flex items-center justify-center space-x-2 font-mono"
-                                >
-                                    {isGenerating ? (
-                                        <div className="flex items-center space-x-2">
-                                            <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
-                                            <span>Processing...</span>
+                                {/* Family Profiles */}
+                                <section>
+                                    <div className="flex justify-between items-center mb-6">
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Family Profiles</label>
+                                        <button className="flex items-center space-x-1 text-[#d64d08] hover:text-[#b54006] transition-colors text-xs font-bold uppercase font-mono">
+                                            <span className="material-symbols-outlined text-sm">add</span>
+                                            <span>New Profile</span>
+                                        </button>
+                                    </div>
+                                    <div className="flex items-center space-x-6 overflow-x-auto pb-4 hide-scrollbar">
+                                        <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
+                                            <div className="w-14 h-14 rounded-full bg-white border-2 border-[#d64d08] flex items-center justify-center text-[#d64d08] font-serif italic text-xl shadow-md transition-transform group-hover:scale-105 overflow-hidden">
+                                                {session?.user?.image ? (
+                                                    <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'G'
+                                                )}
+                                            </div>
+                                            <span className="text-xs font-bold text-gray-900 uppercase tracking-wider font-mono">{session?.user?.name?.split(' ')[0] || 'Chef'}</span>
+                                        </button>
+                                        {/* Placeholders */}
+                                        <button className="flex flex-col items-center space-y-2 flex-shrink-0 group opacity-40 hover:opacity-100 transition-opacity">
+                                            <div className="w-14 h-14 rounded-full bg-gray-200 border-2 border-transparent flex items-center justify-center text-gray-500 font-serif italic text-xl transition-transform group-hover:scale-105">
+                                                <span className="material-symbols-outlined">add</span>
+                                            </div>
+                                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Add</span>
+                                        </button>
+                                    </div>
+                                </section>
+
+                                {/* Form Fields */}
+                                <section className="space-y-6">
+                                    <div className="group">
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Dietary Needs (Global)</label>
+                                        <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="e.g. Keto, Vegan" type="text" />
+                                    </div>
+                                    <div className="group">
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Allergens</label>
+                                        <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="e.g. Peanuts, Shellfish" type="text" />
+                                    </div>
+                                    <div className="group">
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-[#d64d08] transition-colors font-mono">Favorite Ingredients</label>
+                                        <input className="w-full bg-white border border-gray-200 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-0 transition-colors placeholder-gray-300 font-sans" placeholder="Truffle oil, Wagyu beef..." type="text" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Spice Level</label>
+                                        <div className="flex rounded-sm overflow-hidden bg-gray-100 p-1 gap-1">
+                                            <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase bg-black text-white rounded-sm shadow-sm font-mono transition-all">None</button>
+                                            <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Mild</button>
+                                            <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Med</button>
+                                            <button className="flex-1 py-3 text-xs font-bold tracking-wider uppercase text-gray-400 hover:text-gray-900 hover:bg-white transition-all rounded-sm font-mono">Hot</button>
                                         </div>
-                                    ) : (
-                                        <>
-                                            <span className="material-symbols-outlined">auto_awesome</span>
-                                            <span>Regenerate Weekly Plan</span>
-                                        </>
-                                    )}
-                                </button>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Plan Duration</label>
+                                        <div className="grid grid-cols-4 gap-2">
+                                            {[1, 3, 5, 7].map((days) => (
+                                                <button
+                                                    key={days}
+                                                    onClick={() => !hasPlan && setNumDays(days)}
+                                                    disabled={hasPlan}
+                                                    className={`py-2 text-xs font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
+                                                            ? (hasPlan ? 'bg-gray-400 text-white border-transparent' : 'bg-[#d64d08] text-white border-[#d64d08]')
+                                                            : 'bg-white text-gray-500 border-gray-200 hover:border-[#d64d08] hover:text-[#d64d08]'
+                                                        } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                >
+                                                    {days} {days === 1 ? 'Day' : 'Days'}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <div className="pt-8 border-t border-gray-200">
+                                    <button
+                                        onClick={handleGeneratePlan}
+                                        disabled={isGenerating || hasPlan}
+                                        className={`w-full font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl transition-all duration-300 transform flex items-center justify-center space-x-2 font-mono ${isGenerating || hasPlan
+                                                ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+                                                : 'bg-[#d64d08] hover:bg-[#b54006] text-white hover:shadow-orange-500/30 active:scale-[0.97]'
+                                            }`}
+                                    >
+                                        {isGenerating ? (
+                                            <div className="flex items-center space-x-2">
+                                                <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
+                                                <span>Processing...</span>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <span className="material-symbols-outlined">auto_awesome</span>
+                                                <span>{hasPlan ? "Plan Active" : "Generate Meal Plan"}</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </main>
             </div>
-
             {/* Styles for Material Symbols */}
             <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
         </div>
     );
+
 }

@@ -30,7 +30,7 @@ export interface IUser {
 
 const UserSchema = new Schema<IUser>(
     {
-        _id: { type: String }, // better-auth uses String IDs by default
+
         name: { type: String },
         email: { type: String, unique: true, required: true },
         image: { type: String },
