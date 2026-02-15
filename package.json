@@ -9,7 +9,9 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "better-auth": "^1.4.18",
     "clsx": "^2.1.1",
+    "mongodb": "^7.1.0",
     "mongoose": "^9.2.1",
     "next": "16.1.6",
     "react": "19.2.3",
@@ -27,5 +29,10 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4.0.7",
     "typescript": "^5"
+  },
+  "pnpm": {
+    "overrides": {
+      "mongodb": "^7.1.0"
+    }
   }
 }

@@ -45,7 +45,7 @@ export default function App() {
   const RightPanel = (
     <div className="flex flex-col h-full">
       {/* Tabs */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-8 -mx-12 -mt-12">
+      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 -mx-8 md:-mx-10 -mt-6 md:-mt-8">
         <div
           onClick={() => setAuthMode('signup')}
           className={`flex-1 text-center py-6 cursor-pointer transition-all ${authMode === 'signup' ? 'border-b-2 border-primary' : 'opacity-40 hover:opacity-70'}`}
@@ -64,10 +64,10 @@ export default function App() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center max-w-lg mx-auto w-full h-[500px]">
+      <div className="flex-1 flex flex-col max-w-lg mx-auto w-full">
         <div className="transition-all duration-500 ease-in-out">
-          <div className="mb-10">
-            <h2 className="font-serif italic text-3xl md:text-4xl text-black dark:text-white mb-2 transition-all duration-300">
+          <div className="mb-6">
+            <h2 className="font-serif italic text-3xl md:text-4xl text-black dark:text-white mb-2 transition-all duration-300 h-10 md:h-12 overflow-hidden">
               {authMode === 'signup' ? 'Start Your Culinary Journey' : 'Welcome Back, Chef'}
             </h2>
             <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-gray-500 dark:text-gray-400">
@@ -75,11 +75,11 @@ export default function App() {
             </p>
           </div>
 
-          <div className="relative min-h-[350px]">
-            <div className={`transition-all duration-500 ${authMode === 'signup' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none absolute inset-0'}`}>
+          <div className="relative h-[620px]">
+            <div className={`transition-all duration-500 absolute inset-0 ${authMode === 'signup' ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none'}`}>
               <SignupForm />
             </div>
-            <div className={`transition-all duration-500 ${authMode === 'signin' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none absolute inset-0'}`}>
+            <div className={`transition-all duration-500 absolute inset-0 ${authMode === 'signin' ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
               <SigninForm />
             </div>
           </div>
