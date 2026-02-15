@@ -3,12 +3,18 @@
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-// import Image from "next/image"; // Will use standard img tags for now as per mockup style or switch to Image if needed
+import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan } from "@/app/actions/mealPlan"; // Import server actions. Note: Next.js Client Components can import Server Actions.
 
 export default function DashboardPage() {
     const { data: session, isPending } = useSession();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("dashboard");
+
+    // Meal Plan State
+    const [isLoadingPlan, setIsLoadingPlan] = useState(true);
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [hasPlan, setHasPlan] = useState(false);
+    const [mealPlan, setMealPlan] = useState<any>(null);
 
     // Middleware handles redirection now
     useEffect(() => {
@@ -17,9 +23,52 @@ export default function DashboardPage() {
         }
     }, [session, isPending, router]);
 
+    // Check for meal plan on load
+    useEffect(() => {
+        async function loadPlan() {
+            if (session?.user) {
+                try {
+                    // 1. Check status
+                    const status = await checkMealPlanStatus();
+                    setHasPlan(status.hasPlan);
+
+                    if (status.hasPlan) {
+                        // 2. Fetch plan data
+                        const plan = await getActiveMealPlan();
+                        setMealPlan(plan);
+                    }
+                } catch (error) {
+                    console.error("Failed to load meal plan:", error);
+                } finally {
+                    setIsLoadingPlan(false);
+                }
+            }
+        }
+
+        if (session && !isPending) {
+            loadPlan();
+        }
+    }, [session, isPending]);
+
+    const handleGeneratePlan = async () => {
+        setIsGenerating(true);
+        try {
+            const newPlan = await generateInitialMealPlan();
+            setMealPlan(newPlan);
+            setHasPlan(true);
+        } catch (error) {
+            console.error("Failed to generate plan:", error);
+            alert("Failed to generate plan. Please try again.");
+        } finally {
+            setIsGenerating(false);
+        }
+    };
+
     if (isPending || !session || !session.user ||
         !(session.user as any).termsAccepted ||
-        !(session.user as any).onboardingComplete) {
+        !(session.user as any).onboardingComplete ||
+        isLoadingPlan // Wait for plan check too
+    ) {
         return (
             <div className="flex items-center justify-center min-h-screen bg-[#1a1a1a]">
                 <div className="animate-pulse flex flex-col items-center">
@@ -82,70 +131,103 @@ export default function DashboardPage() {
                                 <h2 className="text-xs font-bold text-gray-400 tracking-widest uppercase mb-1 font-mono">Weekly Calendar</h2>
                                 <h3 className="text-4xl font-light text-gray-900 font-sans">Your Menu</h3>
                             </div>
-                            <div className="flex space-x-4">
-                                <button className="flex items-center space-x-2 text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-gray-900 transition-colors font-mono">
-                                    <span className="material-symbols-outlined text-lg">chevron_left</span>
-                                    <span>Previous</span>
-                                </button>
-                                <button className="flex items-center space-x-2 text-xs font-bold tracking-widest uppercase text-gray-900 font-mono">
-                                    <span>Next</span>
-                                    <span className="material-symbols-outlined text-lg">chevron_right</span>
-                                </button>
-                            </div>
+                            {/* Navigation controls only show if we have data */}
+                            {hasPlan && (
+                                <div className="flex space-x-4">
+                                    <button className="flex items-center space-x-2 text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-gray-900 transition-colors font-mono">
+                                        <span className="material-symbols-outlined text-lg">chevron_left</span>
+                                        <span>Previous</span>
+                                    </button>
+                                    <button className="flex items-center space-x-2 text-xs font-bold tracking-widest uppercase text-gray-900 font-mono">
+                                        <span>Next</span>
+                                        <span className="material-symbols-outlined text-lg">chevron_right</span>
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Menu Cards */}
-                        <div className="space-y-8 pb-12">
-                            {/* Today - Featured */}
-                            <div className="bg-white rounded-3xl p-8 border-2 border-[#d64d08] shadow-xl relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 bg-[#d64d08] text-white text-[10px] font-bold px-4 py-1 uppercase tracking-widest font-mono">Today</div>
-                                <div className="mb-6">
-                                    <span className="text-[11px] font-black text-[#d64d08] uppercase tracking-tighter font-mono">Day 01</span>
-                                    <h4 className="text-2xl font-bold text-gray-900 font-sans">Monday</h4>
+                        {/* Content Area */}
+                        {!hasPlan ? (
+                            // EMPTY STATE
+                            <div className="flex-1 flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 rounded-3xl bg-gray-50/50 text-center">
+                                <div className="w-20 h-20 bg-[#d64d08]/10 rounded-full flex items-center justify-center mb-6 text-[#d64d08]">
+                                    <span className="material-symbols-outlined text-4xl">restaurant_menu</span>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                    {[
-                                        { type: 'Breakfast', title: 'Steel-Cut Oats with Berries & Walnuts' },
-                                        { type: 'Lunch', title: 'Miso Glazed Salmon with Bok Choy' },
-                                        { type: 'Dinner', title: 'Roasted Herb-Chicken with Asparagus' }
-                                    ].map((meal, idx) => (
-                                        <div key={idx} className="flex flex-col space-y-3">
-                                            <div className="aspect-[4/3] bg-gray-100 rounded-2xl relative overflow-hidden group-hover:bg-gray-200 transition-colors">
-                                                <div className="absolute inset-0 bg-gray-200"></div>
-                                                <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 font-mono">{meal.type}</span>
-                                            </div>
-                                            <h5 className="text-xs font-bold text-gray-900 line-clamp-2 font-sans">{meal.title}</h5>
+                                <h4 className="text-2xl font-bold text-gray-900 mb-2 font-serif italic">Your Kitchen is Empty</h4>
+                                <p className="text-gray-500 mb-8 max-w-md">
+                                    You haven't generated a meal plan for this week yet.
+                                    Configure your preferences on the right and start cooking!
+                                </p>
+                                <button
+                                    onClick={handleGeneratePlan}
+                                    disabled={isGenerating}
+                                    className="bg-[#d64d08] hover:bg-[#b54006] text-white px-8 py-4 rounded-sm shadow-lg font-bold tracking-widest text-xs uppercase flex items-center gap-2 transition-all hover:scale-105 disabled:opacity-70 disabled:hover:scale-100"
+                                >
+                                    {isGenerating ? (
+                                        <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
+                                    ) : (
+                                        <span className="material-symbols-outlined">auto_awesome</span>
+                                    )}
+                                    {isGenerating ? "Generating..." : "Generate First Plan"}
+                                </button>
+                            </div>
+                        ) : (
+                            // LOADED MEAL PLAN
+                            <div className="space-y-8 pb-12">
+                                {/* Today - Featured (Hardcoded for now based on sample logic, needs complex mapping in real app) */}
+                                {/* For MVP, we map the first day from the DB plan */}
+                                {mealPlan && mealPlan.days && mealPlan.days.length > 0 && (
+                                    <div className="bg-white rounded-3xl p-8 border-2 border-[#d64d08] shadow-xl relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 bg-[#d64d08] text-white text-[10px] font-bold px-4 py-1 uppercase tracking-widest font-mono">Today</div>
+                                        <div className="mb-6">
+                                            <span className="text-[11px] font-black text-[#d64d08] uppercase tracking-tighter font-mono">Day 01</span>
+                                            <h4 className="text-2xl font-bold text-gray-900 font-sans">{mealPlan.days[0].day}</h4>
                                         </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Other Days */}
-                            {[
-                                { day: 'Tuesday', dayNum: '02', meals: ['Avocado Toast with Poached Egg', 'Roasted Vegetable Quinoa Bowl', 'Garlic Butter Shrimp with Zucchini'] },
-                                { day: 'Wednesday', dayNum: '03', meals: ['Greek Yogurt with Chia & Mango', 'Spicy Thai Basil Chicken', 'Beef & Broccoli Stir-Fry'] }
-                            ].map((day, idx) => (
-                                <div key={idx} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:border-gray-200 transition-all">
-                                    <div className="mb-6">
-                                        <span className="text-[11px] font-black text-gray-300 uppercase tracking-tighter font-mono">Day {day.dayNum}</span>
-                                        <h4 className="text-2xl font-bold text-gray-900 font-sans">{day.day}</h4>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                        {day.meals.map((meal, mIdx) => (
-                                            <div key={mIdx} className="flex flex-col space-y-3">
-                                                <div className="aspect-[4/3] bg-gray-100 rounded-2xl relative overflow-hidden">
-                                                    <div className="absolute inset-0 bg-gray-200"></div>
-                                                    <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 font-mono">
-                                                        {['Breakfast', 'Lunch', 'Dinner'][mIdx]}
-                                                    </span>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            {[
+                                                { type: 'Breakfast', data: mealPlan.days[0].meals.breakfast },
+                                                { type: 'Lunch', data: mealPlan.days[0].meals.lunch },
+                                                { type: 'Dinner', data: mealPlan.days[0].meals.dinner }
+                                            ].map((meal, idx) => (
+                                                <div key={idx} className="flex flex-col space-y-3">
+                                                    <div className={`aspect-[4/3] ${meal.data.imageColor || 'bg-gray-100'} rounded-2xl relative overflow-hidden group-hover:brightness-95 transition-all`}>
+                                                        {/* Image would go here */}
+                                                        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 font-mono">{meal.type}</span>
+                                                    </div>
+                                                    <h5 className="text-xs font-bold text-gray-900 line-clamp-2 font-sans">{meal.data.name}</h5>
                                                 </div>
-                                                <h5 className="text-xs font-bold text-gray-900 line-clamp-2 font-sans">{meal}</h5>
-                                            </div>
-                                        ))}
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                )}
+
+                                {/* Other Days */}
+                                {mealPlan && mealPlan.days && mealPlan.days.slice(1).map((day: any, idx: number) => (
+                                    <div key={idx} className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm hover:border-gray-200 transition-all">
+                                        <div className="mb-6">
+                                            <span className="text-[11px] font-black text-gray-300 uppercase tracking-tighter font-mono">Day 0{idx + 2}</span>
+                                            <h4 className="text-2xl font-bold text-gray-900 font-sans">{day.day}</h4>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                            {[
+                                                { type: 'Breakfast', data: day.meals.breakfast },
+                                                { type: 'Lunch', data: day.meals.lunch },
+                                                { type: 'Dinner', data: day.meals.dinner }
+                                            ].map((meal, mIdx) => (
+                                                <div key={mIdx} className="flex flex-col space-y-3">
+                                                    <div className={`aspect-[4/3] ${meal.data.imageColor || 'bg-gray-100'} rounded-2xl relative overflow-hidden`}>
+                                                        <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 font-mono">
+                                                            {meal.type}
+                                                        </span>
+                                                    </div>
+                                                    <h5 className="text-xs font-bold text-gray-900 line-clamp-2 font-sans">{meal.data.name}</h5>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Panel - Configuration */}
@@ -212,9 +294,22 @@ export default function DashboardPage() {
                             </section>
 
                             <div className="pt-8 border-t border-gray-200">
-                                <button className="w-full bg-[#d64d08] hover:bg-[#b54006] text-white font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl hover:shadow-orange-500/30 transition-all duration-300 transform active:scale-[0.97] flex items-center justify-center space-x-2 font-mono">
-                                    <span className="material-symbols-outlined">auto_awesome</span>
-                                    <span>Regenerate Weekly Plan</span>
+                                <button
+                                    onClick={handleGeneratePlan}
+                                    disabled={isGenerating}
+                                    className="w-full bg-[#d64d08] hover:bg-[#b54006] text-white font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl hover:shadow-orange-500/30 transition-all duration-300 transform active:scale-[0.97] flex items-center justify-center space-x-2 font-mono"
+                                >
+                                    {isGenerating ? (
+                                        <div className="flex items-center space-x-2">
+                                            <div className="animate-spin h-4 w-4 border-2 border-white rounded-full border-t-transparent"></div>
+                                            <span>Processing...</span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <span className="material-symbols-outlined">auto_awesome</span>
+                                            <span>Regenerate Weekly Plan</span>
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>

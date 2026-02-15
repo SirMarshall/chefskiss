@@ -20,6 +20,10 @@ export interface IUser {
     termsAcceptedAt?: Date;
     generatedMenu?: any; // Store the initial menu generated during onboarding
 
+    // Meal Plan Integration
+    currentMealPlanId?: string; // Reference to the active WeeklyMealPlan
+    mealPlanGenerated?: boolean; // Fast flag for UI
+
     createdAt: Date;
     updatedAt: Date;
 }
@@ -44,6 +48,10 @@ const UserSchema = new Schema<IUser>(
         termsAccepted: { type: Boolean, default: false },
         termsAcceptedAt: { type: Date },
         generatedMenu: { type: Schema.Types.Mixed },
+
+        // Meal Plan Integration
+        currentMealPlanId: { type: Schema.Types.ObjectId, ref: 'WeeklyMealPlan' },
+        mealPlanGenerated: { type: Boolean, default: false },
     },
     {
         timestamps: true,
