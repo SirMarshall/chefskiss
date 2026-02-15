@@ -29,7 +29,11 @@ const RecipeSchema = new Schema({
     id: { type: String, required: true }, // Internal ID from generation or standard ID
     name: { type: String, required: true },
     description: { type: String },
-    image: { type: String },
+    image: { type: String }, // Keep for legacy/manual overrides
+    imageUrl: { type: String }, // Unsplash URL
+    imageBlurHash: { type: String }, // Unsplash BlurHash
+    imageUserName: { type: String }, // Unsplash Photographer
+    imageUserLink: { type: String }, // Unsplash Link
     imageColor: { type: String },
     prepTimeMinutes: { type: Number },
     cookTimeMinutes: { type: Number },

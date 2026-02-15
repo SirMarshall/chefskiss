@@ -5,7 +5,16 @@ interface DashboardOverviewProps {
     mealPlan: any;
 }
 
+import RecipeDetail from '@/components/RecipeDetail';
+import { useState } from 'react';
+
+interface DashboardOverviewProps {
+    mealPlan: any;
+}
+
 export default function DashboardOverview({ mealPlan }: DashboardOverviewProps) {
+    const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
+
     if (!mealPlan || !mealPlan.days) return null;
 
     return (
@@ -24,14 +33,18 @@ export default function DashboardOverview({ mealPlan }: DashboardOverviewProps) 
                             { type: 'Lunch', data: mealPlan.days[0].meals.lunch },
                             { type: 'Dinner', data: mealPlan.days[0].meals.dinner }
                         ].map((meal, idx) => (
-                            <div key={idx} className="flex flex-col space-y-3">
+                            <div
+                                key={idx}
+                                onClick={() => setSelectedRecipe(meal.data)}
+                                className="flex flex-col space-y-3 cursor-pointer group"
+                            >
                                 <div
                                     className="aspect-[4/3] bg-gray-100 dark:bg-zinc-700 rounded-2xl relative overflow-hidden group-hover:brightness-95 transition-all bg-cover bg-center"
-                                    style={{ backgroundColor: meal.data.imageColor || '' }}
+                                    style={{ backgroundImage: meal.data.imageUrl ? `url('${meal.data.imageUrl}')` : 'none', backgroundColor: meal.data.imageColor || '' }}
                                 >
                                     <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">{meal.type}</span>
                                 </div>
-                                <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans">{meal.data.name}</h5>
+                                <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.data.name}</h5>
                             </div>
                         ))}
                     </div>
@@ -51,21 +64,31 @@ export default function DashboardOverview({ mealPlan }: DashboardOverviewProps) 
                             { type: 'Lunch', data: day.meals.lunch },
                             { type: 'Dinner', data: day.meals.dinner }
                         ].map((meal, mIdx) => (
-                            <div key={mIdx} className="flex flex-col space-y-3">
+                            <div
+                                key={mIdx}
+                                onClick={() => setSelectedRecipe(meal.data)}
+                                className="flex flex-col space-y-3 cursor-pointer group"
+                            >
                                 <div
                                     className="aspect-[4/3] bg-gray-100 dark:bg-zinc-700 rounded-2xl relative overflow-hidden bg-cover bg-center transition-colors"
-                                    style={{ backgroundColor: meal.data.imageColor || '' }}
+                                    style={{ backgroundImage: meal.data.imageUrl ? `url('${meal.data.imageUrl}')` : 'none', backgroundColor: meal.data.imageColor || '' }}
                                 >
                                     <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">
                                         {meal.type}
                                     </span>
                                 </div>
-                                <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans">{meal.data.name}</h5>
+                                <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.data.name}</h5>
                             </div>
                         ))}
                     </div>
                 </div>
             ))}
+            {selectedRecipe && (
+                <RecipeDetail
+                    recipe={selectedRecipe}
+                    onClose={() => setSelectedRecipe(null)}
+                />
+            )}
         </div>
     );
 }

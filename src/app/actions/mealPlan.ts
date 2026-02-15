@@ -6,6 +6,7 @@ import User, { IUser } from "@/models/User";
 import WeeklyMealPlan from "@/models/WeeklyMealPlan";
 import { headers } from "next/headers";
 import { GoogleGenAI, Type, Schema } from '@google/genai';
+import { searchImage } from "@/lib/unsplash";
 
 /**
  * Checks if the current user has a generated meal plan.
@@ -222,12 +223,35 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
             ]
         });
 
-        const generatedText = response.text;
+        let generatedText = response.text;
         if (!generatedText) {
             throw new Error("No response from AI");
         }
 
+        // Clean up markdown code blocks if present
+        generatedText = generatedText.replace(/```json\n?/, "").replace(/```/, "");
+
         const planData = JSON.parse(generatedText);
+
+        // --- ENRICH WITH UNSPLASH IMAGES ---
+        const days = planData.days;
+        for (const day of days) {
+            if (day.meals) {
+                for (const mealType of ['breakfast', 'lunch', 'dinner', 'snack']) {
+                    const meal = day.meals[mealType];
+                    if (meal && meal.name) {
+                        const imageResult = await searchImage(meal.name);
+                        if (imageResult) {
+                            meal.imageUrl = imageResult.imageUrl;
+                            meal.imageBlurHash = imageResult.imageBlurHash;
+                            meal.imageUserName = imageResult.imageUserName;
+                            meal.imageUserLink = imageResult.imageUserLink;
+                        }
+                    }
+                }
+            }
+        }
+        // -----------------------------------
 
         // Save to DB
         // Force userId since schema doesn't have it
@@ -235,7 +259,7 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
             userId: session.user.id,
             weekStartDate: planData.weekStartDate || new Date().toISOString().split('T')[0],
             userProfile: planData.userProfile,
-            days: planData.days,
+            days: days, // Use the modified days array
             shoppingList: planData.shoppingList || []
         });
 
@@ -248,9 +272,9 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
 
         return JSON.parse(JSON.stringify(newPlan));
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error generating meal plan:", error);
-        throw new Error("Failed to generate meal plan");
+        throw new Error(`Failed to generate meal plan: ${error.message || error}`);
     }
 }
 
