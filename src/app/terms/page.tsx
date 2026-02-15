@@ -72,7 +72,7 @@ export default function TermsPage() {
                 <div className="prose prose-sm max-w-none dark:prose-invert">
                     <section className="mb-10">
                         <h3 className="flex items-baseline gap-3 text-black dark:text-white">
-                            <span className="font-serif italic font-bold text-[#D65A0C] text-2xl">1.</span>
+                            <span className="font-serif italic font-bold text-primary text-2xl">1.</span>
                             <span className="font-sans font-semibold text-lg uppercase tracking-wide">Acceptance of Terms</span>
                         </h3>
                         <p className="font-sans text-gray-500 dark:text-gray-400 leading-relaxed mt-4">
@@ -138,7 +138,7 @@ export default function TermsPage() {
                 <button
                     onClick={handleAccept}
                     disabled={loading}
-                    className="w-full sm:w-auto px-10 py-4 bg-[#D65A0C] hover:bg-[#B5490A] text-white font-mono font-bold text-xs tracking-[0.2em] uppercase rounded-sm shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto px-10 py-4 bg-primary hover:bg-primary/90 text-white font-mono font-bold text-xs tracking-[0.2em] uppercase rounded-sm shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {loading ? "PROCESSING..." : "I AGREE"}
                 </button>

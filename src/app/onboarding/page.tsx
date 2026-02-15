@@ -188,20 +188,17 @@ export default function OnboardingPage() {
     };
 
     return (
-        <div className="flex h-screen w-full bg-white overflow-hidden">
+        <div className="flex h-screen w-full bg-background-light dark:bg-background-dark overflow-hidden transition-colors duration-500">
             {/* Full Screen Container */}
-            <div className="w-full h-full bg-white flex flex-col md:flex-row relative">
+            <div className="w-full h-full flex flex-col md:flex-row relative">
 
                 {/* Sidebar */}
-                <aside className="w-full md:w-[320px] lg:w-[400px] flex-shrink-0 flex flex-col p-8 border-r border-gray-200/50 overflow-hidden relative" style={{
-                    backgroundColor: '#e5e5e5',
-                    backgroundImage: 'linear-gradient(to bottom right, #f0f0f0, #e0e0e0)'
-                }}>
+                <aside className="w-full md:w-[320px] lg:w-[400px] flex-shrink-0 flex flex-col p-8 border-r border-gray-200/50 dark:border-gray-800/50 overflow-hidden relative bg-panel-left-light dark:bg-panel-left-dark transition-colors duration-500">
                     <div className="mb-8">
-                        <h1 className="text-4xl tracking-widest font-light text-gray-900 uppercase leading-none mb-1 font-sans">CHEF'S</h1>
-                        <h1 className="text-5xl font-serif italic font-bold text-gray-900 leading-none">KISS</h1>
-                        <div className="w-12 h-0.5 bg-gray-800 mt-6 mb-4"></div>
-                        <p className="text-xs font-bold tracking-[0.2em] text-gray-800 uppercase font-mono">
+                        <h1 className="text-4xl tracking-widest font-light text-gray-900 dark:text-white uppercase leading-none mb-1 font-sans">CHEF'S</h1>
+                        <h1 className="text-5xl font-serif italic font-bold text-gray-900 dark:text-white leading-none">KISS</h1>
+                        <div className="w-12 h-0.5 bg-gray-800 dark:bg-gray-200 mt-6 mb-4"></div>
+                        <p className="text-xs font-bold tracking-[0.2em] text-gray-800 dark:text-gray-300 uppercase font-mono">
                             Generative Personal<br />Meal Prep AI
                         </p>
                     </div>
@@ -211,14 +208,14 @@ export default function OnboardingPage() {
                         <h2 className="text-xs font-bold text-gray-400 tracking-[0.3em] uppercase mb-6 font-mono">Sample Weekly Menu</h2>
 
                         {/* Meal Switcher */}
-                        <div className="flex space-x-1 mb-6 bg-gray-200/50 p-1.5 rounded-xl">
+                        <div className="flex space-x-1 mb-6 bg-gray-200/50 dark:bg-zinc-800/50 p-1.5 rounded-xl">
                             {(['breakfast', 'lunch', 'dinner'] as MealType[]).map((meal) => (
                                 <button
                                     key={meal}
                                     onClick={() => setActiveMeal(meal)}
                                     className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all font-mono ${activeMeal === meal
-                                        ? 'bg-white shadow-sm text-[#d64d08]'
-                                        : 'text-gray-400 hover:text-gray-600'
+                                        ? 'bg-white dark:bg-zinc-700 shadow-sm text-primary'
+                                        : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                                         }`}
                                 >
                                     {meal.charAt(0)}
@@ -227,19 +224,19 @@ export default function OnboardingPage() {
                         </div>
 
                         <div className="relative">
-                            <div className="bg-white rounded-2xl p-5 border-2 border-[#d64d08] shadow-lg transition-all duration-300 mb-4">
+                            <div className="bg-white dark:bg-zinc-800 rounded-2xl p-5 border-2 border-primary shadow-lg transition-all duration-300 mb-4 font-sans">
                                 <div className="flex justify-between items-center mb-3">
-                                    <span className="text-[10px] font-bold text-[#d64d08] uppercase tracking-widest font-mono">
+                                    <span className="text-[10px] font-bold text-primary uppercase tracking-widest font-mono">
                                         {activeMeal} (Focus)
                                     </span>
                                 </div>
                                 <div className="flex gap-4 items-center">
                                     <div className={`w-16 h-16 flex-shrink-0 ${currentSampleMeals[activeMeal].imageColor} rounded-xl shadow-inner`}></div>
                                     <div>
-                                        <div className="text-base font-bold text-gray-900 font-sans leading-tight mb-2">
+                                        <div className="text-base font-bold text-gray-900 dark:text-white font-sans leading-tight mb-2">
                                             {currentSampleMeals[activeMeal].name}
                                         </div>
-                                        <div className="text-[10px] text-gray-400 uppercase tracking-widest font-mono">
+                                        <div className="text-[10px] text-gray-400 dark:text-gray-500 uppercase tracking-widest font-mono">
                                             {currentSampleMeals[activeMeal].stats}
                                         </div>
                                     </div>
@@ -248,13 +245,13 @@ export default function OnboardingPage() {
                         </div>
                     </div>
 
-                    <div className="mt-auto pt-8 border-t border-gray-300/50 italic text-gray-500 text-lg leading-relaxed font-serif">
+                    <div className="mt-auto pt-8 border-t border-gray-300/50 italic text-gray-500 dark:text-gray-400 text-lg leading-relaxed font-serif">
                         "The secret of success is to eat what you like and let the food fight it out inside."
                     </div>
                 </aside>
 
                 {/* Main Content */}
-                <main className="flex-1 bg-[#F9FAFB] relative overflow-hidden flex flex-col">
+                <main className="flex-1 bg-[#F9FAFB] dark:bg-zinc-900 relative overflow-hidden flex flex-col transition-colors duration-500">
                     <div className="flex-1 overflow-y-auto hide-scrollbar p-6 md:p-12 lg:p-16">
                         <div className="max-w-[1200px] mx-auto w-full h-full flex flex-col justify-center">
 
@@ -262,16 +259,16 @@ export default function OnboardingPage() {
                             <section className="mb-10">
                                 <div className="flex justify-between items-end mb-6">
                                     <div>
-                                        <span className="text-xs font-bold text-[#d64d08] tracking-[0.3em] uppercase mb-3 block font-mono">Step 01</span>
-                                        <h2 className="text-4xl font-light text-gray-900 font-sans">Build Your Family</h2>
+                                        <span className="text-xs font-bold text-primary tracking-[0.3em] uppercase mb-3 block font-mono">Step 01</span>
+                                        <h2 className="text-4xl font-light text-gray-900 dark:text-white font-sans">Build Your Family</h2>
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap gap-6 items-start">
                                     {familyMembers.map((member: any, idx) => (
                                         <div key={idx} className="flex flex-col items-center space-y-2">
                                             <div className="relative group">
-                                                <div className="w-20 h-20 rounded-full border-2 border-[#d64d08] p-0.5 ring-4 ring-transparent group-hover:ring-[#d64d08]/10 transition-all cursor-pointer shadow-sm">
-                                                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-gray-900 font-serif italic text-3xl overflow-hidden">
+                                                <div className="w-20 h-20 rounded-full border-2 border-primary p-0.5 ring-4 ring-transparent group-hover:ring-primary/10 transition-all cursor-pointer shadow-sm">
+                                                    <div className="w-full h-full rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center text-gray-900 dark:text-white font-serif italic text-3xl overflow-hidden">
                                                         {member.image ? (
                                                             <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
                                                         ) : (
@@ -279,44 +276,44 @@ export default function OnboardingPage() {
                                                         )}
                                                     </div>
                                                 </div>
-                                                <div className="absolute -top-1 -right-1 bg-[#d64d08] text-white p-1 rounded-full shadow-md border-2 border-white">
+                                                <div className="absolute -top-1 -right-1 bg-primary text-white p-1 rounded-full shadow-md border-2 border-white dark:border-zinc-800">
                                                     <span className="material-symbols-outlined text-[10px] block font-bold">check</span>
                                                 </div>
                                             </div>
-                                            <span className="text-xs font-bold text-gray-900 uppercase tracking-widest font-mono">{member.name}</span>
+                                            <span className="text-xs font-bold text-gray-900 dark:text-gray-100 uppercase tracking-widest font-mono">{member.name}</span>
                                         </div>
                                     ))}
                                     <div className="flex flex-col items-center space-y-2">
                                         <button
                                             onClick={handleAddMember}
-                                            className="w-20 h-20 rounded-full border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-300 hover:border-[#d64d08] hover:text-[#d64d08] hover:bg-orange-50 transition-all group"
+                                            className="w-20 h-20 rounded-full border-2 border-dashed border-gray-300 dark:border-gray-700 flex flex-col items-center justify-center text-gray-300 dark:text-gray-600 hover:border-primary hover:text-primary hover:bg-orange-50 dark:hover:bg-primary/10 transition-all group"
                                         >
                                             <span className="material-symbols-outlined text-2xl">add</span>
                                         </button>
-                                        <span className="text-xs font-bold text-gray-300 uppercase tracking-widest font-mono group-hover:text-[#d64d08]">Add</span>
+                                        <span className="text-xs font-bold text-gray-300 dark:text-gray-600 uppercase tracking-widest font-mono group-hover:text-primary transition-colors">Add</span>
                                     </div>
                                 </div>
                             </section>
 
-                            <hr className="border-gray-200 mb-10" />
+                            <hr className="border-gray-200 dark:border-gray-800 mb-10" />
 
                             {/* Step 2: Preferences */}
                             <section className="mb-8">
                                 <div className="mb-8">
-                                    <span className="text-xs font-bold text-[#d64d08] tracking-[0.3em] uppercase mb-3 block font-mono">Step 02</span>
-                                    <h2 className="text-4xl font-light text-gray-900 uppercase tracking-tight font-sans">{familyMembers[0].name}'s Preferences</h2>
+                                    <span className="text-xs font-bold text-primary tracking-[0.3em] uppercase mb-3 block font-mono">Step 02</span>
+                                    <h2 className="text-4xl font-light text-gray-900 dark:text-white uppercase tracking-tight font-sans">{familyMembers[0].name}'s Preferences</h2>
                                 </div>
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <div className="flex flex-col gap-6">
                                         {/* Dietary */}
-                                        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Dietary Preferences</label>
+                                        <div className="bg-white dark:bg-zinc-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
+                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Dietary Preferences</label>
                                             <div className="flex flex-wrap gap-2">
                                                 {['Keto', 'Vegan', 'Paleo', 'Vegetarian', 'Pescatarian', 'Low Carb', 'Gluten-Free'].map(diet => (
                                                     <div
                                                         key={diet}
                                                         onClick={() => togglePreference('dietary', diet)}
-                                                        className={`px-5 py-3 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer font-mono ${preferences.dietary.includes(diet) ? 'bg-[#d64d08] border-[#d64d08] text-white shadow-md' : 'border-gray-200 hover:border-[#d64d08] hover:text-[#d64d08] hover:bg-orange-50'}`}
+                                                        className={`px-5 py-3 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer font-mono ${preferences.dietary.includes(diet) ? 'bg-primary border-primary text-white shadow-md' : 'border-gray-200 dark:border-gray-700 dark:text-gray-400 hover:border-primary hover:text-primary hover:bg-orange-50 dark:hover:bg-primary/10'}`}
                                                     >
                                                         {diet}
                                                     </div>
@@ -325,14 +322,14 @@ export default function OnboardingPage() {
                                         </div>
 
                                         {/* Spice Level */}
-                                        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Spice Level</label>
-                                            <div className="flex items-center justify-between bg-gray-50 p-1 rounded-full border border-gray-100">
+                                        <div className="bg-white dark:bg-zinc-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
+                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Spice Level</label>
+                                            <div className="flex items-center justify-between bg-gray-50 dark:bg-zinc-900/50 p-1 rounded-full border border-gray-100 dark:border-gray-800">
                                                 {['None', 'Mild', 'Medium', 'Hot'].map(level => (
                                                     <button
                                                         key={level}
                                                         onClick={() => handleSpiceLevel(level)}
-                                                        className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all font-mono ${preferences.spiceLevel === level ? 'bg-white shadow-sm text-[#d64d08] ring-1 ring-gray-100' : 'text-gray-400 hover:text-gray-600'}`}
+                                                        className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all font-mono ${preferences.spiceLevel === level ? 'bg-white dark:bg-zinc-700 shadow-sm text-primary ring-1 ring-gray-100 dark:ring-gray-800' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'}`}
                                                     >
                                                         {level}
                                                     </button>
@@ -341,13 +338,13 @@ export default function OnboardingPage() {
                                         </div>
 
                                         {/* Favorites as Cuisines */}
-                                        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Favorite Cuisines</label>
+                                        <div className="bg-white dark:bg-zinc-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
+                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Favorite Cuisines</label>
                                             <div className="flex flex-wrap gap-2 mb-4">
                                                 {preferences.favorites.map(cuisine => (
-                                                    <div key={cuisine} className="bg-orange-50 text-[#d64d08] px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-orange-100">
+                                                    <div key={cuisine} className="bg-orange-50 dark:bg-primary/10 text-primary dark:text-primary px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-orange-100 dark:border-primary/20">
                                                         {cuisine}
-                                                        <button onClick={() => handleRemoveItem('favorites', cuisine)} className="hover:text-red-500">
+                                                        <button onClick={() => handleRemoveItem('favorites', cuisine)} className="hover:text-red-500 transition-colors">
                                                             <span className="material-symbols-outlined text-xs">close</span>
                                                         </button>
                                                     </div>
@@ -355,7 +352,7 @@ export default function OnboardingPage() {
                                             </div>
                                             <div className="relative group">
                                                 <input
-                                                    className="w-full bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-1 focus:ring-[#d64d08]/20 transition-all placeholder-gray-300 font-sans"
+                                                    className="w-full bg-white dark:bg-zinc-700 border border-gray-200 dark:border-gray-700 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
                                                     placeholder="e.g. Japanese, Mexican, American Soul"
                                                     type="text"
                                                     value={activeInput === 'favorites' ? inputValue : ""}
@@ -368,7 +365,7 @@ export default function OnboardingPage() {
                                                     }}
                                                 />
                                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
-                                                    <span className="material-symbols-outlined text-lg">keyboard_return</span>
+                                                    <span className="material-symbols-outlined text-lg dark:text-gray-400">keyboard_return</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -376,14 +373,14 @@ export default function OnboardingPage() {
 
                                     <div className="flex flex-col gap-6">
                                         {/* Common Allergens */}
-                                        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Common Allergens</label>
+                                        <div className="bg-white dark:bg-zinc-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
+                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Common Allergens</label>
                                             <div className="flex flex-wrap gap-2">
                                                 {['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat'].map(allergen => (
                                                     <div
                                                         key={allergen}
                                                         onClick={() => togglePreference('allergens', allergen)}
-                                                        className={`px-5 py-3 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer font-mono ${preferences.allergens.includes(allergen) ? 'bg-[#d64d08] border-[#d64d08] text-white shadow-md' : 'border-gray-200 hover:border-[#d64d08] hover:text-[#d64d08] hover:bg-orange-50'}`}
+                                                        className={`px-5 py-3 rounded-full border text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer font-mono ${preferences.allergens.includes(allergen) ? 'bg-primary border-primary text-white shadow-md' : 'border-gray-200 dark:border-gray-700 dark:text-gray-400 hover:border-primary hover:text-primary hover:bg-orange-50 dark:hover:bg-primary/10'}`}
                                                     >
                                                         {allergen}
                                                     </div>
@@ -392,13 +389,13 @@ export default function OnboardingPage() {
                                         </div>
 
                                         {/* Custom Allergens */}
-                                        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Custom Allergens</label>
+                                        <div className="bg-white dark:bg-zinc-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
+                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Custom Allergens</label>
                                             <div className="flex flex-wrap gap-2 mb-4">
                                                 {preferences.allergens.filter(a => !['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat'].includes(a)).map(allergen => (
-                                                    <div key={allergen} className="bg-red-50 text-red-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-red-100">
+                                                    <div key={allergen} className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-red-100 dark:border-red-900/40 transition-colors">
                                                         {allergen}
-                                                        <button onClick={() => handleRemoveItem('allergens', allergen)} className="hover:text-red-500">
+                                                        <button onClick={() => handleRemoveItem('allergens', allergen)} className="hover:text-red-500 transition-colors">
                                                             <span className="material-symbols-outlined text-xs">close</span>
                                                         </button>
                                                     </div>
@@ -406,7 +403,7 @@ export default function OnboardingPage() {
                                             </div>
                                             <div className="relative group">
                                                 <input
-                                                    className="w-full bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-1 focus:ring-[#d64d08]/20 transition-all placeholder-gray-300 font-sans"
+                                                    className="w-full bg-white dark:bg-zinc-700 border border-gray-200 dark:border-gray-700 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
                                                     placeholder="Type and press enter to add..."
                                                     type="text"
                                                     value={activeInput === 'allergens' ? inputValue : ""}
@@ -419,19 +416,19 @@ export default function OnboardingPage() {
                                                     }}
                                                 />
                                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
-                                                    <span className="material-symbols-outlined text-lg">keyboard_return</span>
+                                                    <span className="material-symbols-outlined text-lg dark:text-gray-400">keyboard_return</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Disliked Ingredients */}
-                                        <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 font-mono">Disliked Ingredients</label>
+                                        <div className="bg-white dark:bg-zinc-800 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
+                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Disliked Ingredients</label>
                                             <div className="flex flex-wrap gap-2 mb-4">
                                                 {preferences.dislikes.map(dislike => (
-                                                    <div key={dislike} className="bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-gray-200">
+                                                    <div key={dislike} className="bg-gray-100 dark:bg-zinc-900 text-gray-600 dark:text-gray-400 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-gray-200 dark:border-gray-700 transition-colors">
                                                         {dislike}
-                                                        <button onClick={() => handleRemoveItem('dislikes', dislike)} className="hover:text-red-500">
+                                                        <button onClick={() => handleRemoveItem('dislikes', dislike)} className="hover:text-red-500 transition-colors">
                                                             <span className="material-symbols-outlined text-xs">close</span>
                                                         </button>
                                                     </div>
@@ -439,7 +436,7 @@ export default function OnboardingPage() {
                                             </div>
                                             <div className="relative group">
                                                 <input
-                                                    className="w-full bg-white border border-gray-200 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-[#d64d08] focus:ring-1 focus:ring-[#d64d08]/20 transition-all placeholder-gray-300 font-sans"
+                                                    className="w-full bg-white dark:bg-zinc-700 border border-gray-200 dark:border-gray-700 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
                                                     placeholder="e.g. Cilantro, Olives"
                                                     type="text"
                                                     value={activeInput === 'dislikes' ? inputValue : ""}
@@ -452,7 +449,7 @@ export default function OnboardingPage() {
                                                     }}
                                                 />
                                                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-30">
-                                                    <span className="material-symbols-outlined text-lg">keyboard_return</span>
+                                                    <span className="material-symbols-outlined text-lg dark:text-gray-400">keyboard_return</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -463,11 +460,11 @@ export default function OnboardingPage() {
                     </div>
 
                     {/* Footer / Continue */}
-                    <div className="p-6 border-t border-gray-100 bg-white/90 backdrop-blur-md flex justify-end items-center mt-auto z-10 sticky bottom-0">
+                    <div className="p-6 border-t border-gray-100 dark:border-gray-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md flex justify-end items-center mt-auto z-10 sticky bottom-0 transition-colors">
                         <button
                             onClick={handleComplete}
                             disabled={loading}
-                            className="bg-[#d64d08] hover:bg-[#b54006] text-white font-bold tracking-[0.3em] uppercase text-xs px-12 py-5 rounded-full shadow-lg hover:shadow-orange-500/30 transition-all duration-300 transform active:scale-95 flex items-center space-x-3 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-primary hover:bg-primary-dark text-white font-bold tracking-[0.3em] uppercase text-xs px-12 py-5 rounded-full shadow-lg hover:shadow-orange-500/30 transition-all duration-300 transform active:scale-95 flex items-center space-x-3 font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span>{loading ? "SAVING..." : "CONTINUE"}</span>
                             <span className="material-symbols-outlined text-base">arrow_forward</span>

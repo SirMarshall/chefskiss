@@ -83,7 +83,7 @@ export default function SigninForm() {
 
                 <div className="pt-2">
                     <button
-                        className="w-full bg-[#D65A0C] hover:bg-[#B5490A] text-white font-mono font-bold text-xs tracking-[0.2em] uppercase py-4.5 px-6 rounded-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-primary hover:bg-primary/90 text-white font-mono font-bold text-xs tracking-[0.2em] uppercase py-4.5 px-6 rounded-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                         type="submit"
                         disabled={loading || googleLoading}
                     >

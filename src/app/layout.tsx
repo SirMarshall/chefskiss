@@ -28,6 +28,7 @@ export const metadata: Metadata = {
 
 import { ToastProvider } from "@/context/ToastContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <ToastProvider>
             {children}
+            <ThemeToggle />
           </ToastProvider>
         </ThemeProvider>
       </body>

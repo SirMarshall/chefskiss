@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import ThemeToggle from './ThemeToggle';
 
 interface AuthLayoutProps {
     children: ReactNode;
@@ -28,9 +27,6 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             <div className="relative z-10 w-full flex justify-center p-4">
                 {children}
             </div>
-
-            {/* Theme Toggle */}
-            <ThemeToggle />
         </div>
     );
 }
