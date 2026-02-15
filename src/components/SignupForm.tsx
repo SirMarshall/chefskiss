@@ -41,13 +41,25 @@ export default function SignupForm() {
                 password: formData.password,
                 name: formData.name,
                 username: formData.username,
-                callbackURL: "/dashboard",
+                callbackURL: "/onboarding",
             } as any);
 
             if (error) {
                 toast(error.message || "Failed to create account", "error");
             } else {
-                toast("Welcome to the Kitchen! You've successfully signed up.", "success");
+                toast("Account created! Signing you in...", "success");
+
+                // Auto-login
+                const { error: signInError } = await signIn.email({
+                    email: formData.email,
+                    password: formData.password,
+                    callbackURL: "/onboarding",
+                });
+
+                if (signInError) {
+                    toast("Account created, but failed to auto-sign in. Please sign in manually.", "error");
+                }
+                // Redirect is handled by callbackURL
             }
         } catch (error) {
             console.error("Signup error:", error);
