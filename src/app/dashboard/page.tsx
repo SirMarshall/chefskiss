@@ -171,8 +171,12 @@ export default function DashboardPage() {
                                 </div>
                                 <div className="flex items-center space-x-6 overflow-x-auto pb-4 hide-scrollbar">
                                     <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
-                                        <div className="w-14 h-14 rounded-full bg-white border-2 border-[#d64d08] flex items-center justify-center text-[#d64d08] font-serif italic text-xl shadow-md transition-transform group-hover:scale-105">
-                                            {session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'G'}
+                                        <div className="w-14 h-14 rounded-full bg-white border-2 border-[#d64d08] flex items-center justify-center text-[#d64d08] font-serif italic text-xl shadow-md transition-transform group-hover:scale-105 overflow-hidden">
+                                            {session?.user?.image ? (
+                                                <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
+                                            ) : (
+                                                session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'G'
+                                            )}
                                         </div>
                                         <span className="text-[10px] font-bold text-gray-900 uppercase tracking-wider font-mono">{session?.user?.name?.split(' ')[0] || 'Chef'}</span>
                                     </button>

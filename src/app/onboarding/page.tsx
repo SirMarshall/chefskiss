@@ -44,7 +44,12 @@ export default function OnboardingPage() {
 
     // Form State
     const [familyMembers, setFamilyMembers] = useState([
-        { name: session?.user?.name?.split(' ')[0] || 'Chef', role: 'Head Chef', isSelf: true }
+        {
+            name: session?.user?.name?.split(' ')[0] || 'Chef',
+            role: 'Head Chef',
+            isSelf: true,
+            image: session?.user?.image
+        }
     ]);
 
     const [preferences, setPreferences] = useState<{
@@ -224,12 +229,16 @@ export default function OnboardingPage() {
                                     </div>
                                 </div>
                                 <div className="flex flex-wrap gap-6 items-start">
-                                    {familyMembers.map((member, idx) => (
+                                    {familyMembers.map((member: any, idx) => (
                                         <div key={idx} className="flex flex-col items-center space-y-2">
                                             <div className="relative group">
                                                 <div className="w-16 h-16 rounded-full border-2 border-[#d64d08] p-0.5 ring-4 ring-transparent group-hover:ring-[#d64d08]/10 transition-all cursor-pointer shadow-sm">
-                                                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-gray-900 font-serif italic text-2xl">
-                                                        {member.name.charAt(0)}
+                                                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center text-gray-900 font-serif italic text-2xl overflow-hidden">
+                                                        {member.image ? (
+                                                            <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            member.name.charAt(0)
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div className="absolute -top-1 -right-1 bg-[#d64d08] text-white p-1 rounded-full shadow-md border-2 border-white">
