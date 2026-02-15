@@ -14,8 +14,22 @@ export const auth = betterAuth({
         additionalFields: {
             username: {
                 type: "string",
-                required: true,
+                required: false, // Changed to false as it might not be there on initial signup
                 defaultValue: "",
+            },
+            onboardingComplete: {
+                type: "boolean",
+                required: false,
+                defaultValue: false,
+            },
+            termsAccepted: {
+                type: "boolean",
+                required: false,
+                defaultValue: false,
+            },
+            termsAcceptedAt: {
+                type: "date",
+                required: false,
             }
         }
     },

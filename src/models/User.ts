@@ -1,6 +1,7 @@
 import mongoose, { Schema, model, models } from "mongoose";
 
 export interface IUser {
+    _id: string;
     name: string;
     email: string;
     image?: string;
@@ -13,12 +14,19 @@ export interface IUser {
     favorites?: string[];
     spiceLevel?: string;
 
+    // Onboarding & Terms
+    onboardingComplete?: boolean;
+    termsAccepted?: boolean;
+    termsAcceptedAt?: Date;
+    generatedMenu?: any; // Store the initial menu generated during onboarding
+
     createdAt: Date;
     updatedAt: Date;
 }
 
 const UserSchema = new Schema<IUser>(
     {
+        _id: { type: String }, // better-auth uses String IDs by default
         name: { type: String },
         email: { type: String, unique: true, required: true },
         image: { type: String },
@@ -31,9 +39,15 @@ const UserSchema = new Schema<IUser>(
         allergens: { type: [String], default: [] },
         favorites: { type: [String], default: [] },
         spiceLevel: { type: String, default: "medium" },
+
+        onboardingComplete: { type: Boolean, default: false },
+        termsAccepted: { type: Boolean, default: false },
+        termsAcceptedAt: { type: Date },
+        generatedMenu: { type: Schema.Types.Mixed },
     },
     {
         timestamps: true,
+        collection: 'user', // Match better-auth default collection name
     }
 );
 

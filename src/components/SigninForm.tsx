@@ -19,7 +19,7 @@ export default function SigninForm() {
         try {
             await signIn.social({
                 provider: "google",
-                callbackURL: "/",
+                callbackURL: "/dashboard",
             });
         } catch (error) {
             console.error("Google sign-in error:", error);
@@ -37,7 +37,7 @@ export default function SigninForm() {
             const { error } = await signIn.email({
                 email: formData.email,
                 password: formData.password,
-                callbackURL: "/",
+                callbackURL: "/dashboard",
             });
 
             if (error) {

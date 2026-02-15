@@ -1,10 +1,44 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import AuthLayout from '@/components/AuthLayout';
 import AuthCard from '@/components/AuthCard';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/context/ToastContext';
 
 export default function TermsPage() {
+    const router = useRouter();
+    const { toast } = useToast();
+    const [loading, setLoading] = useState(false);
+
+    const handleAccept = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch('/api/user/update', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    termsAccepted: true,
+                }),
+            });
+
+            if (response.ok) {
+                toast("Terms accepted. Welcome aboard!", "success");
+                // Force a hard reload to ensure session is updated
+                window.location.href = '/onboarding';
+            } else {
+                toast("Failed to accept terms. Please try again.", "error");
+            }
+        } catch (error) {
+            console.error("Error accepting terms:", error);
+            toast("Something went wrong. Please try again.", "error");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const LeftPanel = (
         <>
             <div>
@@ -28,7 +62,7 @@ export default function TermsPage() {
     );
 
     const RightPanel = (
-        <div className="flex flex-col h-full -m-12">
+        <div className="flex flex-col h-full -m-8 md:-m-10">
             <div className="px-8 md:px-16 pt-12 pb-6 border-b border-gray-100 dark:border-gray-800">
                 <h2 className="font-serif italic text-3xl md:text-4xl text-black dark:text-white mb-2">
                     Terms and Conditions
@@ -87,8 +121,12 @@ export default function TermsPage() {
                 </div>
             </div>
             <div className="px-8 md:px-16 py-8 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-zinc-900 flex flex-col sm:flex-row items-center gap-4">
-                <button className="w-full sm:w-auto px-10 py-4 bg-[#D65A0C] hover:bg-[#B5490A] text-white font-mono font-bold text-xs tracking-[0.2em] uppercase rounded-sm shadow-lg transition-all duration-300 transform hover:-translate-y-0.5">
-                    I AGREE
+                <button
+                    onClick={handleAccept}
+                    disabled={loading}
+                    className="w-full sm:w-auto px-10 py-4 bg-[#D65A0C] hover:bg-[#B5490A] text-white font-mono font-bold text-xs tracking-[0.2em] uppercase rounded-sm shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {loading ? "PROCESSING..." : "I AGREE"}
                 </button>
                 <button className="w-full sm:w-auto px-10 py-4 border border-gray-200 dark:border-gray-700 text-black dark:text-white font-mono font-bold text-xs tracking-[0.2em] uppercase rounded-sm hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                     PRINT

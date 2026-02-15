@@ -12,14 +12,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
             <div
                 className="absolute inset-0 z-0"
                 style={{
-                    backgroundImage: `
-            conic-gradient(
-              var(--checker-color-1) 90deg, 
-              var(--checker-color-2) 90deg 180deg, 
-              var(--checker-color-1) 180deg 270deg, 
-              var(--checker-color-2) 270deg
-            )
-          `,
+                    backgroundImage: `conic-gradient(var(--checker-color-1) 90deg, var(--checker-color-2) 90deg 180deg, var(--checker-color-1) 180deg 270deg, var(--checker-color-2) 270deg)`,
                     backgroundSize: '200px 200px',
                     backgroundPosition: 'center',
                 }}
