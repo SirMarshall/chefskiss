@@ -12,8 +12,8 @@ export default function RecipeDetail({ recipe, onClose }: RecipeDetailProps) {
     if (!recipe) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="w-full max-w-[1600px] h-full max-h-[900px] bg-white dark:bg-zinc-900 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 md:p-8 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="w-full max-w-[1600px] h-full md:max-h-[900px] bg-white dark:bg-zinc-900 rounded-none md:rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative animate-in zoom-in-95 duration-200">
 
                 {/* Close Button */}
                 <button
@@ -75,7 +75,7 @@ export default function RecipeDetail({ recipe, onClose }: RecipeDetailProps) {
                         <div className="absolute bottom-0 left-0 right-0 p-8 pb-4">
                             <div className="flex items-center space-x-3 mb-3">
                                 {recipe.tags && recipe.tags.map((tag: string, i: number) => (
-                                    <span key={i} className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">{tag}</span>
+                                    <span key={i} className="bg-white/90 dark:bg-zinc-900/90 backdrop-blur-sm shadow-sm text-primary text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">{tag}</span>
                                 ))}
                             </div>
                             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
@@ -144,8 +144,8 @@ export default function RecipeDetail({ recipe, onClose }: RecipeDetailProps) {
                                                     {step.instruction}
                                                 </p>
                                                 {step.timerSeconds && (
-                                                    <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-900/30 flex items-start gap-3">
-                                                        <span className="material-symbols-outlined text-amber-600 dark:text-amber-500 text-sm mt-0.5">timer</span>
+                                                    <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-100 dark:border-amber-900/30 flex items-center gap-3">
+                                                        <span className="material-symbols-outlined text-amber-600 dark:text-amber-500 text-sm">timer</span>
                                                         <p className="text-xs text-amber-800 dark:text-amber-200 font-medium">Timer: {Math.floor(step.timerSeconds / 60)} min</p>
                                                     </div>
                                                 )}

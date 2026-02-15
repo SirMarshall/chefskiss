@@ -179,7 +179,7 @@ export default function DashboardPage() {
                                         setIsSidebarOpen(false);
                                     }}
                                     className={`flex items-center space-x-3 text-sm font-medium tracking-wide transition-colors py-1 ${item.disabled
-                                        ? 'text-gray-300 dark:text-gray-700 cursor-not-allowed opacity-50'
+                                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
                                         : activeTab === item.id
                                             ? 'text-primary border-r-2 border-primary'
                                             : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
@@ -187,6 +187,9 @@ export default function DashboardPage() {
                                 >
                                     <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                                     <span>{item.label}</span>
+                                    {item.disabled && (
+                                        <span className="bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 whitespace-nowrap">SOON</span>
+                                    )}
                                 </a>
                             ))}
                         </nav>
@@ -293,14 +296,14 @@ export default function DashboardPage() {
                             {/* Mobile Config Drawer Overlay */}
                             {isConfigOpen && (
                                 <div
-                                    className="fixed inset-0 bg-black/60 z-30 lg:hidden backdrop-blur-sm transition-opacity"
+                                    className="fixed inset-0 bg-black/60 z-[55] lg:hidden backdrop-blur-sm transition-opacity"
                                     onClick={() => setIsConfigOpen(false)}
                                 />
                             )}
 
                             <div className={`
-                                fixed inset-y-0 right-0 z-40 w-[90%] sm:w-80 lg:relative lg:inset-auto lg:z-0 lg:w-2/5 transform transition-transform duration-300 ease-in-out
-                                bg-gray-50 dark:bg-zinc-900/40 border-l border-gray-200/50 dark:border-gray-800/50 lg:border-l-0 overflow-y-auto lg:flex flex-col transition-colors duration-500
+                                fixed inset-y-0 right-0 z-[60] w-full sm:w-80 lg:relative lg:inset-auto lg:z-0 lg:w-2/5 transform transition-transform duration-300 ease-in-out
+                                bg-gray-50/95 dark:bg-zinc-900/90 backdrop-blur-xl border-l border-gray-200/50 dark:border-gray-800/50 lg:border-l-0 overflow-y-auto lg:flex flex-col transition-colors duration-500
                                 ${isConfigOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
                             `}>
                                 <div className="p-8 md:p-12 space-y-10">
