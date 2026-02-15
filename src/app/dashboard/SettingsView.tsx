@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "@/lib/auth-client";
+import { useSession, signOut } from "@/lib/auth-client";
 import { useState } from "react";
 import { updateUserName, deleteUserAccount } from "@/app/actions/user";
 import { useRouter } from "next/navigation";
@@ -11,6 +11,24 @@ export default function SettingsView() {
     const [name, setName] = useState(session?.user?.name || "");
     const [isUpdating, setIsUpdating] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const handleSignOut = async () => {
+        setIsLoggingOut(true);
+        try {
+            await signOut({
+                fetchOptions: {
+                    onSuccess: () => {
+                        router.push("/");
+                    },
+                },
+            });
+        } catch (error) {
+            console.error("Logout failed:", error);
+            alert("Failed to log out. Please try again.");
+            setIsLoggingOut(false);
+        }
+    };
 
     const handleUpdateName = async () => {
         if (!name.trim()) return;
@@ -72,6 +90,33 @@ export default function SettingsView() {
                             </button>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <section className="space-y-6">
+                <div className="border-b border-gray-200 dark:border-gray-800 pb-2">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white font-serif italic">Account Security</h3>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-800/50 border border-gray-200 dark:border-gray-800/50 rounded-lg p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-1">Session Management</h4>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Securely sign out of your current session.
+                        </p>
+                    </div>
+                    <button
+                        onClick={handleSignOut}
+                        disabled={isLoggingOut}
+                        className="bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 px-6 py-2.5 rounded-sm text-xs font-bold uppercase tracking-[0.1em] hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all font-mono shadow-sm flex items-center gap-2"
+                    >
+                        {isLoggingOut ? (
+                            <span className="animate-spin h-3.5 w-3.5 border-2 border-gray-400 border-t-transparent rounded-full"></span>
+                        ) : (
+                            <span className="material-symbols-outlined text-sm">logout</span>
+                        )}
+                        {isLoggingOut ? "SIGNING OUT..." : "SIGN OUT"}
+                    </button>
                 </div>
             </section>
 
