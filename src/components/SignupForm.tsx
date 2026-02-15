@@ -36,13 +36,13 @@ export default function SignupForm() {
         setLoading(true);
 
         try {
-            const { error } = await (signUp.email as any)({
+            const { error } = await signUp.email({
                 email: formData.email,
                 password: formData.password,
                 name: formData.name,
                 username: formData.username,
                 callbackURL: "/dashboard",
-            });
+            } as any);
 
             if (error) {
                 toast(error.message || "Failed to create account", "error");
