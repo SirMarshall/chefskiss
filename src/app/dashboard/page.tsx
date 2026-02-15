@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan, getUserProfile } from "@/app/actions/mealPlan";
 import DashboardOverview from "./DashboardOverview";
-import MealPlanView from "./MealPlanView";
+import SettingsView from "./SettingsView";
 
 export default function DashboardPage() {
     const { data: session, isPending } = useSession();
@@ -163,11 +163,10 @@ export default function DashboardPage() {
                         </div>
                         <nav className="space-y-6">
                             {[
-                                { id: 'dashboard', label: 'DASHBOARD', icon: 'dashboard' },
-                                { id: 'meal-plan', label: 'MEAL PLAN', icon: 'calendar_month' },
+                                { id: 'dashboard', label: 'PLAN', icon: 'dashboard' },
                                 { id: 'pantry', label: 'PANTRY', icon: 'kitchen', disabled: true },
                                 { id: 'family', label: 'FAMILY', icon: 'groups', disabled: true },
-                                { id: 'settings', label: 'SETTINGS', icon: 'settings', disabled: true }
+                                { id: 'settings', label: 'SETTINGS', icon: 'settings' }
                             ].map((item) => (
                                 <a
                                     key={item.id}
@@ -196,7 +195,17 @@ export default function DashboardPage() {
                     </div>
                     <div className="mt-auto hidden md:block">
                         <blockquote className="text-gray-800 dark:text-gray-300 font-serif italic text-lg leading-relaxed">
-                            "Your palate is unique.<br />Your menu should be too."
+                            {activeTab === 'settings' ? (
+                                <>
+                                    "I'm going through changes."
+                                    <span className="block text-[10px] mt-2 not-italic font-bold font-mono tracking-widest text-gray-400 uppercase">- Black Sabbath</span>
+                                </>
+                            ) : (
+                                // Default Quote
+                                <>
+                                    "Your palate is unique.<br />Your menu should be too."
+                                </>
+                            )}
                         </blockquote>
                     </div>
                 </aside>
@@ -216,32 +225,15 @@ export default function DashboardPage() {
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-10 flex-shrink-0">
                             <div>
                                 <h2 className="text-xs font-bold text-gray-400 dark:text-gray-500 tracking-widest uppercase mb-1 font-mono">
-                                    {activeTab === 'dashboard' ? 'Weekly Calendar' : 'Weekly Forecast'}
+                                    {activeTab === 'settings' ? 'Preferences' : 'Weekly Calendar'}
                                 </h2>
-                                <h3 className="text-3xl font-light text-gray-900 dark:text-white font-sans">Your Menu</h3>
+                                <h3 className="text-3xl font-light text-gray-900 dark:text-white font-sans">
+                                    {activeTab === 'settings' ? 'Settings' : 'Your Menu'}
+                                </h3>
                             </div>
                             {/* Action Buttons */}
                             <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-                                {activeTab === 'meal-plan' && (
-                                    <div className="flex items-center gap-2">
-                                        <button className="hidden sm:flex bg-gray-100 dark:bg-zinc-800 hover:bg-gray-200 dark:hover:bg-zinc-700 text-gray-700 dark:text-gray-300 text-[10px] font-bold uppercase tracking-wider px-3 py-2 rounded-lg transition-colors items-center space-x-2">
-                                            <span className="material-symbols-outlined text-sm">print</span>
-                                            <span>Print</span>
-                                        </button>
-                                        <button
-                                            onClick={handleGeneratePlan}
-                                            disabled={isGenerating || hasPlan}
-                                            className="bg-primary hover:bg-primary-dark text-white text-[10px] font-bold uppercase tracking-wider px-3 py-2 rounded-lg transition-colors shadow-lg hover:shadow-orange-500/30 flex items-center space-x-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                                        >
-                                            {isGenerating ? (
-                                                <div className="animate-spin h-3 w-3 border-2 border-white rounded-full border-t-transparent"></div>
-                                            ) : (
-                                                <span className="material-symbols-outlined text-sm">auto_awesome</span>
-                                            )}
-                                            <span>{isGenerating ? "..." : (hasPlan ? "Active" : "New")}</span>
-                                        </button>
-                                    </div>
-                                )}
+
 
                                 <div className="flex space-x-4">
                                     <button className="flex items-center space-x-2 text-xs font-bold tracking-widest uppercase text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors font-mono">
@@ -257,7 +249,7 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Content Area */}
-                        {!hasPlan ? (
+                        {!hasPlan && activeTab !== 'settings' ? (
                             // EMPTY STATE
                             <div className="flex-1 flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl bg-gray-50/50 dark:bg-zinc-800/30 text-center">
                                 <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
@@ -282,10 +274,10 @@ export default function DashboardPage() {
                                 </button>
                             </div>
                         ) : (
-                            activeTab === 'dashboard' ? (
-                                <DashboardOverview mealPlan={mealPlan} />
+                            activeTab === 'settings' ? (
+                                <SettingsView />
                             ) : (
-                                <MealPlanView mealPlan={mealPlan} />
+                                <DashboardOverview mealPlan={mealPlan} />
                             )
                         )}
                     </div>
