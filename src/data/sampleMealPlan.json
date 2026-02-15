@@ -1,0 +1,188 @@
+{
+    "id": "plan_123456789",
+    "weekStartDate": "2024-10-28",
+    "userProfile": {
+        "name": "Chef Carter",
+        "dietaryRestrictions": [
+            "Low Carb"
+        ],
+        "allergens": [
+            "Peanuts"
+        ],
+        "dislikes": [
+            "Olives"
+        ],
+        "favorites": [
+            "Avocado",
+            "Salmon"
+        ],
+        "spiceLevel": "Medium",
+        "householdSize": 2
+    },
+    "days": [
+        {
+            "day": "Monday",
+            "summary": "High-Energy Start",
+            "meals": {
+                "breakfast": {
+                    "id": "rcp_001",
+                    "name": "Avocado & Egg Power Bowl",
+                    "description": "A quick, high-protein breakfast to start your week right.",
+                    "image": "/images/recipes/avo-egg.jpg",
+                    "imageColor": "bg-green-100",
+                    "prepTimeMinutes": 5,
+                    "cookTimeMinutes": 10,
+                    "totalTimeMinutes": 15,
+                    "difficulty": "Easy",
+                    "servings": 2,
+                    "tags": [
+                        "Quick",
+                        "High Protein"
+                    ],
+                    "nutrition": {
+                        "calories": 450,
+                        "protein": 22,
+                        "carbs": 12,
+                        "fats": 35
+                    },
+                    "ingredients": [
+                        {
+                            "name": "Avocado",
+                            "quantity": 1,
+                            "unit": "whole",
+                            "category": "Produce"
+                        },
+                        {
+                            "name": "Eggs",
+                            "quantity": 4,
+                            "unit": "whole",
+                            "category": "Dairy"
+                        },
+                        {
+                            "name": "Cherry Tomatoes",
+                            "quantity": 1,
+                            "unit": "cup",
+                            "category": "Produce"
+                        }
+                    ],
+                    "instructions": [
+                        {
+                            "stepNumber": 1,
+                            "instruction": "Boil water in a small pot."
+                        },
+                        {
+                            "stepNumber": 2,
+                            "instruction": "Add eggs and cook for 7 minutes for soft boiled.",
+                            "timerSeconds": 420
+                        },
+                        {
+                            "stepNumber": 3,
+                            "instruction": "Slice avocado and tomatoes while eggs cook."
+                        }
+                    ]
+                },
+                "lunch": {
+                    "id": "rcp_002",
+                    "name": "Grilled Chicken Caesar Salad",
+                    "description": "Classic Caesar with a low-carb twist (no croutons).",
+                    "imageColor": "bg-yellow-100",
+                    "prepTimeMinutes": 15,
+                    "cookTimeMinutes": 15,
+                    "totalTimeMinutes": 30,
+                    "difficulty": "Medium",
+                    "servings": 2,
+                    "tags": [
+                        "Classic",
+                        "Salad"
+                    ],
+                    "nutrition": {
+                        "calories": 520,
+                        "protein": 45,
+                        "carbs": 8,
+                        "fats": 32
+                    },
+                    "ingredients": [
+                        {
+                            "name": "Chicken Breast",
+                            "quantity": 2,
+                            "unit": "fillets",
+                            "category": "Meat"
+                        },
+                        {
+                            "name": "Romaine Lettuce",
+                            "quantity": 2,
+                            "unit": "heads",
+                            "category": "Produce"
+                        }
+                    ],
+                    "instructions": [
+                        {
+                            "stepNumber": 1,
+                            "instruction": "Grill chicken until internal temp reaches 165°F."
+                        },
+                        {
+                            "stepNumber": 2,
+                            "instruction": "Chop lettuce and toss with dressing."
+                        }
+                    ]
+                },
+                "dinner": {
+                    "id": "rcp_003",
+                    "name": "Miso Glazed Salmon",
+                    "description": "Savory, umami-packed salmon with roasted asparagus.",
+                    "imageColor": "bg-orange-100",
+                    "prepTimeMinutes": 10,
+                    "cookTimeMinutes": 20,
+                    "totalTimeMinutes": 30,
+                    "difficulty": "Medium",
+                    "servings": 2,
+                    "tags": [
+                        "Omega-3",
+                        "Dinner Party"
+                    ],
+                    "nutrition": {
+                        "calories": 600,
+                        "protein": 40,
+                        "carbs": 15,
+                        "fats": 40
+                    },
+                    "ingredients": [
+                        {
+                            "name": "Salmon Fillet",
+                            "quantity": 2,
+                            "unit": "pcs",
+                            "category": "Seafood"
+                        },
+                        {
+                            "name": "Miso Paste",
+                            "quantity": 2,
+                            "unit": "tbsp",
+                            "category": "Pantry"
+                        },
+                        {
+                            "name": "Asparagus",
+                            "quantity": 1,
+                            "unit": "bunch",
+                            "category": "Produce"
+                        }
+                    ],
+                    "instructions": [
+                        {
+                            "stepNumber": 1,
+                            "instruction": "Preheat oven to 400°F."
+                        },
+                        {
+                            "stepNumber": 2,
+                            "instruction": "Mix miso, soy sauce, and ginger."
+                        },
+                        {
+                            "stepNumber": 3,
+                            "instruction": "Brush glaze on salmon and bake for 12-15 minutes.",
+                            "timerSeconds": 900
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}

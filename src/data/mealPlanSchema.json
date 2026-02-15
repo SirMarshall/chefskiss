@@ -1,0 +1,705 @@
+{
+    "type": "object",
+    "properties": {
+        "response": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "weekStartDate": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "userProfile": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "type": "string"
+                        },
+                        "dietaryRestrictions": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "allergens": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "dislikes": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "favorites": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        "spiceLevel": {
+                            "type": "string",
+                            "enum": [
+                                "None",
+                                "Mild",
+                                "Medium",
+                                "Hot"
+                            ]
+                        },
+                        "householdSize": {
+                            "type": "integer",
+                            "minimum": 1
+                        }
+                    },
+                    "required": [
+                        "name",
+                        "dietaryRestrictions",
+                        "allergens",
+                        "dislikes",
+                        "favorites",
+                        "spiceLevel",
+                        "householdSize"
+                    ]
+                },
+                "days": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "day": {
+                                "type": "string",
+                                "enum": [
+                                    "Monday",
+                                    "Tuesday",
+                                    "Wednesday",
+                                    "Thursday",
+                                    "Friday",
+                                    "Saturday",
+                                    "Sunday"
+                                ]
+                            },
+                            "summary": {
+                                "type": "string"
+                            },
+                            "meals": {
+                                "type": "object",
+                                "properties": {
+                                    "breakfast": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "image": {
+                                                "type": "string"
+                                            },
+                                            "imageColor": {
+                                                "type": "string"
+                                            },
+                                            "prepTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "cookTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "totalTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "difficulty": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Easy",
+                                                    "Medium",
+                                                    "Hard"
+                                                ]
+                                            },
+                                            "cuisine": {
+                                                "type": "string"
+                                            },
+                                            "tags": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "rating": {
+                                                "type": "number",
+                                                "minimum": 1,
+                                                "maximum": 5
+                                            },
+                                            "servings": {
+                                                "type": "integer"
+                                            },
+                                            "nutrition": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "calories": {
+                                                        "type": "number"
+                                                    },
+                                                    "protein": {
+                                                        "type": "number"
+                                                    },
+                                                    "carbs": {
+                                                        "type": "number"
+                                                    },
+                                                    "fats": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "calories",
+                                                    "protein",
+                                                    "carbs",
+                                                    "fats"
+                                                ]
+                                            },
+                                            "ingredients": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "quantity": {
+                                                            "type": "number"
+                                                        },
+                                                        "unit": {
+                                                            "type": "string"
+                                                        },
+                                                        "notes": {
+                                                            "type": "string"
+                                                        },
+                                                        "category": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "quantity",
+                                                        "unit"
+                                                    ]
+                                                }
+                                            },
+                                            "instructions": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "stepNumber": {
+                                                            "type": "integer"
+                                                        },
+                                                        "instruction": {
+                                                            "type": "string"
+                                                        },
+                                                        "timerSeconds": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "stepNumber",
+                                                        "instruction"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "name",
+                                            "description",
+                                            "prepTimeMinutes",
+                                            "cookTimeMinutes",
+                                            "totalTimeMinutes",
+                                            "difficulty",
+                                            "servings",
+                                            "nutrition",
+                                            "ingredients",
+                                            "instructions",
+                                            "tags"
+                                        ]
+                                    },
+                                    "lunch": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "image": {
+                                                "type": "string"
+                                            },
+                                            "imageColor": {
+                                                "type": "string"
+                                            },
+                                            "prepTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "cookTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "totalTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "difficulty": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Easy",
+                                                    "Medium",
+                                                    "Hard"
+                                                ]
+                                            },
+                                            "cuisine": {
+                                                "type": "string"
+                                            },
+                                            "tags": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "rating": {
+                                                "type": "number",
+                                                "minimum": 1,
+                                                "maximum": 5
+                                            },
+                                            "servings": {
+                                                "type": "integer"
+                                            },
+                                            "nutrition": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "calories": {
+                                                        "type": "number"
+                                                    },
+                                                    "protein": {
+                                                        "type": "number"
+                                                    },
+                                                    "carbs": {
+                                                        "type": "number"
+                                                    },
+                                                    "fats": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "calories",
+                                                    "protein",
+                                                    "carbs",
+                                                    "fats"
+                                                ]
+                                            },
+                                            "ingredients": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "quantity": {
+                                                            "type": "number"
+                                                        },
+                                                        "unit": {
+                                                            "type": "string"
+                                                        },
+                                                        "notes": {
+                                                            "type": "string"
+                                                        },
+                                                        "category": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "quantity",
+                                                        "unit"
+                                                    ]
+                                                }
+                                            },
+                                            "instructions": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "stepNumber": {
+                                                            "type": "integer"
+                                                        },
+                                                        "instruction": {
+                                                            "type": "string"
+                                                        },
+                                                        "timerSeconds": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "stepNumber",
+                                                        "instruction"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "name",
+                                            "description",
+                                            "prepTimeMinutes",
+                                            "cookTimeMinutes",
+                                            "totalTimeMinutes",
+                                            "difficulty",
+                                            "servings",
+                                            "nutrition",
+                                            "ingredients",
+                                            "instructions",
+                                            "tags"
+                                        ]
+                                    },
+                                    "dinner": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "image": {
+                                                "type": "string"
+                                            },
+                                            "imageColor": {
+                                                "type": "string"
+                                            },
+                                            "prepTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "cookTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "totalTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "difficulty": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Easy",
+                                                    "Medium",
+                                                    "Hard"
+                                                ]
+                                            },
+                                            "cuisine": {
+                                                "type": "string"
+                                            },
+                                            "tags": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "rating": {
+                                                "type": "number",
+                                                "minimum": 1,
+                                                "maximum": 5
+                                            },
+                                            "servings": {
+                                                "type": "integer"
+                                            },
+                                            "nutrition": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "calories": {
+                                                        "type": "number"
+                                                    },
+                                                    "protein": {
+                                                        "type": "number"
+                                                    },
+                                                    "carbs": {
+                                                        "type": "number"
+                                                    },
+                                                    "fats": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "calories",
+                                                    "protein",
+                                                    "carbs",
+                                                    "fats"
+                                                ]
+                                            },
+                                            "ingredients": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "quantity": {
+                                                            "type": "number"
+                                                        },
+                                                        "unit": {
+                                                            "type": "string"
+                                                        },
+                                                        "notes": {
+                                                            "type": "string"
+                                                        },
+                                                        "category": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "quantity",
+                                                        "unit"
+                                                    ]
+                                                }
+                                            },
+                                            "instructions": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "stepNumber": {
+                                                            "type": "integer"
+                                                        },
+                                                        "instruction": {
+                                                            "type": "string"
+                                                        },
+                                                        "timerSeconds": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "stepNumber",
+                                                        "instruction"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "name",
+                                            "description",
+                                            "prepTimeMinutes",
+                                            "cookTimeMinutes",
+                                            "totalTimeMinutes",
+                                            "difficulty",
+                                            "servings",
+                                            "nutrition",
+                                            "ingredients",
+                                            "instructions",
+                                            "tags"
+                                        ]
+                                    },
+                                    "snack": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "string"
+                                            },
+                                            "name": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "image": {
+                                                "type": "string"
+                                            },
+                                            "imageColor": {
+                                                "type": "string"
+                                            },
+                                            "prepTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "cookTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "totalTimeMinutes": {
+                                                "type": "integer"
+                                            },
+                                            "difficulty": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "Easy",
+                                                    "Medium",
+                                                    "Hard"
+                                                ]
+                                            },
+                                            "cuisine": {
+                                                "type": "string"
+                                            },
+                                            "tags": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "rating": {
+                                                "type": "number",
+                                                "minimum": 1,
+                                                "maximum": 5
+                                            },
+                                            "servings": {
+                                                "type": "integer"
+                                            },
+                                            "nutrition": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "calories": {
+                                                        "type": "number"
+                                                    },
+                                                    "protein": {
+                                                        "type": "number"
+                                                    },
+                                                    "carbs": {
+                                                        "type": "number"
+                                                    },
+                                                    "fats": {
+                                                        "type": "number"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "calories",
+                                                    "protein",
+                                                    "carbs",
+                                                    "fats"
+                                                ]
+                                            },
+                                            "ingredients": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "quantity": {
+                                                            "type": "number"
+                                                        },
+                                                        "unit": {
+                                                            "type": "string"
+                                                        },
+                                                        "notes": {
+                                                            "type": "string"
+                                                        },
+                                                        "category": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "name",
+                                                        "quantity",
+                                                        "unit"
+                                                    ]
+                                                }
+                                            },
+                                            "instructions": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "stepNumber": {
+                                                            "type": "integer"
+                                                        },
+                                                        "instruction": {
+                                                            "type": "string"
+                                                        },
+                                                        "timerSeconds": {
+                                                            "type": "integer"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "stepNumber",
+                                                        "instruction"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "id",
+                                            "name",
+                                            "description",
+                                            "prepTimeMinutes",
+                                            "cookTimeMinutes",
+                                            "totalTimeMinutes",
+                                            "difficulty",
+                                            "servings",
+                                            "nutrition",
+                                            "ingredients",
+                                            "instructions",
+                                            "tags"
+                                        ]
+                                    }
+                                },
+                                "required": [
+                                    "breakfast",
+                                    "lunch",
+                                    "dinner"
+                                ]
+                            }
+                        },
+                        "required": [
+                            "day",
+                            "meals"
+                        ]
+                    }
+                },
+                "shoppingList": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "quantity": {
+                                "type": "number"
+                            },
+                            "unit": {
+                                "type": "string"
+                            },
+                            "notes": {
+                                "type": "string"
+                            },
+                            "category": {
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "name",
+                            "quantity",
+                            "unit"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "id",
+                "weekStartDate",
+                "userProfile",
+                "days"
+            ]
+        }
+    },
+    "required": [
+        "response"
+    ]
+}
