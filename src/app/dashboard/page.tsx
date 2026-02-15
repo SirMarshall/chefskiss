@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan, getUserProfile } from "@/app/actions/mealPlan";
 import DashboardOverview from "./DashboardOverview";
 import SettingsView from "./SettingsView";
+import DashboardSkeleton from "@/components/DashboardSkeleton";
 
 export default function DashboardPage() {
     const { data: session, isPending } = useSession();
@@ -246,7 +247,23 @@ export default function DashboardPage() {
                         </div>
 
                         {/* Content Area */}
-                        {!hasPlan && activeTab !== 'settings' ? (
+                        {isGenerating ? (
+                            <div className="flex-1 flex flex-col">
+                                <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                                    <div className="flex items-center space-x-3 mb-2">
+                                        <div className="flex space-x-1">
+                                            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                                            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                                            <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
+                                        </div>
+                                        <span className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase font-mono">We're Cooking...</span>
+                                    </div>
+                                    <h4 className="text-2xl font-serif italic text-gray-900 dark:text-white">Curating your personalized weekly palette...</h4>
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 font-mono">Fetching seasonal inspiration & balancing nutrition</p>
+                                </div>
+                                <DashboardSkeleton />
+                            </div>
+                        ) : !hasPlan && activeTab !== 'settings' ? (
                             // EMPTY STATE
                             <div className="flex-1 flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl bg-gray-50/50 dark:bg-zinc-800/30 text-center">
                                 <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
@@ -277,6 +294,7 @@ export default function DashboardPage() {
                                 <DashboardOverview mealPlan={mealPlan} />
                             )
                         )}
+
                     </div>
 
                     {/* Right Panel - Configuration */}

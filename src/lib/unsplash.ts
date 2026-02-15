@@ -4,6 +4,9 @@ import dbConnect from "./db";
 const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 const UNSPLASH_API_URL = "https://api.unsplash.com";
 
+// Simple in-memory flag to stop hammering the API if we hit a limit in the current process
+let isRateLimited = false;
+
 interface UnsplashImageResult {
     imageUrl: string;
     imageBlurHash: string;
@@ -17,10 +20,24 @@ export async function searchImage(query: string): Promise<UnsplashImageResult | 
     try {
         await dbConnect();
 
-        // 1. Check Cache
-        const cached = await ImageCache.findOne({ query: query.toLowerCase() });
+        const normalizedQuery = query.toLowerCase().trim();
+
+        // 1. Check Cache for Exact Match
+        let cached = await ImageCache.findOne({ query: normalizedQuery });
+
+        // 2. "Fuzzy" Cache Fallback: If no exact match, try the last word (usually the noun)
+        if (!cached) {
+            const words = normalizedQuery.split(" ");
+            if (words.length > 1) {
+                const keyword = words[words.length - 1]; // e.g. "Salmon" from "Honey Garlic Salmon"
+                cached = await ImageCache.findOne({ query: new RegExp(keyword, "i") });
+                if (cached) {
+                    console.log(`[Unsplash] Fuzzy cache hit for "${query}" using keyword "${keyword}"`);
+                }
+            }
+        }
+
         if (cached) {
-            console.log(`[Unsplash] Cache hit for "${query}"`);
             return {
                 imageUrl: cached.imageUrl,
                 imageBlurHash: cached.imageBlurHash,
@@ -29,18 +46,24 @@ export async function searchImage(query: string): Promise<UnsplashImageResult | 
             };
         }
 
-        // 2. Fetch from Unsplash
-        if (!UNSPLASH_ACCESS_KEY) {
-            console.warn("[Unsplash] No access key provided. Skipping image fetch.");
+        // 3. Early exit if we know we are rate limited or have no key
+        if (isRateLimited || !UNSPLASH_ACCESS_KEY) {
             return null;
         }
 
+        // 4. Fetch from Unsplash
         console.log(`[Unsplash] Fetching for "${query}"`);
         const response = await fetch(`${UNSPLASH_API_URL}/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`, {
             headers: {
                 "Authorization": `Client-ID ${UNSPLASH_ACCESS_KEY}`
             }
         });
+
+        if (response.status === 403 || response.status === 429) {
+            console.warn("[Unsplash] Rate limit hit. Disabling further requests for this session.");
+            isRateLimited = true;
+            return null;
+        }
 
         if (!response.ok) {
             console.error(`[Unsplash] Error fetching image: ${response.status} ${response.statusText}`);
@@ -52,28 +75,27 @@ export async function searchImage(query: string): Promise<UnsplashImageResult | 
         if (data.results && data.results.length > 0) {
             const photo = data.results[0];
             const result: UnsplashImageResult = {
-                imageUrl: photo.urls.regular, // or 'small' depending on needs
+                imageUrl: photo.urls.regular,
                 imageBlurHash: photo.blur_hash,
                 imageUserName: photo.user.name,
                 imageUserLink: photo.user.links.html
             };
 
-            // 3. Save to Cache (expires in 7 days)
+            // 5. Save to Cache
             await ImageCache.create({
-                query: query.toLowerCase(),
+                query: normalizedQuery,
                 ...result,
                 expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             });
 
             return result;
-        } else {
-            console.log(`[Unsplash] No results found for "${query}"`);
-            // Optionally cache the "no result" to match existing behavior or avoid re-querying
-            return null;
         }
+
+        return null;
 
     } catch (error) {
         console.error("[Unsplash] Unexpected error:", error);
         return null;
     }
 }
+
