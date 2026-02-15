@@ -165,19 +165,25 @@ export default function DashboardPage() {
                             {[
                                 { id: 'dashboard', label: 'DASHBOARD', icon: 'dashboard' },
                                 { id: 'meal-plan', label: 'MEAL PLAN', icon: 'calendar_month' },
-                                { id: 'pantry', label: 'PANTRY', icon: 'kitchen' },
-                                { id: 'family', label: 'FAMILY', icon: 'groups' },
-                                { id: 'settings', label: 'SETTINGS', icon: 'settings' }
+                                { id: 'pantry', label: 'PANTRY', icon: 'kitchen', disabled: true },
+                                { id: 'family', label: 'FAMILY', icon: 'groups', disabled: true },
+                                { id: 'settings', label: 'SETTINGS', icon: 'settings', disabled: true }
                             ].map((item) => (
                                 <a
                                     key={item.id}
                                     href="#"
                                     onClick={(e) => {
                                         e.preventDefault();
+                                        if (item.disabled) return;
                                         setActiveTab(item.id);
                                         setIsSidebarOpen(false);
                                     }}
-                                    className={`flex items-center space-x-3 text-sm font-medium tracking-wide transition-colors py-1 ${activeTab === item.id ? 'text-primary border-r-2 border-primary' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
+                                    className={`flex items-center space-x-3 text-sm font-medium tracking-wide transition-colors py-1 ${item.disabled
+                                        ? 'text-gray-300 dark:text-gray-700 cursor-not-allowed opacity-50'
+                                        : activeTab === item.id
+                                            ? 'text-primary border-r-2 border-primary'
+                                            : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                                        }`}
                                 >
                                     <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
                                     <span>{item.label}</span>
@@ -312,7 +318,7 @@ export default function DashboardPage() {
                                     </div>
 
                                     {/* Family Profiles */}
-                                    <section>
+                                    <section className="opacity-40 pointer-events-none grayscale-[0.5]">
                                         <div className="flex justify-between items-center mb-6">
                                             <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Family Profiles</label>
                                             <button
