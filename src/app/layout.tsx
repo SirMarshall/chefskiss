@@ -28,6 +28,7 @@ export const metadata: Metadata = {
 
 import { ToastProvider } from "@/context/ToastContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </ToastProvider>
         </ThemeProvider>
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
