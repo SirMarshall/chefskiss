@@ -1,25 +1,29 @@
 
-import React from 'react';
-
-interface DashboardOverviewProps {
-    mealPlan: any;
-}
-
+import React, { useState, useEffect } from 'react';
 import RecipeDetail from '@/components/RecipeDetail';
-import { useState } from 'react';
 
 interface DashboardOverviewProps {
     mealPlan: any;
+    onPlanComplete: () => void;
 }
 
-export default function DashboardOverview({ mealPlan }: DashboardOverviewProps) {
+export default function DashboardOverview({ mealPlan, onPlanComplete }: DashboardOverviewProps) {
     const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
+    const [now, setNow] = useState(new Date());
+
+    // Update 'now' every minute to catch day changes in real-time
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setNow(new Date());
+        }, 60000);
+        return () => clearInterval(timer);
+    }, []);
 
     if (!mealPlan || !mealPlan.days) return null;
 
-    // Calculate current day index relative to weekStartDate
-    const getTodayIndex = () => {
-        const today = new Date();
+    // Calculate current status relative to weekStartDate
+    const getPlanStatus = () => {
+        const today = new Date(now);
         today.setHours(0, 0, 0, 0);
 
         const start = new Date(mealPlan.weekStartDate);
@@ -29,17 +33,40 @@ export default function DashboardOverview({ mealPlan }: DashboardOverviewProps) 
         const diffTime = today.getTime() - startLocal.getTime();
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-        // Return 0 if in the past or before start, otherwise the calculated index (capped at length-1)
-        return Math.max(0, Math.min(diffDays, mealPlan.days.length - 1));
+        return {
+            currentIndex: Math.max(0, diffDays),
+            isExpired: diffDays >= mealPlan.days.length,
+            isFuture: diffDays < 0
+        };
     };
 
-    const todayIdx = getTodayIndex();
-    const todayData = mealPlan.days[todayIdx];
+    const status = getPlanStatus();
+    
+    // If expired, show completion view
+    if (status.isExpired) {
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-12 text-center animate-in fade-in duration-700">
+                <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-8 text-primary animate-bounce">
+                    <span className="material-symbols-outlined text-5xl">celebration</span>
+                </div>
+                <h2 className="text-xs font-bold text-primary tracking-[0.3em] uppercase mb-4 font-mono">Mission Accomplished</h2>
+                <h3 className="text-4xl font-serif italic text-gray-900 dark:text-white mb-6">You've finished your plan!</h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-10 max-w-md leading-relaxed">
+                    That's a wrap on this week's culinary journey. Your palate is refreshed and your kitchen is ready for a new chapter.
+                </p>
+                <button
+                    onClick={onPlanComplete}
+                    className="bg-primary hover:bg-primary-dark text-white px-10 py-5 rounded-sm shadow-2xl font-bold tracking-[0.2em] text-xs uppercase flex items-center gap-3 transition-all hover:scale-105 active:scale-95"
+                >
+                    <span className="material-symbols-outlined">refresh</span>
+                    Start New Week
+                </button>
+            </div>
+        );
+    }
 
-    // Days to show: Today first, then future days, then past days (optional, but let's just show from today onwards?)
-    // Actually, usually users want to see the whole plan but highlight today.
-    // The previous UI showed all days in order. 
-    // Let's re-order to show Today first, then the rest.
+    const todayIdx = Math.min(status.currentIndex, mealPlan.days.length - 1);
+    const todayData = mealPlan.days[todayIdx];
 
     const otherDays = [
         ...mealPlan.days.slice(todayIdx + 1),
@@ -140,3 +167,4 @@ export default function DashboardOverview({ mealPlan }: DashboardOverviewProps) 
         </div>
     );
 }
+

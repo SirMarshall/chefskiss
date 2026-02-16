@@ -4,7 +4,7 @@
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan, getUserProfile } from "@/app/actions/mealPlan";
+import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan, getUserProfile, archiveCurrentMealPlan } from "@/app/actions/mealPlan";
 import { SuggestionTagInput, PillSelector } from "@/components/preferences/PreferencesUI";
 import DashboardOverview from "./DashboardOverview";
 import SettingsView from "./SettingsView";
@@ -113,6 +113,18 @@ export default function DashboardPage() {
             setIsGenerating(false);
         }
     };
+
+    const handlePlanComplete = async () => {
+        try {
+            await archiveCurrentMealPlan();
+            setMealPlan(null);
+            setHasPlan(false);
+        } catch (error) {
+            console.error("Failed to archive plan:", error);
+            alert("Failed to clear current plan. Please try again.");
+        }
+    };
+
 
 
 
@@ -289,14 +301,14 @@ export default function DashboardPage() {
                                     ) : (
                                         <span className="material-symbols-outlined">auto_awesome</span>
                                     )}
-                                    {isGenerating ? "Generating..." : "Generate First Plan"}
+                                    {isGenerating ? "Generating..." : "Generate Plan"}
                                 </button>
                             </div>
                         ) : (
                             activeTab === 'settings' ? (
                                 <SettingsView />
                             ) : (
-                                <DashboardOverview mealPlan={mealPlan} />
+                                <DashboardOverview mealPlan={mealPlan} onPlanComplete={handlePlanComplete} />
                             )
                         )}
 

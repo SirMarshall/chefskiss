@@ -327,3 +327,23 @@ export async function getUserProfile() {
     // Return as plain object
     return JSON.parse(JSON.stringify(user));
 }
+/**
+ * Archives the current meal plan by clearing the user's active plan flags.
+ */
+export async function archiveCurrentMealPlan() {
+    await dbConnect();
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+
+    await User.findByIdAndUpdate(session.user.id, {
+        mealPlanGenerated: false,
+        currentMealPlanId: null
+    });
+
+    return { success: true };
+}
