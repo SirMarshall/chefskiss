@@ -5,9 +5,12 @@ import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { checkMealPlanStatus, getActiveMealPlan, generateInitialMealPlan, getUserProfile } from "@/app/actions/mealPlan";
+import { SuggestionTagInput, PillSelector } from "@/components/preferences/PreferencesUI";
 import DashboardOverview from "./DashboardOverview";
 import SettingsView from "./SettingsView";
 import DashboardSkeleton from "@/components/DashboardSkeleton";
+
+const CUISINE_SUGGESTIONS = ['Japanese', 'Mexican', 'Italian', 'French', 'Indian', 'Thai', 'Mediterranean', 'American'];
 
 export default function DashboardPage() {
     const { data: session, isPending } = useSession();
@@ -22,10 +25,10 @@ export default function DashboardPage() {
     const [numDays, setNumDays] = useState(7); // Default to 7 days
 
     // Profile State
-    const [dietaryRestrictions, setDietaryRestrictions] = useState("");
-    const [allergens, setAllergens] = useState("");
-    const [favorites, setFavorites] = useState("");
-    const [dislikes, setDislikes] = useState("");
+    const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
+    const [allergens, setAllergens] = useState<string[]>([]);
+    const [favorites, setFavorites] = useState<string[]>([]);
+    const [dislikes, setDislikes] = useState<string[]>([]);
     const [spiceLevel, setSpiceLevel] = useState("Medium");
     const [householdSize, setHouseholdSize] = useState(1);
 
@@ -76,10 +79,10 @@ export default function DashboardPage() {
             // Load profile
             getUserProfile().then(profile => {
                 if (profile) {
-                    setDietaryRestrictions(profile.dietaryRestrictions?.join(", ") || "");
-                    setAllergens(profile.allergens?.join(", ") || "");
-                    setFavorites(profile.favorites?.join(", ") || "");
-                    setDislikes(profile.dislikes?.join(", ") || "");
+                    setDietaryRestrictions(profile.dietaryRestrictions || []);
+                    setAllergens(profile.allergens || []);
+                    setFavorites(profile.favorites || []);
+                    setDislikes(profile.dislikes || []);
                     if (profile.spiceLevel) setSpiceLevel(profile.spiceLevel.charAt(0).toUpperCase() + profile.spiceLevel.slice(1).toLowerCase());
                     if (profile.householdSize) setHouseholdSize(profile.householdSize);
                     if (profile.planDuration) setNumDays(profile.planDuration);
@@ -93,10 +96,10 @@ export default function DashboardPage() {
         setIsGenerating(true);
         try {
             const newPlan = await generateInitialMealPlan(numDays, {
-                dietaryRestrictions: dietaryRestrictions.split(',').map(s => s.trim()).filter(Boolean),
-                allergens: allergens.split(',').map(s => s.trim()).filter(Boolean),
-                favorites: favorites.split(',').map(s => s.trim()).filter(Boolean),
-                dislikes: dislikes.split(',').map(s => s.trim()).filter(Boolean),
+                dietaryRestrictions,
+                allergens,
+                favorites,
+                dislikes,
                 spiceLevel,
                 householdSize
             });
@@ -110,6 +113,8 @@ export default function DashboardPage() {
             setIsGenerating(false);
         }
     };
+
+
 
     if (isPending || !session || !session.user ||
         !(session.user as any).termsAccepted ||
@@ -361,64 +366,48 @@ export default function DashboardPage() {
                                     </section>
 
                                     {/* Form Fields */}
-                                    <section className="space-y-6">
-                                        <div className="group">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Dietary Needs (Global)</label>
-                                            <input
-                                                value={dietaryRestrictions}
-                                                onChange={(e) => setDietaryRestrictions(e.target.value)}
-                                                className="w-full bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                                placeholder="e.g. Keto, Vegan"
-                                                type="text"
-                                            />
-                                        </div>
-                                        <div className="group">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Allergens</label>
-                                            <input
-                                                value={allergens}
-                                                onChange={(e) => setAllergens(e.target.value)}
-                                                className="w-full bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                                placeholder="e.g. Peanuts, Shellfish"
-                                                type="text"
-                                            />
-                                        </div>
-                                        <div className="group">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Favorite Cuisines</label>
-                                            <input
-                                                value={favorites}
-                                                onChange={(e) => setFavorites(e.target.value)}
-                                                className="w-full bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                                placeholder="Japanese, Mexican, Soul Food..."
-                                                type="text"
-                                            />
-                                        </div>
-                                        <div className="group">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 group-focus-within:text-primary transition-colors font-mono">Dislikes</label>
-                                            <input
-                                                value={dislikes}
-                                                onChange={(e) => setDislikes(e.target.value)}
-                                                className="w-full bg-white dark:bg-zinc-800/80 border border-gray-200 dark:border-gray-700 rounded-sm text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-0 transition-colors placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                                placeholder="Mushrooms, Cilantro..."
-                                                type="text"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Spice Level</label>
-                                            <div className="flex rounded-sm overflow-hidden bg-gray-100 dark:bg-zinc-800 p-1 gap-1">
-                                                {["None", "Mild", "Medium", "Hot"].map((level) => (
-                                                    <button
-                                                        key={level}
-                                                        onClick={() => setSpiceLevel(level)}
-                                                        className={`flex-1 py-3 text-xs font-bold tracking-wider uppercase rounded-sm font-mono transition-all ${spiceLevel === level
-                                                            ? "bg-black dark:bg-white dark:text-black text-white shadow-sm"
-                                                            : "text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-white dark:hover:bg-zinc-700"
-                                                            }`}
-                                                    >
-                                                        {level}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
+                                    <section className="space-y-8">
+                                        <PillSelector
+                                            label="Dietary Needs"
+                                            options={['Keto', 'Vegan', 'Paleo', 'Vegetarian', 'Pescatarian', 'Low Carb', 'Gluten-Free']}
+                                            value={dietaryRestrictions}
+                                            onChange={(val) => setDietaryRestrictions(val as string[])}
+                                            multiSelect={true}
+                                        />
+
+                                        <SuggestionTagInput
+                                            label="Allergens"
+                                            placeholder="e.g. Peanuts, Shellfish"
+                                            value={allergens}
+                                            onChange={setAllergens}
+                                            suggestions={['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat']}
+                                            color="red"
+                                        />
+
+                                        <SuggestionTagInput
+                                            label="Favorite Cuisines"
+                                            placeholder="Japanese, Mexican..."
+                                            value={favorites}
+                                            onChange={setFavorites}
+                                            suggestions={CUISINE_SUGGESTIONS}
+                                        />
+
+                                        <SuggestionTagInput
+                                            label="Dislikes"
+                                            placeholder="Mushrooms, Cilantro..."
+                                            value={dislikes}
+                                            onChange={setDislikes}
+                                            color="gray"
+                                        />
+
+                                        <PillSelector
+                                            label="Spice Level"
+                                            options={["None", "Mild", "Medium", "Hot"]}
+                                            value={spiceLevel}
+                                            onChange={(val) => setSpiceLevel(val as string)}
+                                        />
+
+                                        <div className="space-y-6">
                                         <div>
                                             <div className="flex justify-between items-center mb-3">
                                                 <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Household Size</label>
@@ -461,6 +450,7 @@ export default function DashboardPage() {
                                                 ))}
                                             </div>
                                         </div>
+                                    </div>
                                     </section>
 
                                     <div className="pt-8 border-t border-gray-200 dark:border-gray-700">

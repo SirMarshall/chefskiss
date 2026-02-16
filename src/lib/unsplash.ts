@@ -30,7 +30,9 @@ export async function searchImage(query: string): Promise<UnsplashImageResult | 
             const words = normalizedQuery.split(" ");
             if (words.length > 1) {
                 const keyword = words[words.length - 1]; // e.g. "Salmon" from "Honey Garlic Salmon"
-                cached = await ImageCache.findOne({ query: new RegExp(keyword, "i") });
+                // Escape special characters to prevent "Invalid regular expression"
+                const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                cached = await ImageCache.findOne({ query: new RegExp(escapedKeyword, "i") });
                 if (cached) {
                     console.log(`[Unsplash] Fuzzy cache hit for "${query}" using keyword "${keyword}"`);
                 }

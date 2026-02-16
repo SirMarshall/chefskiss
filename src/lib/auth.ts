@@ -20,7 +20,6 @@ export const auth = betterAuth({
             username: {
                 type: "string",
                 required: false,
-                defaultValue: "",
             },
             onboardingComplete: {
                 type: "boolean",
@@ -42,6 +41,11 @@ export const auth = betterAuth({
         google: {
             clientId: process.env.GOOGLE_CLIENT_ID || "",
             clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+            mapProfileToUser: (profile) => {
+                return {
+                    username: profile.email,
+                }
+            }
         }
     }
 });
