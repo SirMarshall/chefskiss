@@ -199,7 +199,7 @@ export default function DashboardClient({
 
 
                 {/* Main Content */}
-                <main className="flex-1 flex overflow-hidden bg-white dark:bg-zinc-900 transition-colors duration-500">
+                <main className="flex-1 flex overflow-hidden bg-white dark:bg-zinc-900">
                     <div className={`w-full ${activeTab === 'dashboard' ? 'lg:w-3/5' : ''} p-6 md:p-12 overflow-y-auto border-r border-gray-100 dark:border-gray-800 flex flex-col`}>
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-10 flex-shrink-0">
                             <div>
@@ -278,7 +278,7 @@ export default function DashboardClient({
 
                             <div className={`
                                 fixed inset-y-0 right-0 z-[60] w-full sm:w-80 lg:relative lg:inset-auto lg:z-0 lg:w-2/5 transform transition-transform duration-300 ease-in-out
-                                bg-gray-50/95 dark:bg-zinc-900/90 backdrop-blur-xl border-l border-gray-200/50 dark:border-gray-800/50 lg:border-l-0 overflow-y-auto lg:flex flex-col transition-colors duration-500
+                                bg-gray-50/95 dark:bg-zinc-900/90 backdrop-blur-xl border-l border-gray-200/50 dark:border-gray-800/50 lg:border-l-0 overflow-y-auto lg:flex flex-col
                                 ${isConfigOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
                             `}>
                                 <div className="p-8 md:p-12 space-y-10">

@@ -6,7 +6,7 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
     return (
-        <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center font-sans selection:bg-primary selection:text-white bg-background-light dark:bg-black transition-colors duration-500">
+        <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center font-sans selection:bg-primary selection:text-white bg-background-light dark:bg-black">
             {/* Vibrant Checkerboard Background */}
             <div
                 className="absolute inset-0 z-0"

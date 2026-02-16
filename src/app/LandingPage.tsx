@@ -90,7 +90,7 @@ export default function LandingPage() {
 
     return (
         <AuthLayout>
-            <div className={`w-full flex justify-center transition-all duration-1000 ease-out transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
+            <div className={`w-full flex justify-center transition-all duration-500 ease-out transform ${mounted ? 'translate-y-0 opacity-100' : 'translate-y-12 opacity-0'}`}>
                 <AuthCard leftPanel={LeftPanel} rightPanel={RightPanel} />
             </div>
         </AuthLayout>

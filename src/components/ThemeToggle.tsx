@@ -1,10 +1,25 @@
 "use client";
 
-import React from "react";
-import { useTheme } from "@/context/ThemeContext";
+import { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 
 export default function ThemeToggle() {
-    const { theme, toggleTheme } = useTheme();
+    const { setTheme, resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const toggleTheme = () => {
+        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    };
+
+    if (!mounted) {
+        return (
+            <div className="fixed bottom-8 right-8 z-50 p-4 rounded-full bg-white dark:bg-zinc-800 shadow-2xl border border-black/10 dark:border-white/10 w-14 h-14" />
+        );
+    }
 
     return (
         <button
@@ -13,10 +28,10 @@ export default function ThemeToggle() {
             aria-label="Toggle Theme"
         >
             <div className="relative w-6 h-6">
-                <span className={`material-symbols-outlined absolute inset-0 transition-transform duration-500 ${theme === 'dark' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'}`}>
+                <span className={`material-symbols-outlined absolute inset-0 transition-transform duration-500 ${resolvedTheme === 'dark' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'}`}>
                     light_mode
                 </span>
-                <span className={`material-symbols-outlined absolute inset-0 transition-transform duration-500 ${theme === 'light' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'}`}>
+                <span className={`material-symbols-outlined absolute inset-0 transition-transform duration-500 ${resolvedTheme === 'light' ? 'rotate-0 opacity-100' : '-rotate-90 opacity-0'}`}>
                     dark_mode
                 </span>
             </div>

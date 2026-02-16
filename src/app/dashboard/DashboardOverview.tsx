@@ -74,9 +74,9 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
     ];
 
     return (
-        <div className="space-y-8 pb-12 transition-all duration-500">
+        <div className="space-y-8 pb-12">
             {/* Today - Featured */}
-            <div className="bg-white dark:bg-zinc-800 rounded-3xl p-8 border-2 border-primary shadow-xl relative overflow-hidden transition-colors duration-500">
+            <div className="bg-white dark:bg-zinc-800 rounded-3xl p-8 border-2 border-primary shadow-xl relative overflow-hidden">
                 <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-4 py-1 uppercase tracking-widest font-mono">Today</div>
                 <div className="mb-6">
                     <span className="text-[11px] font-black text-primary uppercase tracking-tighter font-mono">Day {String(todayIdx + 1).padStart(2, '0')}</span>

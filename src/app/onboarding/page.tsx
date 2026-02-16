@@ -4,7 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession, updateUser } from '@/lib/auth-client';
 import { useToast } from '@/context/ToastContext';
-import { useTheme } from '@/context/ThemeContext';
+import { useTheme } from 'next-themes';
 import ImageWithFallback from '@/components/ImageWithFallback';
 
 const CUISINE_SUGGESTIONS = ['Japanese', 'Mexican', 'Italian', 'French', 'Indian', 'Thai', 'Mediterranean', 'American'];
@@ -41,8 +41,13 @@ export default function OnboardingPage() {
     const router = useRouter();
     const { data: session } = useSession();
     const { toast } = useToast();
-    const { theme, toggleTheme } = useTheme();
+    const { setTheme, resolvedTheme } = useTheme();
     const [loading, setLoading] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     // UI State
     const [activeMeal, setActiveMeal] = useState<MealType>('dinner');
@@ -210,7 +215,7 @@ export default function OnboardingPage() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="flex h-screen w-full bg-background-light dark:bg-background-dark overflow-hidden transition-colors duration-500 flex-col">
+        <div className="flex h-screen w-full bg-background-light dark:bg-background-dark overflow-hidden flex-col">
             {/* Mobile Header */}
             <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-800/50 bg-panel-left-light dark:bg-panel-left-dark z-50">
                 <div className="flex flex-col">
@@ -295,13 +300,19 @@ export default function OnboardingPage() {
                     </div>
 
                     <button
-                        onClick={toggleTheme}
+                        onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
                         className="mt-6 flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-gray-400 hover:text-primary transition-colors font-mono"
                     >
-                        <span className="material-symbols-outlined text-xl">
-                            {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-                        </span>
-                        {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                        {mounted ? (
+                            <>
+                                <span className="material-symbols-outlined text-xl">
+                                    {resolvedTheme === 'dark' ? 'light_mode' : 'dark_mode'}
+                                </span>
+                                {resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                            </>
+                        ) : (
+                            <div className="h-5 w-24 bg-gray-200/50 dark:bg-zinc-800/50 animate-pulse rounded" />
+                        )}
                     </button>
                 </aside>
 
@@ -314,7 +325,7 @@ export default function OnboardingPage() {
                 )}
 
                 {/* Main Content */}
-                <main className="flex-1 bg-[#F9FAFB] dark:bg-zinc-900 relative overflow-hidden flex flex-col transition-colors duration-500">
+                <main className="flex-1 bg-[#F9FAFB] dark:bg-zinc-900 relative overflow-hidden flex flex-col">
                     <div className="flex-1 overflow-y-auto hide-scrollbar p-6 md:p-12 lg:p-16">
                         <div className="max-w-[1200px] mx-auto w-full flex flex-col pt-10 pb-20">
 

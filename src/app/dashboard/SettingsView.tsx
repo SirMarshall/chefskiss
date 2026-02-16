@@ -5,12 +5,18 @@ import { useState, useEffect } from "react";
 import { updateUserName, deleteUserAccount } from "@/app/actions/user";
 import { useRouter } from "next/navigation";
 
-import { useTheme } from "@/context/ThemeContext";
+import { useTheme } from "next-themes";
 
 export default function SettingsView({ onProfileUpdate }: { onProfileUpdate?: () => void }) {
     const { data: session } = useSession();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
     const [name, setName] = useState(session?.user?.name || "");
     const [isUpdating, setIsUpdating] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -138,14 +144,14 @@ export default function SettingsView({ onProfileUpdate }: { onProfileUpdate?: ()
                     <div className="flex bg-gray-100 dark:bg-zinc-900 p-1 rounded-lg border border-gray-200 dark:border-gray-700">
                         <button
                             onClick={() => setTheme('light')}
-                            className={`px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${theme === 'light' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                            className={`px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${mounted && theme === 'light' ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'}`}
                         >
                             <span className="material-symbols-outlined text-sm">light_mode</span>
                             Light
                         </button>
                         <button
                             onClick={() => setTheme('dark')}
-                            className={`px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${theme === 'dark' ? 'bg-zinc-800 shadow-sm text-primary' : 'text-gray-500 dark:text-gray-400 hover:text-gray-300'}`}
+                            className={`px-4 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 ${mounted && theme === 'dark' ? 'bg-zinc-800 shadow-sm text-primary' : 'text-gray-500 dark:text-gray-400 hover:text-gray-300'}`}
                         >
                             <span className="material-symbols-outlined text-sm">dark_mode</span>
                             Dark
