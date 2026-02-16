@@ -24,6 +24,8 @@ export default function DashboardPage() {
     const [mealPlan, setMealPlan] = useState<any>(null);
     const [numDays, setNumDays] = useState(7); // Default to 7 days
 
+    const [hasUnlimitedRegens, setHasUnlimitedRegens] = useState(false);
+
     // Profile State
     const [dietaryRestrictions, setDietaryRestrictions] = useState<string[]>([]);
     const [allergens, setAllergens] = useState<string[]>([]);
@@ -86,13 +88,14 @@ export default function DashboardPage() {
                     if (profile.spiceLevel) setSpiceLevel(profile.spiceLevel.charAt(0).toUpperCase() + profile.spiceLevel.slice(1).toLowerCase());
                     if (profile.householdSize) setHouseholdSize(profile.householdSize);
                     if (profile.planDuration) setNumDays(profile.planDuration);
+                    if (profile.hasUnlimitedRegens) setHasUnlimitedRegens(profile.hasUnlimitedRegens);
                 }
             });
         }
     }, [session, isPending]);
 
     const handleGeneratePlan = async () => {
-        if (hasPlan) return; // Prevent generation if plan exists
+        if (hasPlan && !hasUnlimitedRegens) return; // Prevent generation if plan exists and not unlimited
         setIsGenerating(true);
         try {
             const newPlan = await generateInitialMealPlan(numDays, {
@@ -293,7 +296,7 @@ export default function DashboardPage() {
                                 </p>
                                 <button
                                     onClick={handleGeneratePlan}
-                                    disabled={isGenerating || hasPlan}
+                                    disabled={isGenerating || (hasPlan && !hasUnlimitedRegens)}
                                     className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-sm shadow-lg font-bold tracking-widest text-xs uppercase flex items-center gap-2 transition-all hover:scale-105 disabled:opacity-70 disabled:hover:scale-100 disabled:cursor-not-allowed"
                                 >
                                     {isGenerating ? (
@@ -301,12 +304,12 @@ export default function DashboardPage() {
                                     ) : (
                                         <span className="material-symbols-outlined">auto_awesome</span>
                                     )}
-                                    {isGenerating ? "Generating..." : "Generate Plan"}
+                                    {isGenerating ? "Generating..." : (hasPlan && hasUnlimitedRegens ? "Regenerate Plan" : "Generate Plan")}
                                 </button>
                             </div>
                         ) : (
                             activeTab === 'settings' ? (
-                                <SettingsView />
+                                <SettingsView onProfileUpdate={() => setHasUnlimitedRegens(true)} />
                             ) : (
                                 <DashboardOverview mealPlan={mealPlan} onPlanComplete={handlePlanComplete} />
                             )
@@ -457,12 +460,12 @@ export default function DashboardPage() {
                                                 {[1, 3, 5, 7].map((days) => (
                                                     <button
                                                         key={days}
-                                                        onClick={() => !hasPlan && setNumDays(days)}
-                                                        disabled={hasPlan}
+                                                        onClick={() => (!hasPlan || hasUnlimitedRegens) && setNumDays(days)}
+                                                        disabled={hasPlan && !hasUnlimitedRegens}
                                                         className={`py-2 text-[10px] font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
-                                                            ? (hasPlan ? 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent' : 'bg-primary text-white border-primary')
+                                                            ? (hasPlan && !hasUnlimitedRegens ? 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent' : 'bg-primary text-white border-primary')
                                                             : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'
-                                                            } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                            } ${hasPlan && !hasUnlimitedRegens ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     >
                                                         {days} Days
                                                     </button>
@@ -475,8 +478,8 @@ export default function DashboardPage() {
                                     <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
                                         <button
                                             onClick={handleGeneratePlan}
-                                            disabled={isGenerating || hasPlan}
-                                            className={`w-full font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl transition-all duration-300 transform flex items-center justify-center space-x-2 font-mono ${isGenerating || hasPlan
+                                            disabled={isGenerating || (hasPlan && !hasUnlimitedRegens)}
+                                            className={`w-full font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl transition-all duration-300 transform flex items-center justify-center space-x-2 font-mono ${isGenerating || (hasPlan && !hasUnlimitedRegens)
                                                 ? 'bg-gray-300 dark:bg-zinc-800 text-gray-500 dark:text-gray-500 cursor-not-allowed shadow-none'
                                                 : 'bg-primary hover:bg-primary-dark text-white hover:shadow-orange-500/30 active:scale-[0.97]'
                                                 }`}
@@ -489,7 +492,7 @@ export default function DashboardPage() {
                                             ) : (
                                                 <>
                                                     <span className="material-symbols-outlined">auto_awesome</span>
-                                                    <span>{hasPlan ? "Plan Active" : "Generate Plan"}</span>
+                                                    <span>{hasPlan ? (hasUnlimitedRegens ? "Regenerate Plan" : "Plan Active") : "Generate Plan"}</span>
                                                 </>
                                             )}
                                         </button>

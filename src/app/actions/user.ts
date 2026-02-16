@@ -54,3 +54,30 @@ export async function deleteUserAccount() {
 
     return { success: true };
 }
+
+export async function redeemReferralCode(code: string) {
+    await dbConnect();
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+
+    if (!code || code.trim().length === 0) {
+        throw new Error("Code cannot be empty");
+    }
+
+    const normalizedCode = code.trim().toUpperCase();
+
+    if (normalizedCode === "IVER") {
+        await User.findByIdAndUpdate(session.user.id, {
+            hasUnlimitedRegens: true
+        });
+        revalidatePath("/dashboard");
+        return { success: true, message: "Unlimited meal plan regenerations unlocked!" };
+    } else {
+        throw new Error("Invalid referral code.");
+    }
+}

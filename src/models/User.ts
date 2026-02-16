@@ -26,6 +26,7 @@ export interface IUser {
     // Meal Plan Integration
     currentMealPlanId?: string; // Reference to the active WeeklyMealPlan
     mealPlanGenerated?: boolean; // Fast flag for UI
+    hasUnlimitedRegens?: boolean; // Referral code bonus
 
     createdAt: Date;
     updatedAt: Date;
@@ -58,6 +59,7 @@ const UserSchema = new Schema<IUser>(
         // Meal Plan Integration
         currentMealPlanId: { type: Schema.Types.ObjectId, ref: 'WeeklyMealPlan' },
         mealPlanGenerated: { type: Boolean, default: false },
+        hasUnlimitedRegens: { type: Boolean, default: false },
     },
     {
         timestamps: true,

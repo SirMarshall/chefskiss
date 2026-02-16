@@ -85,7 +85,7 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
         await user.save();
     }
 
-    if (user.mealPlanGenerated) {
+    if (user.mealPlanGenerated && !user.hasUnlimitedRegens) {
         throw new Error("Meal plan already exists.");
     }
 
@@ -199,8 +199,8 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
     };
 
     // Construct Prompt
-    const prompt = `
-        Generate a meal plan for ${days} days for a user with the following profile:
+        const prompt = `
+        Generate a meal plan for exactly ${days} days for a user with the following profile:
         Name: ${user.name}
         Dietary Restrictions: ${user.dietaryRestrictions?.join(", ") || "None"}
         Allergens: ${user.allergens?.join(", ") || "None"}
@@ -211,6 +211,7 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
 
         The plan MUST start from today (${todayName}, ${todayISO}).
         The 'weekStartDate' in the response MUST be "${todayISO}".
+        The 'days' array MUST contain exactly ${days} items.
         For each day in the 'days' array, provide the correct day name (e.g. ${todayName} for the first day, then the next day, etc.).
         Provide colorful, appetizing color codes for 'imageColor' (hex).
         Ensure nutritional balance.
@@ -320,7 +321,7 @@ export async function getUserProfile() {
         throw new Error("Unauthorized");
     }
 
-    const user = await User.findById(session.user.id).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize planDuration');
+    const user = await User.findById(session.user.id).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize planDuration hasUnlimitedRegens');
 
     if (!user) return null;
 

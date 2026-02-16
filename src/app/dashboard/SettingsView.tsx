@@ -1,13 +1,13 @@
 "use client";
 
 import { useSession, signOut } from "@/lib/auth-client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { updateUserName, deleteUserAccount } from "@/app/actions/user";
 import { useRouter } from "next/navigation";
 
 import { useTheme } from "@/context/ThemeContext";
 
-export default function SettingsView() {
+export default function SettingsView({ onProfileUpdate }: { onProfileUpdate?: () => void }) {
     const { data: session } = useSession();
     const router = useRouter();
     const { theme, setTheme } = useTheme();
@@ -175,6 +175,110 @@ export default function SettingsView() {
                     </button>
                 </div>
             </section>
+
+             <section className="space-y-6">
+                <div className="border-b border-gray-200 dark:border-gray-800 pb-2">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white font-serif italic">Promotions</h3>
+                </div>
+
+                <div className="bg-white dark:bg-zinc-800/50 border border-gray-200 dark:border-gray-800/50 rounded-lg p-6">
+                     <ReferralCodeInput onProfileUpdate={onProfileUpdate} />
+                </div>
+            </section>
+        </div>
+    );
+}
+
+function ReferralCodeInput({ onProfileUpdate }: { onProfileUpdate?: () => void }) {
+    const [code, setCode] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+    const { data: session } = useSession(); // Access session to check if already redeemed
+    // However, session might not be updated immediately. Ideally we use the profile.
+    // For now, let's just allow input. If they are already unlimited, the backend action will just set it to true again, which is fine.
+
+    // Better: Check if they ALREADY have it.
+    // We need to fetch the profile to know if they have it, or trust the session if we update session.
+    // The session object from `useSession` might not have the custom field unless we added it to the session callback.
+    // Let's rely on the action's response or a profile fetch.
+    // Actually, let's just fetch the profile to check status on load?
+    // Or just let them enter it.
+
+    const [hasUnlimited, setHasUnlimited] = useState(false);
+
+    useEffect(() => {
+       // Check status on mount
+       import("@/app/actions/mealPlan").then(({getUserProfile}) => {
+           getUserProfile().then(profile => {
+               if (profile?.hasUnlimitedRegens) {
+                   setHasUnlimited(true);
+               }
+           })
+       })
+    }, []);
+
+    const handleRedeem = async () => {
+        if (!code.trim()) return;
+        setIsLoading(true);
+        setMessage(null);
+
+        try {
+            const { redeemReferralCode } = await import("@/app/actions/user");
+            const result = await redeemReferralCode(code);
+            if (result.success) {
+                setMessage({ type: 'success', text: "Code redeemed! You now have unlimited meal plan generations." });
+                setHasUnlimited(true);
+                setCode("");
+                if (onProfileUpdate) onProfileUpdate(); // Notify parent
+            }
+        } catch (error: any) {
+            setMessage({ type: 'error', text: error.message || "Invalid code." });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (hasUnlimited) {
+         return (
+             <div className="flex items-center gap-3 text-green-600 dark:text-green-400">
+                 <span className="material-symbols-outlined">check_circle</span>
+                 <div>
+                     <p className="font-bold text-sm uppercase tracking-wide">Premium Active</p>
+                     <p className="text-xs opacity-80">Unlimited meal plan generations enabled.</p>
+                 </div>
+             </div>
+         )
+    }
+
+    return (
+        <div className="flex flex-col gap-4">
+             <div>
+                <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-1">Referral Code</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Enter a code to unlock detailed features.
+                </p>
+            </div>
+            <div className="flex gap-4">
+                <input
+                    type="text"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    placeholder="Enter code"
+                    className="flex-1 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-gray-700 rounded-sm px-4 py-2 text-sm focus:outline-none focus:border-primary transition-colors font-mono uppercase"
+                />
+                <button
+                    onClick={handleRedeem}
+                    disabled={isLoading || !code.trim()}
+                    className="bg-gray-900 dark:bg-white text-white dark:text-zinc-900 px-6 py-2 rounded-sm text-xs font-bold uppercase tracking-wider hover:bg-gray-800 dark:hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-mono"
+                >
+                    {isLoading ? "Checking..." : "Redeem"}
+                </button>
+            </div>
+            {message && (
+                <p className={`text-xs font-bold ${message.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                    {message.text}
+                </p>
+            )}
         </div>
     );
 }
