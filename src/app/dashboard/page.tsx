@@ -333,35 +333,42 @@ export default function DashboardPage() {
                                     </div>
 
                                     {/* Family Profiles */}
-                                    <section className="opacity-40 pointer-events-none grayscale-[0.5]">
-                                        <div className="flex justify-between items-center mb-6">
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Family Profiles</label>
-                                            <button
-                                                onClick={() => alert("Multi-profile support coming soon!")}
-                                                className="flex items-center space-x-1 text-primary hover:text-primary-dark transition-colors text-xs font-bold uppercase font-mono"
-                                            >
-                                                <span className="material-symbols-outlined text-sm">add</span>
-                                                <span>New Profile</span>
-                                            </button>
+                                    <section className="relative">
+                                        <div className="absolute inset-0 z-10 flex items-center justify-center">
+                                            <div className="bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-4 py-2 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 flex items-center space-x-2">
+                                                <span className="material-symbols-outlined text-primary text-sm">construction</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-900 dark:text-gray-100 font-mono">Family Profiles Coming Soon</span>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center space-x-6 overflow-x-auto pb-4 hide-scrollbar">
-                                            <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
-                                                <div className="w-14 h-14 rounded-full bg-white dark:bg-zinc-800 border-2 border-primary flex items-center justify-center text-primary font-serif italic text-xl shadow-md transition-transform group-hover:scale-105 overflow-hidden">
-                                                    {session?.user?.image ? (
-                                                        <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'G'
-                                                    )}
-                                                </div>
-                                                <span className="text-xs font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider font-mono">{session?.user?.name?.split(' ')[0] || 'Chef'}</span>
-                                            </button>
-                                            {/* Placeholders */}
-                                            <button className="flex flex-col items-center space-y-2 flex-shrink-0 group opacity-40 hover:opacity-100 transition-opacity">
-                                                <div className="w-14 h-14 rounded-full bg-gray-200 border-2 border-transparent flex items-center justify-center text-gray-500 font-serif italic text-xl transition-transform group-hover:scale-105">
-                                                    <span className="material-symbols-outlined">add</span>
-                                                </div>
-                                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Add</span>
-                                            </button>
+                                        <div className="opacity-25 pointer-events-none grayscale blur-[2px] select-none">
+                                            <div className="flex justify-between items-center mb-6">
+                                                <label className="block text-xs font-bold text-gray-400 result-gray-600 uppercase tracking-widest font-mono">Family Profiles</label>
+                                                <button
+                                                    className="flex items-center space-x-1 text-primary transition-colors text-xs font-bold uppercase font-mono"
+                                                >
+                                                    <span className="material-symbols-outlined text-sm">add</span>
+                                                    <span>New Profile</span>
+                                                </button>
+                                            </div>
+                                            <div className="flex items-center space-x-6 overflow-x-auto pb-4 hide-scrollbar">
+                                                <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
+                                                    <div className="w-14 h-14 rounded-full bg-white dark:bg-zinc-800 border-2 border-primary flex items-center justify-center text-primary font-serif italic text-xl shadow-md overflow-hidden">
+                                                        {session?.user?.image ? (
+                                                            <img src={session.user.image} alt={session.user.name || 'User'} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            session?.user?.name ? session.user.name.charAt(0).toUpperCase() : 'G'
+                                                        )}
+                                                    </div>
+                                                    <span className="text-xs font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider font-mono">{session?.user?.name?.split(' ')[0] || 'Chef'}</span>
+                                                </button>
+                                                {/* Placeholders */}
+                                                <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
+                                                    <div className="w-14 h-14 rounded-full bg-gray-200 border-2 border-transparent flex items-center justify-center text-gray-500 font-serif italic text-xl">
+                                                        <span className="material-symbols-outlined">add</span>
+                                                    </div>
+                                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Add</span>
+                                                </button>
+                                            </div>
                                         </div>
                                     </section>
 
