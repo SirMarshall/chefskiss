@@ -7,6 +7,7 @@ interface MealPlanViewProps {
 
 import RecipeDetail from '@/components/RecipeDetail';
 import { useState } from 'react';
+import ImageWithFallback from '@/components/ImageWithFallback';
 
 interface MealPlanViewProps {
     mealPlan: any;
@@ -45,9 +46,17 @@ export default function MealPlanView({ mealPlan }: MealPlanViewProps) {
                                             backgroundColor: meal.data.imageColor || '',
                                         }}
                                     >
-                                        {meal.data.imageUrl && (
-                                            <img src={meal.data.imageUrl} alt={meal.data.name} className="w-full h-full object-cover" />
-                                        )}
+                                        <div className="absolute inset-0">
+                                            {meal.data.imageUrl && (
+                                                <ImageWithFallback 
+                                                    src={meal.data.imageUrl} 
+                                                    alt={meal.data.name} 
+                                                    fill
+                                                    className="object-cover transition-opacity duration-300 hover:opacity-90"
+                                                    sizes="(max-width: 768px) 33vw, 15vw"
+                                                />
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="flex flex-col flex-1 min-w-0">

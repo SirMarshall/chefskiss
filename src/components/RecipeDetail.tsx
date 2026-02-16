@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Blurhash } from 'react-blurhash';
+import ImageWithFallback from './ImageWithFallback';
 
 interface RecipeDetailProps {
     recipe: any;
@@ -47,11 +48,14 @@ export default function RecipeDetail({ recipe, onClose }: RecipeDetailProps) {
                                 className={`absolute inset-0 bg-cover bg-center transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 style={{ backgroundImage: `url('${recipe.imageUrl}')` }}
                             >
-                                <img
+                                <ImageWithFallback
                                     src={recipe.imageUrl}
                                     alt={recipe.name}
-                                    className="hidden"
+                                    fill
+                                    className={`object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                                     onLoad={() => setImageLoaded(true)}
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    priority
                                 />
                             </div>
                         ) : (

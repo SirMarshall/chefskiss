@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useSession, updateUser } from '@/lib/auth-client';
 import { useToast } from '@/context/ToastContext';
 import { useTheme } from '@/context/ThemeContext';
+import ImageWithFallback from '@/components/ImageWithFallback';
 
 const CUISINE_SUGGESTIONS = ['Japanese', 'Mexican', 'Italian', 'French', 'Indian', 'Thai', 'Mediterranean', 'American'];
 
@@ -330,9 +331,15 @@ export default function OnboardingPage() {
                                         <div key={idx} className="flex flex-col items-center space-y-2">
                                             <div className="relative group">
                                                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-primary p-0.5 ring-4 ring-transparent group-hover:ring-primary/10 transition-all cursor-pointer shadow-sm">
-                                                    <div className="w-full h-full rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center text-gray-900 dark:text-white font-serif italic text-2xl sm:text-3xl overflow-hidden">
+                                                    <div className="w-full h-full rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center text-gray-900 dark:text-white font-serif italic text-2xl sm:text-3xl overflow-hidden relative">
                                                         {member.image ? (
-                                                            <img src={member.image} alt={member.name} className="w-full h-full object-cover" />
+                                                            <ImageWithFallback 
+                                                                src={member.image} 
+                                                                alt={member.name} 
+                                                                fill
+                                                                className="object-cover" 
+                                                                sizes="80px"
+                                                            />
                                                         ) : (
                                                             member.name.charAt(0)
                                                         )}
