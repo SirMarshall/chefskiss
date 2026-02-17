@@ -240,7 +240,7 @@ export default function DashboardClient({
                                     <h4 className="text-2xl font-serif italic text-gray-900 dark:text-white">Curating your personalized weekly palette...</h4>
                                     <p className="text-xs text-gray-400 dark:text-gray-500 mt-1 font-mono">Fetching seasonal inspiration & balancing nutrition</p>
                                 </div>
-                                <DashboardSkeleton />
+                                <DashboardSkeleton numDays={numDays} />
                             </div>
                         ) : !hasPlan && activeTab !== 'settings' ? (
                             // EMPTY STATE

@@ -154,9 +154,9 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
     ];
 
     // Helper to check if a meal should be displayed
-    // It should define "valid" as having an image OR if we decide to show fallback.
-    // User asked "instead of showing empty cards", so we hide until image exists.
-    const shouldShowMeal = (meal: any) => {
+    // It should define "valid" as having an image OR if it is today (for immediate feedback)
+    const shouldShowMeal = (meal: any, isToday: boolean = false) => {
+        if (isToday) return true;
         return meal && meal.imageUrl;
     };
 
@@ -175,7 +175,7 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
                         { type: 'Lunch', data: todayData.meals.lunch },
                         { type: 'Dinner', data: todayData.meals.dinner }
                     ].map((meal, idx) => (
-                        shouldShowMeal(meal.data) ? (
+                        shouldShowMeal(meal.data, true) ? (
                             <MealCard
                                 key={idx}
                                 meal={meal.data}
