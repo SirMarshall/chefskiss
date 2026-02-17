@@ -4,7 +4,7 @@ import mongoose, { Schema, model, models } from "mongoose";
 const IngredientSchema = new Schema({
     name: { type: String, required: true },
     quantity: { type: Number, required: true },
-    unit: { type: String, required: true },
+    unit: { type: String, required: false }, // AI might not always return a unit (e.g. "2 eggs")
     notes: { type: String },
     category: { type: String }
 }, { _id: false });

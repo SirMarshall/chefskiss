@@ -258,29 +258,9 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
         }
 
         // --- ENRICH WITH UNSPLASH IMAGES (Parallelized) ---
-        const allMeals: any[] = [];
-        planData.days.forEach((day: any) => {
-            if (day.meals) {
-                Object.values(day.meals).forEach((meal: any) => {
-                    if (meal && meal.name) allMeals.push(meal);
-                });
-            }
-        });
-
-        // Run all searches in parallel
-        await Promise.all(allMeals.map(async (meal) => {
-            try {
-                const imageResult = await searchImage(meal.name);
-                if (imageResult) {
-                    meal.imageUrl = imageResult.imageUrl;
-                    meal.imageBlurHash = imageResult.imageBlurHash;
-                    meal.imageUserName = imageResult.imageUserName;
-                    meal.imageUserLink = imageResult.imageUserLink;
-                }
-            } catch (err) {
-                console.error(`[Unsplash] Error fetching image for ${meal.name}:`, err);
-            }
-        }));
+        // DEPRECATED: We now fetch images lazily on the client to speed up initial generation.
+        // The client will call fetchMealImage for each meal.
+        // -----------------------------------
         // -----------------------------------
 
 
@@ -306,6 +286,45 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
     } catch (error: any) {
         console.error("Error generating meal plan:", error);
         throw new Error(`Failed to generate meal plan: ${error.message || error}`);
+    }
+}
+
+/**
+ * Fetches an image for a specific meal and saves it to the meal plan.
+ */
+export async function fetchMealImage(planId: string, dayIndex: number, mealType: string, mealName: string) {
+    await dbConnect();
+    const session = await auth.api.getSession({
+        headers: await headers()
+    });
+
+    if (!session || !session.user) {
+        throw new Error("Unauthorized");
+    }
+
+    try {
+        const imageResult = await searchImage(mealName);
+
+        if (imageResult) {
+            // Update the specific meal in the database
+            // Note: mealType needs to be lowercase (breakfast, lunch, dinner)
+            const updatePath = `days.${dayIndex}.meals.${mealType.toLowerCase()}`;
+
+            await WeeklyMealPlan.findByIdAndUpdate(planId, {
+                $set: {
+                    [`${updatePath}.imageUrl`]: imageResult.imageUrl,
+                    [`${updatePath}.imageBlurHash`]: imageResult.imageBlurHash,
+                    [`${updatePath}.imageUserName`]: imageResult.imageUserName,
+                    [`${updatePath}.imageUserLink`]: imageResult.imageUserLink
+                }
+            });
+
+            return imageResult;
+        }
+        return null;
+    } catch (error) {
+        console.error(`Error fetching image for ${mealName}:`, error);
+        return null; // Fail silently for the UI
     }
 }
 

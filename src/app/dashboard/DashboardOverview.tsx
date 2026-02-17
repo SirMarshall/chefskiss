@@ -1,6 +1,8 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import RecipeDetail from '@/components/RecipeDetail';
+import MealCard from '@/components/MealCard';
+import MealCardSkeleton from '@/components/MealCardSkeleton';
+import { fetchMealImage } from '@/app/actions/mealPlan';
 
 interface DashboardOverviewProps {
     mealPlan: any;
@@ -10,6 +12,15 @@ interface DashboardOverviewProps {
 export default function DashboardOverview({ mealPlan, onPlanComplete }: DashboardOverviewProps) {
     const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
     const [now, setNow] = useState(new Date());
+    const [activePlan, setActivePlan] = useState<any>(mealPlan);
+    const isFetchingRef = useRef(false);
+
+    // Sync activePlan with props when prop changes (e.g. regeneration)
+    useEffect(() => {
+        setActivePlan(mealPlan);
+        // Reset fetching lock when plan changes
+        isFetchingRef.current = false;
+    }, [mealPlan]);
 
     // Update 'now' every minute to catch day changes in real-time
     useEffect(() => {
@@ -19,14 +30,82 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
         return () => clearInterval(timer);
     }, []);
 
-    if (!mealPlan || !mealPlan.days) return null;
+    // Sequential Image Fetching Effect
+    useEffect(() => {
+        if (!activePlan || !activePlan.days || isFetchingRef.current) return;
+
+        const fetchNextImage = async () => {
+            // Find the first meal that needs an image and hasn't been attempted/fetched
+            let target = null;
+            const days = activePlan.days;
+            const mealTypes = ['breakfast', 'lunch', 'dinner'];
+
+            for (let d = 0; d < days.length; d++) {
+                const meals = days[d].meals;
+                for (const type of mealTypes) {
+                    const meal = meals[type];
+                    // Check if meal exists, has a name, NO image URL, and hasn't failed/been skipped
+                    if (meal && meal.name && !meal.imageUrl && !meal.__fetchAttempted) {
+                        target = { dayIndex: d, type, mealName: meal.name };
+                        break;
+                    }
+                }
+                if (target) break;
+            }
+
+            if (target) {
+                isFetchingRef.current = true;
+                try {
+                    // Optimized: Fetch image
+                    const result = await fetchMealImage(activePlan._id, target.dayIndex, target.type, target.mealName);
+
+                    // Update state
+                    setActivePlan((prev: any) => {
+                        // Deep clone to avoid mutation issues
+                        const next = JSON.parse(JSON.stringify(prev));
+                        const targetMeal = next.days[target.dayIndex].meals[target.type];
+
+                        targetMeal.__fetchAttempted = true; // Mark as processed regardless of success
+
+                        if (result) {
+                            targetMeal.imageUrl = result.imageUrl;
+                            targetMeal.imageBlurHash = result.imageBlurHash;
+                            targetMeal.imageUserName = result.imageUserName;
+                            targetMeal.imageUserLink = result.imageUserLink;
+                        } else {
+                            // Fallback or just leave empty but marked attempted so we don't retry
+                            // We might want a placeholder logic here if we want to show it eventually
+                        }
+                        return next;
+                    });
+                } catch (err) {
+                    console.error("Error in sequential fetch:", err);
+                    // Mark attempted to prevent infinite loop on error
+                    setActivePlan((prev: any) => {
+                        const next = JSON.parse(JSON.stringify(prev));
+                        if (next.days?.[target.dayIndex]?.meals?.[target.type]) {
+                            next.days[target.dayIndex].meals[target.type].__fetchAttempted = true;
+                        }
+                        return next;
+                    });
+                } finally {
+                    isFetchingRef.current = false;
+                }
+            }
+        };
+
+        fetchNextImage();
+    }, [activePlan]); // Runs whenever activePlan updates (e.g. after a fetch completes)
+
+
+    if (!activePlan || !activePlan.days) return null;
 
     // Calculate current status relative to weekStartDate
     const getPlanStatus = () => {
         const today = new Date(now);
         today.setHours(0, 0, 0, 0);
 
-        const start = new Date(mealPlan.weekStartDate);
+        const start = new Date(activePlan.weekStartDate);
         // Ensure start is treated as local date if it's YYYY-MM-DD
         const startLocal = new Date(start.getUTCFullYear(), start.getUTCMonth(), start.getUTCDate());
 
@@ -35,7 +114,7 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
 
         return {
             currentIndex: Math.max(0, diffDays),
-            isExpired: diffDays >= mealPlan.days.length,
+            isExpired: diffDays >= activePlan.days.length,
             isFuture: diffDays < 0
         };
     };
@@ -46,6 +125,7 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
     if (status.isExpired) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-12 text-center animate-in fade-in duration-700">
+                {/* ... (Same completion UI) ... */}
                 <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-8 text-primary animate-bounce">
                     <span className="material-symbols-outlined text-5xl">celebration</span>
                 </div>
@@ -65,55 +145,56 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
         );
     }
 
-    const todayIdx = Math.min(status.currentIndex, mealPlan.days.length - 1);
-    const todayData = mealPlan.days[todayIdx];
+    const todayIdx = Math.min(status.currentIndex, activePlan.days.length - 1);
+    const todayData = activePlan.days[todayIdx];
 
     const otherDays = [
-        ...mealPlan.days.slice(todayIdx + 1),
-        ...mealPlan.days.slice(0, todayIdx)
+        ...activePlan.days.slice(todayIdx + 1),
+        ...activePlan.days.slice(0, todayIdx)
     ];
+
+    // Helper to check if a meal should be displayed
+    // It should define "valid" as having an image OR if we decide to show fallback.
+    // User asked "instead of showing empty cards", so we hide until image exists.
+    const shouldShowMeal = (meal: any) => {
+        return meal && meal.imageUrl;
+    };
 
     return (
         <div className="space-y-8 pb-12">
             {/* Today - Featured */}
-            <div className="bg-white dark:bg-zinc-800 rounded-3xl p-8 border-2 border-primary shadow-xl relative overflow-hidden">
+            <div className="bg-white dark:bg-zinc-800 rounded-3xl p-8 border-2 border-primary shadow-xl relative overflow-hidden transition-all duration-500">
                 <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-4 py-1 uppercase tracking-widest font-mono">Today</div>
                 <div className="mb-6">
                     <span className="text-[11px] font-black text-primary uppercase tracking-tighter font-mono">Day {String(todayIdx + 1).padStart(2, '0')}</span>
                     <h4 className="text-2xl font-bold text-gray-900 dark:text-white font-sans">{todayData.day}</h4>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 min-h-[100px]">
                     {[
                         { type: 'Breakfast', data: todayData.meals.breakfast },
                         { type: 'Lunch', data: todayData.meals.lunch },
                         { type: 'Dinner', data: todayData.meals.dinner }
                     ].map((meal, idx) => (
-                        <div
-                            key={idx}
-                            onClick={() => setSelectedRecipe(meal.data)}
-                            className="flex flex-col space-y-3 cursor-pointer group"
-                        >
-                            <div
-                                className="aspect-[4/3] bg-gray-100 dark:bg-zinc-700 rounded-2xl relative overflow-hidden group-hover:brightness-95 transition-all bg-cover bg-center"
-                                style={{ backgroundImage: meal.data.imageUrl ? `url('${meal.data.imageUrl}')` : 'none', backgroundColor: meal.data.imageColor || '' }}
-                            >
-                                <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">{meal.type}</span>
-                                {meal.data.imageUserName && (
-                                    <div className="absolute bottom-2 left-2 text-[8px] text-white/50 font-mono tracking-tighter">
-                                        {meal.data.imageUserName} / Unsplash
-                                    </div>
-                                )}
-                            </div>
-                            <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.data.name}</h5>
-                        </div>
+                        shouldShowMeal(meal.data) ? (
+                            <MealCard
+                                key={idx}
+                                meal={meal.data}
+                                type={meal.type}
+                                onClick={() => setSelectedRecipe(meal.data)}
+                            />
+                        ) : (
+                            <MealCardSkeleton key={idx} />
+                        )
                     ))}
+                    {/* Show a "Loading more..." indicator if today's meals aren't all here yet? 
+                         If we hide them, the user just sees partial list. That's fine. */}
                 </div>
             </div>
 
             {/* Other Days */}
             {otherDays.map((day: any, idx: number) => {
                 // Find original index for "Day XX" label
-                const originalIdx = mealPlan.days.indexOf(day);
+                const originalIdx = activePlan.days.indexOf(day);
                 const isPast = originalIdx < todayIdx;
 
                 return (
@@ -133,26 +214,16 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
                                 { type: 'Lunch', data: day.meals.lunch },
                                 { type: 'Dinner', data: day.meals.dinner }
                             ].map((meal, mIdx) => (
-                                <div
-                                    key={mIdx}
-                                    onClick={() => setSelectedRecipe(meal.data)}
-                                    className="flex flex-col space-y-3 cursor-pointer group"
-                                >
-                                    <div
-                                        className="aspect-[4/3] bg-gray-100 dark:bg-zinc-700 rounded-2xl relative overflow-hidden bg-cover bg-center transition-colors"
-                                        style={{ backgroundImage: meal.data.imageUrl ? `url('${meal.data.imageUrl}')` : 'none', backgroundColor: meal.data.imageColor || '' }}
-                                    >
-                                        <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">
-                                            {meal.type}
-                                        </span>
-                                        {meal.data.imageUserName && (
-                                            <div className="absolute bottom-2 left-2 text-[8px] text-white/50 font-mono tracking-tighter">
-                                                {meal.data.imageUserName} / Unsplash
-                                            </div>
-                                        )}
-                                    </div>
-                                    <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.data.name}</h5>
-                                </div>
+                                shouldShowMeal(meal.data) ? (
+                                    <MealCard
+                                        key={mIdx}
+                                        meal={meal.data}
+                                        type={meal.type}
+                                        onClick={() => setSelectedRecipe(meal.data)}
+                                    />
+                                ) : (
+                                    <MealCardSkeleton key={mIdx} />
+                                )
                             ))}
                         </div>
                     </div>
