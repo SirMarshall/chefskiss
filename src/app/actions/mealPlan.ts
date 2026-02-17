@@ -10,28 +10,28 @@ import { searchImage } from "@/lib/unsplash";
 
 /**
  * Checks if the current user has a generated meal plan.
+ * @param userOrId Optional user object or ID to bypass session/DB lookup
  */
-/**
- * Checks if the current user has a generated meal plan.
- * @param userId Optional user ID to bypass session lookup
- */
-export async function checkMealPlanStatus(userId?: string) {
+export async function checkMealPlanStatus(userOrId?: string | any) {
     await dbConnect();
     
-    let currentUserId = userId;
+    let user = typeof userOrId === 'object' ? userOrId : null;
+    let userId = typeof userOrId === 'string' ? userOrId : (user ? user._id || user.id : null);
     
-    if (!currentUserId) {
+    if (!userId && !user) {
         const session = await auth.api.getSession({
             headers: await headers()
         });
         if (!session || !session.user) {
             return { hasPlan: false, planId: null };
         }
-        currentUserId = session.user.id;
+        userId = session.user.id;
     }
 
-    // We can check the user record directly for speed
-    const user = await User.findById(currentUserId).select('mealPlanGenerated currentMealPlanId');
+    // If we don't have the user object with the required fields, fetch it
+    if (!user || user.mealPlanGenerated === undefined) {
+        user = await User.findById(userId).select('mealPlanGenerated currentMealPlanId').lean();
+    }
 
     if (!user) return { hasPlan: false, planId: null };
     
@@ -41,9 +41,6 @@ export async function checkMealPlanStatus(userId?: string) {
     };
 }
 
-/**
- * Retrieves the active meal plan for the current user.
- */
 /**
  * Retrieves the active meal plan for the current user.
  * @param userId Optional user ID to bypass session lookup
@@ -328,27 +325,28 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
 
 /**
  * Retrieves the user's dietary profile.
+ * @param userOrId Optional user object or ID to bypass session/DB lookup
  */
-/**
- * Retrieves the user's dietary profile.
- * @param userId Optional user ID to bypass session lookup
- */
-export async function getUserProfile(userId?: string) {
+export async function getUserProfile(userOrId?: string | any) {
     await dbConnect();
     
-    let currentUserId = userId;
+    let user = typeof userOrId === 'object' ? userOrId : null;
+    let userId = typeof userOrId === 'string' ? userOrId : (user ? user._id || user.id : null);
     
-    if (!currentUserId) {
+    if (!userId && !user) {
         const session = await auth.api.getSession({
             headers: await headers()
         });
         if (!session || !session.user) {
             throw new Error("Unauthorized");
         }
-        currentUserId = session.user.id;
+        userId = session.user.id;
     }
 
-    const user = await User.findById(currentUserId).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize planDuration hasUnlimitedRegens');
+    // If we don't have the user object with the required fields, fetch it
+    if (!user || user.dietaryRestrictions === undefined) {
+        user = await User.findById(userId).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize planDuration hasUnlimitedRegens').lean();
+    }
 
     if (!user) return null;
 
