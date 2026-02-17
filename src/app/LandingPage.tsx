@@ -48,17 +48,21 @@ export default function LandingPage() {
             <div className="flex border-b border-gray-200 dark:border-gray-700 mb-6 -mx-6 md:-mx-10 -mt-6 md:-mt-8">
                 <div
                     onClick={() => setAuthMode('signup')}
-                    className={`flex-1 text-center py-6 cursor-pointer transition-all ${authMode === 'signup' ? 'border-b-2 border-primary' : 'opacity-40 hover:opacity-70'}`}
+                    className={`flex-1 text-center py-6 cursor-pointer transition-all border-b-2 ${authMode === 'signup'
+                        ? 'border-primary text-black dark:text-white bg-gray-50/50 dark:bg-white/5'
+                        : 'border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'}`}
                 >
-                    <span className="font-mono text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase text-black dark:text-white">
+                    <span className="font-mono text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase">
                         New to Chef's Kiss?
                     </span>
                 </div>
                 <div
                     onClick={() => setAuthMode('signin')}
-                    className={`flex-1 text-center py-6 cursor-pointer transition-all ${authMode === 'signin' ? 'border-b-2 border-primary' : 'opacity-40 hover:opacity-70'}`}
+                    className={`flex-1 text-center py-6 cursor-pointer transition-all border-b-2 ${authMode === 'signin'
+                        ? 'border-primary text-black dark:text-white bg-gray-50/50 dark:bg-white/5'
+                        : 'border-transparent text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-black/5 dark:hover:bg-white/5'}`}
                 >
-                    <span className="font-mono text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase text-gray-500 dark:text-gray-400">
+                    <span className="font-mono text-[10px] md:text-xs font-bold tracking-[0.15em] uppercase">
                         Already a Member?
                     </span>
                 </div>
@@ -75,11 +79,11 @@ export default function LandingPage() {
                         </p>
                     </div>
 
-                    <div className="relative md:h-[620px]">
-                        <div className={`transition-all duration-500 md:absolute md:inset-0 ${authMode === 'signup' ? 'relative opacity-100 translate-x-0' : 'absolute inset-0 opacity-0 -translate-x-8 pointer-events-none'}`}>
+                    <div className="relative min-h-[400px]">
+                        <div className={`transition-all duration-500 w-full ${authMode === 'signup' ? 'relative opacity-100 translate-x-0' : 'absolute top-0 left-0 opacity-0 -translate-x-8 pointer-events-none'}`}>
                             <SignupForm />
                         </div>
-                        <div className={`transition-all duration-500 md:absolute md:inset-0 ${authMode === 'signin' ? 'relative opacity-100 translate-x-0' : 'absolute inset-0 opacity-0 translate-x-8 pointer-events-none'}`}>
+                        <div className={`transition-all duration-500 w-full ${authMode === 'signin' ? 'relative opacity-100 translate-x-0' : 'absolute top-0 left-0 opacity-0 translate-x-8 pointer-events-none'}`}>
                             <SigninForm />
                         </div>
                     </div>

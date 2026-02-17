@@ -4,13 +4,15 @@ import React, { useState } from 'react';
 import AuthLayout from '@/components/AuthLayout';
 import AuthCard from '@/components/AuthCard';
 import { useRouter } from 'next/navigation';
+import { useSession, updateUser } from '@/lib/auth-client';
 import { useToast } from '@/context/ToastContext';
-import { updateUser } from '@/lib/auth-client';
 
 export default function TermsPage() {
     const router = useRouter();
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
+
+    const { data: session } = useSession();
 
     const handleAccept = async () => {
         setLoading(true);
@@ -22,8 +24,13 @@ export default function TermsPage() {
 
             if (!error) {
                 toast("Terms accepted. Welcome aboard!", "success");
-                // Force a full navigation to ensure the session update is recognized
-                window.location.href = '/onboarding';
+
+                // Smart Redirect: If already onboarded, go to dashboard. Else onboarding.
+                if ((session?.user as any)?.onboardingComplete) {
+                    window.location.href = '/dashboard';
+                } else {
+                    window.location.href = '/onboarding';
+                }
             } else {
                 console.error("Error accepting terms:", error);
                 toast("Failed to accept terms. Please try again.", "error");
@@ -68,8 +75,8 @@ export default function TermsPage() {
                     Last Updated: February 15, 2026
                 </p>
             </div>
-            <div className="flex-1 overflow-y-auto px-6 md:px-16 py-6 md:py-8 custom-scrollbar">
-                <div className="prose prose-sm max-w-none dark:prose-invert">
+            <div className="flex-1 overflow-auto px-6 md:px-16 py-6 md:py-8 custom-scrollbar">
+                <div className="prose prose-sm max-w-none dark:prose-invert max-h-[60vh] md:max-h-none overflow-y-auto md:overflow-visible pr-2">
                     <section className="mb-10">
                         <h3 className="flex items-baseline gap-3 text-black dark:text-white">
                             <span className="font-serif italic font-bold text-primary text-2xl">1.</span>
@@ -134,7 +141,7 @@ export default function TermsPage() {
                     </section>
                 </div>
             </div>
-            <div className="px-6 md:px-16 py-6 md:py-8 border-t border-gray-100 dark:border-gray-800 bg-white dark:bg-zinc-900 flex flex-col sm:flex-row items-center gap-4">
+            <div className="px-6 md:px-16 py-6 md:py-8 border-t border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md flex flex-col sm:flex-row items-center gap-4 z-10 relative">
                 <button
                     onClick={handleAccept}
                     disabled={loading}
@@ -151,7 +158,12 @@ export default function TermsPage() {
 
     return (
         <AuthLayout>
-            <AuthCard leftPanel={LeftPanel} rightPanel={RightPanel} />
+            <AuthCard
+                leftPanel={LeftPanel}
+                rightPanel={RightPanel}
+                className="max-h-[85vh] h-[85vh]"
+                hideLeftPanelOnMobile={true}
+            />
         </AuthLayout>
     );
 }

@@ -18,11 +18,11 @@ interface DashboardClientProps {
     user: any;
 }
 
-export default function DashboardClient({ 
-    initialMealPlan, 
-    initialStatus, 
-    initialProfile, 
-    user 
+export default function DashboardClient({
+    initialMealPlan,
+    initialStatus,
+    initialProfile,
+    user
 }: DashboardClientProps) {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("dashboard");
@@ -38,13 +38,14 @@ export default function DashboardClient({
     const [allergens, setAllergens] = useState<string[]>(initialProfile?.allergens || []);
     const [favorites, setFavorites] = useState<string[]>(initialProfile?.favorites || []);
     const [dislikes, setDislikes] = useState<string[]>(initialProfile?.dislikes || []);
-    
+
     // Capitalize spice level from DB if present
-    const defaultSpice = initialProfile?.spiceLevel 
-        ? initialProfile.spiceLevel.charAt(0).toUpperCase() + initialProfile.spiceLevel.slice(1).toLowerCase() 
+    const defaultSpice = initialProfile?.spiceLevel
+        ? initialProfile.spiceLevel.charAt(0).toUpperCase() + initialProfile.spiceLevel.slice(1).toLowerCase()
         : "Medium";
     const [spiceLevel, setSpiceLevel] = useState(defaultSpice);
     const [householdSize, setHouseholdSize] = useState(initialProfile?.householdSize || 1);
+    const [hasUnlimitedRegens, setHasUnlimitedRegens] = useState(initialProfile?.hasUnlimitedRegens || false);
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -61,7 +62,9 @@ export default function DashboardClient({
     }, [user, router]);
 
     const handleGeneratePlan = async () => {
-        if (hasPlan) return; // Prevent generation if plan exists
+        // Allow generation if no plan OR if user has unlimited regens
+        if (hasPlan && !hasUnlimitedRegens) return;
+
         setIsGenerating(true);
         try {
             const newPlan = await generateInitialMealPlan(numDays, {
@@ -75,6 +78,9 @@ export default function DashboardClient({
             setMealPlan(newPlan);
             setHasPlan(true);
             setIsConfigOpen(false); // Close drawer after generation
+
+            // If they just generated a plan, they might have used a regen if they were allowed to
+            // But here we just update state.
         } catch (error) {
             console.error("Failed to generate plan:", error);
             alert("Failed to generate plan. Please try again.");
@@ -96,6 +102,10 @@ export default function DashboardClient({
 
     return (
         <div className="h-screen w-full overflow-hidden bg-background-light dark:bg-background-dark flex flex-col">
+            {/* ... (header code remains same, omitted for brevity in replace block if possible, but replace_file_content needs context) ... */}
+            {/* Actually, I should use multi_replace or carefully target the specific function and button */}
+            {/* I will scope this replacement to the logic functions mostly, and then another for the button */}
+
             {/* Mobile Header */}
             <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-800/50 bg-panel-left-light dark:bg-panel-left-dark z-50">
                 <div className="flex items-center space-x-3">
@@ -317,11 +327,11 @@ export default function DashboardClient({
                                                 <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
                                                     <div className="w-14 h-14 rounded-full bg-white dark:bg-zinc-800 border-2 border-primary flex items-center justify-center text-primary font-serif italic text-xl shadow-md overflow-hidden relative">
                                                         {user?.image ? (
-                                                            <ImageWithFallback 
-                                                                src={user.image} 
-                                                                alt={user.name || 'User'} 
+                                                            <ImageWithFallback
+                                                                src={user.image}
+                                                                alt={user.name || 'User'}
                                                                 fill
-                                                                className="object-cover" 
+                                                                className="object-cover"
                                                                 sizes="56px"
                                                             />
                                                         ) : (
@@ -384,56 +394,56 @@ export default function DashboardClient({
                                         />
 
                                         <div className="space-y-6">
-                                        <div>
-                                            <div className="flex justify-between items-center mb-3">
-                                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Household Size</label>
-                                                <span className="text-primary font-bold font-mono text-sm">{householdSize} {householdSize === 1 ? 'PERSON' : 'PEOPLE'}</span>
+                                            <div>
+                                                <div className="flex justify-between items-center mb-3">
+                                                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Household Size</label>
+                                                    <span className="text-primary font-bold font-mono text-sm">{householdSize} {householdSize === 1 ? 'PERSON' : 'PEOPLE'}</span>
+                                                </div>
+                                                <div className="relative pt-2">
+                                                    <input
+                                                        value={householdSize}
+                                                        onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
+                                                        type="range"
+                                                        min="1"
+                                                        max="10"
+                                                        step="1"
+                                                        className="w-full accent-primary"
+                                                    />
+                                                    <div className="flex justify-between mt-2 px-1">
+                                                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                                            <span key={n} className={`text-xs font-bold font-mono ${householdSize === n ? 'text-primary' : 'text-gray-400 dark:text-gray-600'}`}>
+                                                                {n}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="relative pt-2">
-                                                <input
-                                                    value={householdSize}
-                                                    onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
-                                                    type="range"
-                                                    min="1"
-                                                    max="10"
-                                                    step="1"
-                                                    className="w-full accent-primary"
-                                                />
-                                                <div className="flex justify-between mt-2 px-1">
-                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                                        <span key={n} className={`text-xs font-bold font-mono ${householdSize === n ? 'text-primary' : 'text-gray-400 dark:text-gray-600'}`}>
-                                                            {n}
-                                                        </span>
+                                            <div>
+                                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Plan Duration</label>
+                                                <div className="grid grid-cols-4 gap-2">
+                                                    {[1, 3, 5, 7].map((days) => (
+                                                        <button
+                                                            key={days}
+                                                            onClick={() => !hasPlan && setNumDays(days)}
+                                                            disabled={hasPlan}
+                                                            className={`py-2 text-[10px] font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
+                                                                ? (hasPlan ? 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent' : 'bg-primary text-white border-primary')
+                                                                : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'
+                                                                } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                        >
+                                                            {days} Days
+                                                        </button>
                                                     ))}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 font-mono">Plan Duration</label>
-                                            <div className="grid grid-cols-4 gap-2">
-                                                {[1, 3, 5, 7].map((days) => (
-                                                    <button
-                                                        key={days}
-                                                        onClick={() => !hasPlan && setNumDays(days)}
-                                                        disabled={hasPlan}
-                                                        className={`py-2 text-[10px] font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
-                                                            ? (hasPlan ? 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent' : 'bg-primary text-white border-primary')
-                                                            : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'
-                                                            } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                    >
-                                                        {days} Days
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
                                     </section>
 
                                     <div className="pt-8 border-t border-gray-200 dark:border-gray-700">
                                         <button
                                             onClick={handleGeneratePlan}
-                                            disabled={isGenerating || hasPlan}
-                                            className={`w-full font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl transition-all duration-300 transform flex items-center justify-center space-x-2 font-mono ${isGenerating || hasPlan
+                                            disabled={isGenerating || (hasPlan && !hasUnlimitedRegens)}
+                                            className={`w-full font-bold tracking-[0.2em] uppercase text-xs py-5 rounded-sm shadow-xl transition-all duration-300 transform flex items-center justify-center space-x-2 font-mono ${isGenerating || (hasPlan && !hasUnlimitedRegens)
                                                 ? 'bg-gray-300 dark:bg-zinc-800 text-gray-500 dark:text-gray-500 cursor-not-allowed shadow-none'
                                                 : 'bg-primary hover:bg-primary-dark text-white hover:shadow-orange-500/30 active:scale-[0.97]'
                                                 }`}
@@ -446,7 +456,7 @@ export default function DashboardClient({
                                             ) : (
                                                 <>
                                                     <span className="material-symbols-outlined">auto_awesome</span>
-                                                    <span>{hasPlan ? "Plan Active" : "Generate Plan"}</span>
+                                                    <span>{hasPlan ? (hasUnlimitedRegens ? "Regenerate Plan" : "Plan Active") : "Generate Plan"}</span>
                                                 </>
                                             )}
                                         </button>

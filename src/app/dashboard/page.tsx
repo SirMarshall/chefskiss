@@ -1,10 +1,10 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { 
-    checkMealPlanStatus, 
-    getActiveMealPlan, 
-    getUserProfile 
+import {
+    checkMealPlanStatus,
+    getActiveMealPlan,
+    getUserProfile
 } from "@/app/actions/mealPlan";
 import DashboardClient from "./DashboardClient";
 
@@ -16,6 +16,15 @@ export default async function DashboardPage() {
 
     if (!session || !session.user) {
         redirect("/");
+    }
+
+    // Force redirects flow: Terms -> Onboarding -> Dashboard
+    if (!(session.user as any).termsAccepted) {
+        redirect("/terms");
+    }
+
+    if (!(session.user as any).onboardingComplete) {
+        redirect("/onboarding");
     }
 
     const start = performance.now();
@@ -32,7 +41,7 @@ export default async function DashboardPage() {
 
     // 3. Render the client component with pre-fetched data
     return (
-        <DashboardClient 
+        <DashboardClient
             user={session.user}
             initialMealPlan={activePlan}
             initialStatus={status}

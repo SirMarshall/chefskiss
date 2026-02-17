@@ -12,8 +12,13 @@ export default function SignupForm() {
         username: "",
         email: "",
         password: "",
+        confirmPassword: "",
     });
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [passwordFocus, setPasswordFocus] = useState(false);
+    const [confirmPasswordFocus, setConfirmPasswordFocus] = useState(false);
     const { toast } = useToast();
 
     const handleGoogleSignIn = async () => {
@@ -21,7 +26,7 @@ export default function SignupForm() {
         try {
             await signIn.social({
                 provider: "google",
-                callbackURL: "/dashboard",
+                callbackURL: "/terms",
             });
         } catch (error) {
             console.error("Google sign-in error:", error);
@@ -31,8 +36,45 @@ export default function SignupForm() {
         }
     };
 
+    const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+        if (e.target.id === 'password') {
+            setPasswordFocus(true);
+        } else if (e.target.id === 'confirm-password') {
+            setConfirmPasswordFocus(true);
+        }
+
+        // Small delay to account for keyboard opening on mobile
+        setTimeout(() => {
+            e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const password = formData.password;
+        if (password.length < 8) {
+            toast("Password must be at least 8 characters long", "error");
+            return;
+        }
+        if (!/[A-Z]/.test(password)) {
+            toast("Password must contain at least one uppercase letter", "error");
+            return;
+        }
+        if (!/[0-9]/.test(password)) {
+            toast("Password must contain at least one number", "error");
+            return;
+        }
+        if (!/[^A-Za-z0-9]/.test(password)) {
+            toast("Password must contain at least one symbol", "error");
+            return;
+        }
+
+        if (password !== formData.confirmPassword) {
+            toast("Passwords do not match", "error");
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -41,7 +83,7 @@ export default function SignupForm() {
                 password: formData.password,
                 name: formData.name,
                 username: formData.username,
-                callbackURL: "/onboarding",
+                callbackURL: "/terms",
             } as any);
 
             if (error) {
@@ -53,7 +95,7 @@ export default function SignupForm() {
                 const { error: signInError } = await signIn.email({
                     email: formData.email,
                     password: formData.password,
-                    callbackURL: "/onboarding",
+                    callbackURL: "/terms",
                 });
 
                 if (signInError) {
@@ -81,7 +123,9 @@ export default function SignupForm() {
                         type="text"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        onFocus={handleInputFocus}
                         disabled={loading || googleLoading}
+                        required
                     />
                 </div>
                 <div className="space-y-1.5">
@@ -93,7 +137,9 @@ export default function SignupForm() {
                         type="text"
                         value={formData.username}
                         onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                        onFocus={handleInputFocus}
                         disabled={loading || googleLoading}
+                        required
                     />
                 </div>
                 <div className="space-y-1.5">
@@ -105,20 +151,98 @@ export default function SignupForm() {
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        onFocus={handleInputFocus}
                         disabled={loading || googleLoading}
+                        required
                     />
                 </div>
                 <div className="space-y-1.5">
                     <label className="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400" htmlFor="password">Password</label>
-                    <input
-                        className="w-full bg-white dark:bg-zinc-800 border border-[var(--input-border)] focus:ring-1 focus:ring-gray-300 dark:focus:ring-gray-500 rounded-sm py-3.5 px-5 text-black dark:text-white placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light"
-                        id="password"
-                        placeholder="••••••••"
-                        type="password"
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        disabled={loading || googleLoading}
-                    />
+                    <div className="relative">
+                        <input
+                            className={`w-full bg-white dark:bg-zinc-800 border ${formData.password && (!/[A-Z]/.test(formData.password) || !/[0-9]/.test(formData.password) || !/[^A-Za-z0-9]/.test(formData.password) || formData.password.length < 8)
+                                ? 'border-red-500 focus:ring-red-500'
+                                : 'border-[var(--input-border)] focus:ring-gray-300 dark:focus:ring-gray-500'
+                                } focus:ring-1 rounded-sm py-3.5 px-5 pr-12 text-black dark:text-white placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light transition-colors`}
+                            id="password"
+                            placeholder="••••••••"
+                            type={showPassword ? "text" : "password"}
+                            value={formData.password}
+                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                            onFocus={handleInputFocus}
+                            onBlur={() => setPasswordFocus(false)}
+                            disabled={loading || googleLoading}
+                            required
+                            minLength={8}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        >
+                            <span className="material-symbols-outlined text-lg">
+                                {showPassword ? 'visibility' : 'visibility_off'}
+                            </span>
+                        </button>
+
+                        {/* Password Requirements Popover */}
+                        <div className={`absolute left-0 bottom-full mb-3 w-full bg-white dark:bg-zinc-800 border-2 border-primary dark:border-primary/80 rounded-lg shadow-2xl p-4 z-20 transition-all duration-200 transform origin-bottom ring-4 ring-primary/10 dark:ring-primary/20 ${passwordFocus ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}`}>
+                            <div className="flex flex-wrap gap-x-3 gap-y-1.5">
+                                <p className={`text-[10px] uppercase tracking-wider font-mono transition-colors font-bold ${!formData.password ? 'text-gray-400' : (formData.password.length >= 8 ? 'text-green-600 dark:text-green-400' : 'text-gray-400')}`}>
+                                    {formData.password && formData.password.length >= 8 ? '✓' : '○'} 8+ Chars
+                                </p>
+                                <p className={`text-[10px] uppercase tracking-wider font-mono transition-colors font-bold ${!formData.password ? 'text-gray-400' : (/[A-Z]/.test(formData.password) ? 'text-green-600 dark:text-green-400' : 'text-gray-400')}`}>
+                                    {formData.password && /[A-Z]/.test(formData.password) ? '✓' : '○'} Uppercase
+                                </p>
+                                <p className={`text-[10px] uppercase tracking-wider font-mono transition-colors font-bold ${!formData.password ? 'text-gray-400' : (/[0-9]/.test(formData.password) ? 'text-green-600 dark:text-green-400' : 'text-gray-400')}`}>
+                                    {formData.password && /[0-9]/.test(formData.password) ? '✓' : '○'} Number
+                                </p>
+                                <p className={`text-[10px] uppercase tracking-wider font-mono transition-colors font-bold ${!formData.password ? 'text-gray-400' : (/[^A-Za-z0-9]/.test(formData.password) ? 'text-green-600 dark:text-green-400' : 'text-gray-400')}`}>
+                                    {formData.password && /[^A-Za-z0-9]/.test(formData.password) ? '✓' : '○'} Symbol
+                                </p>
+                            </div>
+                            <div className="absolute left-6 bottom-[-6px] w-3 h-3 bg-white dark:bg-zinc-800 border-b-2 border-r-2 border-primary dark:border-primary/80 transform rotate-45"></div>
+                        </div>
+                    </div>
+                </div>
+                <div className="space-y-1.5">
+                    <label className="block font-mono text-[10px] uppercase tracking-[0.15em] font-bold text-gray-500 dark:text-gray-400" htmlFor="confirm-password">Confirm Password</label>
+                    <div className="relative">
+                        <input
+                            className={`w-full bg-white dark:bg-zinc-800 border ${formData.confirmPassword && formData.password !== formData.confirmPassword
+                                ? 'border-red-500 focus:ring-red-500'
+                                : 'border-[var(--input-border)] focus:ring-gray-300 dark:focus:ring-gray-500'
+                                } focus:ring-1 rounded-sm py-3.5 px-5 pr-12 text-black dark:text-white placeholder-gray-300 dark:placeholder-gray-500 font-sans font-light transition-colors`}
+                            id="confirm-password"
+                            placeholder="••••••••"
+                            type={showConfirmPassword ? "text" : "password"}
+                            value={formData.confirmPassword}
+                            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                            onFocus={handleInputFocus}
+                            onBlur={() => setConfirmPasswordFocus(false)}
+                            disabled={loading || googleLoading}
+                            required
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                        >
+                            <span className="material-symbols-outlined text-lg">
+                                {showConfirmPassword ? 'visibility' : 'visibility_off'}
+                            </span>
+                        </button>
+
+                        {/* Confirm Password Requirements Popover */}
+                        <div className={`absolute left-0 bottom-full mb-3 w-full bg-white dark:bg-zinc-800 border-2 border-primary dark:border-primary/80 rounded-lg shadow-2xl p-4 z-20 transition-all duration-200 transform origin-bottom ring-4 ring-primary/10 dark:ring-primary/20 ${confirmPasswordFocus ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-2 pointer-events-none'}`}>
+                            <div className="flex flex-wrap gap-x-3 gap-y-1.5">
+                                <p className={`text-[10px] uppercase tracking-wider font-mono transition-colors font-bold ${!formData.confirmPassword ? 'text-gray-400' : (formData.password === formData.confirmPassword ? 'text-green-600 dark:text-green-400' : 'text-red-500')}`}>
+                                    {formData.confirmPassword && formData.password === formData.confirmPassword ? '✓' : (formData.confirmPassword ? '✕' : '○')} Passwords Match
+                                </p>
+                            </div>
+                            <div className="absolute left-6 bottom-[-6px] w-3 h-3 bg-white dark:bg-zinc-800 border-b-2 border-r-2 border-primary dark:border-primary/80 transform rotate-45"></div>
+                        </div>
+                    </div>
                 </div>
                 <div className="pt-2">
                     <button

@@ -4,7 +4,7 @@ import RecipeDetail from '@/components/RecipeDetail';
 
 interface DashboardOverviewProps {
     mealPlan: any;
-    onPlanComplete: () => void;
+    onPlanComplete: () => void | Promise<void>;
 }
 
 export default function DashboardOverview({ mealPlan, onPlanComplete }: DashboardOverviewProps) {
@@ -41,7 +41,7 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
     };
 
     const status = getPlanStatus();
-    
+
     // If expired, show completion view
     if (status.isExpired) {
         return (
