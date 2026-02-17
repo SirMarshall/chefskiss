@@ -11,21 +11,30 @@ import { searchImage } from "@/lib/unsplash";
 /**
  * Checks if the current user has a generated meal plan.
  */
-export async function checkMealPlanStatus() {
+/**
+ * Checks if the current user has a generated meal plan.
+ * @param userId Optional user ID to bypass session lookup
+ */
+export async function checkMealPlanStatus(userId?: string) {
     await dbConnect();
-    const session = await auth.api.getSession({
-        headers: await headers()
-    });
-
-    if (!session || !session.user) {
-        return { hasPlan: false, planId: null };
+    
+    let currentUserId = userId;
+    
+    if (!currentUserId) {
+        const session = await auth.api.getSession({
+            headers: await headers()
+        });
+        if (!session || !session.user) {
+            return { hasPlan: false, planId: null };
+        }
+        currentUserId = session.user.id;
     }
 
     // We can check the user record directly for speed
-    const user = await User.findById(session.user.id).select('mealPlanGenerated currentMealPlanId');
+    const user = await User.findById(currentUserId).select('mealPlanGenerated currentMealPlanId');
 
     if (!user) return { hasPlan: false, planId: null };
-
+    
     return {
         hasPlan: !!user.mealPlanGenerated,
         planId: user.currentMealPlanId ? user.currentMealPlanId.toString() : null
@@ -35,17 +44,26 @@ export async function checkMealPlanStatus() {
 /**
  * Retrieves the active meal plan for the current user.
  */
-export async function getActiveMealPlan() {
+/**
+ * Retrieves the active meal plan for the current user.
+ * @param userId Optional user ID to bypass session lookup
+ */
+export async function getActiveMealPlan(userId?: string) {
     await dbConnect();
-    const session = await auth.api.getSession({
-        headers: await headers()
-    });
-
-    if (!session || !session.user) {
-        throw new Error("Unauthorized");
+    
+    let currentUserId = userId;
+    
+    if (!currentUserId) {
+        const session = await auth.api.getSession({
+            headers: await headers()
+        });
+        if (!session || !session.user) {
+            throw new Error("Unauthorized");
+        }
+        currentUserId = session.user.id;
     }
 
-    const plan = await WeeklyMealPlan.findOne({ userId: session.user.id })
+    const plan = await WeeklyMealPlan.findOne({ userId: currentUserId })
         .sort({ createdAt: -1 }) // Get the latest one
         .lean();
 
@@ -311,17 +329,26 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
 /**
  * Retrieves the user's dietary profile.
  */
-export async function getUserProfile() {
+/**
+ * Retrieves the user's dietary profile.
+ * @param userId Optional user ID to bypass session lookup
+ */
+export async function getUserProfile(userId?: string) {
     await dbConnect();
-    const session = await auth.api.getSession({
-        headers: await headers()
-    });
-
-    if (!session || !session.user) {
-        throw new Error("Unauthorized");
+    
+    let currentUserId = userId;
+    
+    if (!currentUserId) {
+        const session = await auth.api.getSession({
+            headers: await headers()
+        });
+        if (!session || !session.user) {
+            throw new Error("Unauthorized");
+        }
+        currentUserId = session.user.id;
     }
 
-    const user = await User.findById(session.user.id).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize planDuration hasUnlimitedRegens');
+    const user = await User.findById(currentUserId).select('dietaryRestrictions allergens dislikes favorites spiceLevel householdSize planDuration hasUnlimitedRegens');
 
     if (!user) return null;
 

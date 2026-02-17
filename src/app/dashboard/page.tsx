@@ -22,9 +22,9 @@ export default async function DashboardPage() {
 
     // 2. Fetch all data in parallel
     const [status, activePlan, profile] = await Promise.all([
-        checkMealPlanStatus(),
-        getActiveMealPlan(),
-        getUserProfile()
+        checkMealPlanStatus(session.user.id),
+        getActiveMealPlan(session.user.id),
+        getUserProfile(session.user.id)
     ]);
 
     const end = performance.now();

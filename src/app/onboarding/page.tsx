@@ -628,8 +628,7 @@ export default function OnboardingPage() {
                 </main>
             </div>
 
-            {/* Styles for Material Symbols */}
-            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+            {/* Styles for Material Symbols handled in layout.tsx */}
         </div>
     );
 }

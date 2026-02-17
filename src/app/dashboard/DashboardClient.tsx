@@ -5,9 +5,14 @@ import { useEffect, useState } from "react";
 import { generateInitialMealPlan, archiveCurrentMealPlan } from "@/app/actions/mealPlan";
 import { SuggestionTagInput, PillSelector } from "@/components/preferences/PreferencesUI";
 import DashboardOverview from "./DashboardOverview";
-import SettingsView from "./SettingsView";
+
 import DashboardSkeleton from "@/components/DashboardSkeleton";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import dynamic from "next/dynamic";
+
+const SettingsView = dynamic(() => import("./SettingsView"), {
+    loading: () => <DashboardSkeleton />,
+});
 
 const CUISINE_SUGGESTIONS = ['Japanese', 'Mexican', 'Italian', 'French', 'Indian', 'Thai', 'Mediterranean', 'American'];
 
@@ -458,7 +463,7 @@ export default function DashboardClient({
                 </main>
             </div>
             {/* Styles for Material Symbols */}
-            <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+            {/* Styles for Material Symbols handled in layout.tsx */}
         </div>
     );
 }
