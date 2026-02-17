@@ -82,6 +82,7 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
         if (profileUpdates.favorites) user.favorites = profileUpdates.favorites;
         if (profileUpdates.spiceLevel) user.spiceLevel = profileUpdates.spiceLevel;
         if (profileUpdates.householdSize) user.householdSize = profileUpdates.householdSize;
+        if (profileUpdates.planDuration) user.planDuration = profileUpdates.planDuration;
         await user.save();
     }
 
@@ -199,7 +200,7 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
     };
 
     // Construct Prompt
-        const prompt = `
+    const prompt = `
         Generate a meal plan for exactly ${days} days for a user with the following profile:
         Name: ${user.name}
         Dietary Restrictions: ${user.dietaryRestrictions?.join(", ") || "None"}

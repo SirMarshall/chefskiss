@@ -73,7 +73,8 @@ export default function DashboardClient({
                 favorites,
                 dislikes,
                 spiceLevel,
-                householdSize
+                householdSize,
+                planDuration: numDays
             });
             setMealPlan(newPlan);
             setHasPlan(true);
@@ -424,12 +425,12 @@ export default function DashboardClient({
                                                     {[1, 3, 5, 7].map((days) => (
                                                         <button
                                                             key={days}
-                                                            onClick={() => !hasPlan && setNumDays(days)}
-                                                            disabled={hasPlan}
+                                                            onClick={() => (!hasPlan || hasUnlimitedRegens) && setNumDays(days)}
+                                                            disabled={hasPlan && !hasUnlimitedRegens}
                                                             className={`py-2 text-[10px] font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
-                                                                ? (hasPlan ? 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent' : 'bg-primary text-white border-primary')
+                                                                ? ((hasPlan && !hasUnlimitedRegens) ? 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent' : 'bg-primary text-white border-primary')
                                                                 : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'
-                                                                } ${hasPlan ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                } ${(hasPlan && !hasUnlimitedRegens) ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                         >
                                                             {days} Days
                                                         </button>
