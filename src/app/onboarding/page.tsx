@@ -44,6 +44,7 @@ export default function OnboardingPage() {
     const { setTheme, resolvedTheme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [showCustomAllergen, setShowCustomAllergen] = useState(false);
 
     useEffect(() => {
         setMounted(true);
@@ -98,7 +99,7 @@ export default function OnboardingPage() {
         allergens: [],
         dislikes: [],
         favorites: [],
-        spiceLevel: 'Medium',
+        spiceLevel: '',
         householdSize: 1,
         numDays: 7
     });
@@ -155,6 +156,10 @@ export default function OnboardingPage() {
         }));
     };
     const handleComplete = async () => {
+        if (!preferences.spiceLevel) {
+            toast("Please select a preferred spice level before continuing.", "error");
+            return;
+        }
         setLoading(true);
 
         // Capture current input if any
@@ -202,7 +207,7 @@ export default function OnboardingPage() {
 
             toast("Profile setup complete! Preparing your kitchen...", "success");
             // Use window.location.href to force a full reload and ensure the fresh session is loaded
-            window.location.href = '/dashboard';
+            window.location.href = '/terms';
 
         } catch (error) {
             console.error("Onboarding error:", error);
@@ -344,11 +349,11 @@ export default function OnboardingPage() {
                                                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-primary p-0.5 ring-4 ring-transparent group-hover:ring-primary/10 transition-all cursor-pointer shadow-sm">
                                                     <div className="w-full h-full rounded-full bg-white dark:bg-zinc-800 flex items-center justify-center text-gray-900 dark:text-white font-serif italic text-2xl sm:text-3xl overflow-hidden relative">
                                                         {member.image ? (
-                                                            <ImageWithFallback 
-                                                                src={member.image} 
-                                                                alt={member.name} 
+                                                            <ImageWithFallback
+                                                                src={member.image}
+                                                                alt={member.name}
                                                                 fill
-                                                                className="object-cover" 
+                                                                className="object-cover"
                                                                 sizes="80px"
                                                             />
                                                         ) : (
@@ -501,10 +506,10 @@ export default function OnboardingPage() {
                                     </div>
 
                                     <div className="flex flex-col gap-6">
-                                        {/* Common Allergens */}
+                                        {/* Allergens */}
                                         <div className="bg-white dark:bg-zinc-800 p-6 sm:p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
-                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Common Allergens</label>
-                                            <div className="flex flex-wrap gap-2">
+                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Allergens</label>
+                                            <div className="flex flex-wrap gap-2 mb-6">
                                                 {['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat'].map(allergen => (
                                                     <div
                                                         key={allergen}
@@ -514,37 +519,45 @@ export default function OnboardingPage() {
                                                         {allergen}
                                                     </div>
                                                 ))}
+                                                <button
+                                                    onClick={() => setShowCustomAllergen(!showCustomAllergen)}
+                                                    className={`px-4 py-2 sm:px-5 sm:py-3 rounded-full border text-[9px] sm:text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer font-mono flex items-center gap-2 ${showCustomAllergen || preferences.allergens.some(a => !['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat'].includes(a)) ? 'bg-primary/10 border-primary text-primary' : 'border-dashed border-gray-300 dark:border-gray-700 text-gray-400 hover:border-primary hover:text-primary'}`}
+                                                >
+                                                    <span className="material-symbols-outlined text-sm">{showCustomAllergen ? 'close' : 'add'}</span>
+                                                    Custom
+                                                </button>
                                             </div>
-                                        </div>
 
-                                        {/* Custom Allergens */}
-                                        <div className="bg-white dark:bg-zinc-800 p-6 sm:p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all">
-                                            <label className="block text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-6 font-mono">Custom Allergens</label>
-                                            <div className="flex flex-wrap gap-2 mb-4">
-                                                {preferences.allergens.filter(a => !['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat'].includes(a)).map(allergen => (
-                                                    <div key={allergen} className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-red-100 dark:border-red-900/40 transition-colors">
-                                                        {allergen}
-                                                        <button onClick={() => handleRemoveItem('allergens', allergen)} className="hover:text-red-500 transition-colors">
-                                                            <span className="material-symbols-outlined text-xs">close</span>
-                                                        </button>
+                                            {(showCustomAllergen || preferences.allergens.some(a => !['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat'].includes(a))) && (
+                                                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                                    <div className="flex flex-wrap gap-2 mb-4">
+                                                        {preferences.allergens.filter(a => !['Peanuts', 'Shellfish', 'Dairy', 'Soy', 'Tree Nuts', 'Wheat'].includes(a)).map(allergen => (
+                                                            <div key={allergen} className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider flex items-center gap-2 border border-red-100 dark:border-red-900/40 transition-colors">
+                                                                {allergen}
+                                                                <button onClick={() => handleRemoveItem('allergens', allergen)} className="hover:text-red-500 transition-colors">
+                                                                    <span className="material-symbols-outlined text-xs">close</span>
+                                                                </button>
+                                                            </div>
+                                                        ))}
                                                     </div>
-                                                ))}
-                                            </div>
-                                            <div className="relative group">
-                                                <input
-                                                    className="w-full bg-white dark:bg-zinc-700 border border-gray-200 dark:border-gray-700 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
-                                                    placeholder="Type to add..."
-                                                    type="text"
-                                                    value={activeInput === 'allergens' ? inputValue : ""}
-                                                    onFocus={() => { setActiveInput('allergens'); setInputValue(""); }}
-                                                    onChange={(e) => setInputValue(e.target.value)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            handleAddItem('allergens');
-                                                        }
-                                                    }}
-                                                />
-                                            </div>
+                                                    <div className="relative group">
+                                                        <input
+                                                            className="w-full bg-white dark:bg-zinc-700 border border-gray-200 dark:border-gray-700 rounded-xl text-sm px-4 py-3 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder-gray-300 dark:placeholder-gray-600 font-sans text-gray-900 dark:text-white"
+                                                            placeholder="Type custom allergen..."
+                                                            type="text"
+                                                            autoFocus
+                                                            value={activeInput === 'allergens' ? inputValue : ""}
+                                                            onFocus={() => { setActiveInput('allergens'); setInputValue(""); }}
+                                                            onChange={(e) => setInputValue(e.target.value)}
+                                                            onKeyDown={(e) => {
+                                                                if (e.key === 'Enter') {
+                                                                    handleAddItem('allergens');
+                                                                }
+                                                            }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Disliked Ingredients */}

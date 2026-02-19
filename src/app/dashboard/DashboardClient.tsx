@@ -57,10 +57,10 @@ export default function DashboardClient({
     // Redirect logic - keep this as a safeguard, though server checks should handle most of it
     useEffect(() => {
         if (user) {
-            if (!user.termsAccepted) {
-                router.push("/terms");
-            } else if (!user.onboardingComplete) {
+            if (!user.onboardingComplete) {
                 router.push("/onboarding");
+            } else if (!user.termsAccepted) {
+                router.push("/terms");
             }
         }
     }, [user, router]);
