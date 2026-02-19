@@ -7,6 +7,27 @@ interface DashboardOverviewProps {
     onPlanComplete: () => void;
 }
 
+const MealItem = React.memo(({ meal, type, onClick }: { meal: any, type: string, onClick: (data: any) => void }) => (
+    <div
+        onClick={() => onClick(meal)}
+        className="flex flex-col space-y-3 cursor-pointer group"
+    >
+        <div
+            className="aspect-[4/3] bg-gray-100 dark:bg-zinc-700 rounded-2xl relative overflow-hidden group-hover:brightness-95 transition-all bg-cover bg-center"
+            style={{ backgroundImage: meal.imageUrl ? `url('${meal.imageUrl}')` : 'none', backgroundColor: meal.imageColor || '' }}
+        >
+            <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">{type}</span>
+            {meal.imageUserName && (
+                <div className="absolute bottom-2 left-2 text-[8px] text-white/50 font-mono tracking-tighter">
+                    {meal.imageUserName} / Unsplash
+                </div>
+            )}
+        </div>
+        <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.name}</h5>
+    </div>
+));
+MealItem.displayName = "MealItem";
+
 export default function DashboardOverview({ mealPlan, onPlanComplete }: DashboardOverviewProps) {
     const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
     const [now, setNow] = useState(new Date());
@@ -83,30 +104,9 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
                     <h4 className="text-2xl font-bold text-gray-900 dark:text-white font-sans">{todayData.day}</h4>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[
-                        { type: 'Breakfast', data: todayData.meals.breakfast },
-                        { type: 'Lunch', data: todayData.meals.lunch },
-                        { type: 'Dinner', data: todayData.meals.dinner }
-                    ].map((meal, idx) => (
-                        <div
-                            key={idx}
-                            onClick={() => setSelectedRecipe(meal.data)}
-                            className="flex flex-col space-y-3 cursor-pointer group"
-                        >
-                            <div
-                                className="aspect-[4/3] bg-gray-100 dark:bg-zinc-700 rounded-2xl relative overflow-hidden group-hover:brightness-95 transition-all bg-cover bg-center"
-                                style={{ backgroundImage: meal.data.imageUrl ? `url('${meal.data.imageUrl}')` : 'none', backgroundColor: meal.data.imageColor || '' }}
-                            >
-                                <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">{meal.type}</span>
-                                {meal.data.imageUserName && (
-                                    <div className="absolute bottom-2 left-2 text-[8px] text-white/50 font-mono tracking-tighter">
-                                        {meal.data.imageUserName} / Unsplash
-                                    </div>
-                                )}
-                            </div>
-                            <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.data.name}</h5>
-                        </div>
-                    ))}
+                    <MealItem type="Breakfast" meal={todayData.meals.breakfast} onClick={setSelectedRecipe} />
+                    <MealItem type="Lunch" meal={todayData.meals.lunch} onClick={setSelectedRecipe} />
+                    <MealItem type="Dinner" meal={todayData.meals.dinner} onClick={setSelectedRecipe} />
                 </div>
             </div>
 
@@ -128,32 +128,9 @@ export default function DashboardOverview({ mealPlan, onPlanComplete }: Dashboar
                             )}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {[
-                                { type: 'Breakfast', data: day.meals.breakfast },
-                                { type: 'Lunch', data: day.meals.lunch },
-                                { type: 'Dinner', data: day.meals.dinner }
-                            ].map((meal, mIdx) => (
-                                <div
-                                    key={mIdx}
-                                    onClick={() => setSelectedRecipe(meal.data)}
-                                    className="flex flex-col space-y-3 cursor-pointer group"
-                                >
-                                    <div
-                                        className="aspect-[4/3] bg-gray-100 dark:bg-zinc-700 rounded-2xl relative overflow-hidden bg-cover bg-center transition-colors"
-                                        style={{ backgroundImage: meal.data.imageUrl ? `url('${meal.data.imageUrl}')` : 'none', backgroundColor: meal.data.imageColor || '' }}
-                                    >
-                                        <span className="absolute top-3 right-3 bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-2 py-1 rounded text-[9px] font-bold uppercase tracking-wider text-gray-800 dark:text-gray-200 font-mono transition-colors">
-                                            {meal.type}
-                                        </span>
-                                        {meal.data.imageUserName && (
-                                            <div className="absolute bottom-2 left-2 text-[8px] text-white/50 font-mono tracking-tighter">
-                                                {meal.data.imageUserName} / Unsplash
-                                            </div>
-                                        )}
-                                    </div>
-                                    <h5 className="text-xs font-bold text-gray-900 dark:text-white line-clamp-2 font-sans group-hover:text-primary transition-colors">{meal.data.name}</h5>
-                                </div>
-                            ))}
+                            <MealItem type="Breakfast" meal={day.meals.breakfast} onClick={setSelectedRecipe} />
+                            <MealItem type="Lunch" meal={day.meals.lunch} onClick={setSelectedRecipe} />
+                            <MealItem type="Dinner" meal={day.meals.dinner} onClick={setSelectedRecipe} />
                         </div>
                     </div>
                 );

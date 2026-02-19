@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo, useDeferredValue } from "react";
 import { generateInitialMealPlan, archiveCurrentMealPlan } from "@/app/actions/mealPlan";
 import { SuggestionTagInput, PillSelector } from "@/components/preferences/PreferencesUI";
 import DashboardOverview from "./DashboardOverview";
@@ -22,6 +22,70 @@ interface DashboardClientProps {
     initialProfile: any;
     user: any;
 }
+
+// Memoized Sub-components
+const MemoizedDashboardOverview = memo(DashboardOverview);
+
+const Sidebar = memo(({ activeTab, setActiveTab, setIsSidebarOpen }: any) => (
+    <aside className="fixed inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out bg-panel-left-light dark:bg-panel-left-dark border-r border-gray-200/50 dark:border-gray-800/50 p-8 md:p-12 flex flex-col justify-between md:relative md:translate-x-0">
+        <div className="pt-16 md:pt-0">
+            <div className="mb-12 hidden md:block">
+                <h1 className="text-5xl tracking-widest font-light text-gray-900 dark:text-white uppercase leading-none mb-1 font-sans">CHEF'S</h1>
+                <h1 className="text-6xl font-serif italic font-bold text-gray-900 dark:text-white leading-none">KISS</h1>
+                <div className="w-12 h-0.5 bg-gray-800 dark:bg-gray-200 mt-6 mb-4"></div>
+                <p className="text-xs font-bold tracking-[0.2em] text-gray-800 dark:text-gray-300 uppercase font-mono">
+                    Generative Personal<br />Meal Prep AI
+                </p>
+            </div>
+            <nav className="space-y-6">
+                {[
+                    { id: 'dashboard', label: 'PLAN', icon: 'dashboard' },
+                    { id: 'pantry', label: 'PANTRY', icon: 'kitchen', disabled: true },
+                    { id: 'family', label: 'FAMILY', icon: 'groups', disabled: true },
+                    { id: 'settings', label: 'SETTINGS', icon: 'settings' }
+                ].map((item) => (
+                    <a
+                        key={item.id}
+                        href="#"
+                        onClick={(e) => {
+                            e.preventDefault();
+                            if (item.disabled) return;
+                            setActiveTab(item.id);
+                            setIsSidebarOpen(false);
+                        }}
+                        className={`flex items-center space-x-3 text-sm font-medium tracking-wide transition-colors py-1 ${item.disabled
+                            ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                            : activeTab === item.id
+                                ? 'text-primary border-r-2 border-primary'
+                                : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                            }`}
+                    >
+                        <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+                        <span>{item.label}</span>
+                        {item.disabled && (
+                            <span className="bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 whitespace-nowrap">SOON</span>
+                        )}
+                    </a>
+                ))}
+            </nav>
+        </div>
+        <div className="mt-auto hidden md:block">
+            <blockquote className="text-gray-800 dark:text-gray-300 font-serif italic text-lg leading-relaxed">
+                {activeTab === 'settings' ? (
+                    <>
+                        "I'm going through changes."
+                        <span className="block text-[10px] mt-2 not-italic font-bold font-mono tracking-widest text-gray-400 uppercase">- Black Sabbath</span>
+                    </>
+                ) : (
+                    <>
+                        "Your palate is unique.<br />Your menu should be too."
+                    </>
+                )}
+            </blockquote>
+        </div>
+    </aside>
+));
+Sidebar.displayName = "Sidebar";
 
 export default function DashboardClient({
     initialMealPlan,
@@ -44,17 +108,21 @@ export default function DashboardClient({
     const [favorites, setFavorites] = useState<string[]>(initialProfile?.favorites || []);
     const [dislikes, setDislikes] = useState<string[]>(initialProfile?.dislikes || []);
 
-    // Capitalize spice level from DB if present
     const defaultSpice = initialProfile?.spiceLevel
         ? initialProfile.spiceLevel.charAt(0).toUpperCase() + initialProfile.spiceLevel.slice(1).toLowerCase()
         : "Medium";
     const [spiceLevel, setSpiceLevel] = useState(defaultSpice);
+    
+    // Optimized range slider state
     const [householdSize, setHouseholdSize] = useState(initialProfile?.householdSize || 1);
+    const [sliderValue, setSliderValue] = useState(initialProfile?.householdSize || 1);
 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isConfigOpen, setIsConfigOpen] = useState(false);
 
-    // Redirect logic - keep this as a safeguard, though server checks should handle most of it
+    // Use deferred values for non-critical updates to improve INP
+    const deferredMealPlan = useDeferredValue(mealPlan);
+
     useEffect(() => {
         if (user) {
             if (!user.onboardingComplete) {
@@ -66,7 +134,6 @@ export default function DashboardClient({
     }, [user, router]);
 
     const handleGeneratePlan = async () => {
-        // Prevent generation if plan exists AND user doesn't have unlimited regens
         if (hasPlan && !user?.hasUnlimitedRegens) return;
 
         setIsGenerating(true);
@@ -81,7 +148,7 @@ export default function DashboardClient({
             });
             setMealPlan(newPlan);
             setHasPlan(true);
-            setIsConfigOpen(false); // Close drawer after generation
+            setIsConfigOpen(false);
         } catch (error) {
             console.error("Failed to generate plan:", error);
             alert("Failed to generate plan. Please try again.");
@@ -101,12 +168,10 @@ export default function DashboardClient({
         }
     };
 
-    // Helper to check if controls should be disabled
     const isPlanLocked = hasPlan && !user?.hasUnlimitedRegens;
 
     return (
         <div className="h-screen w-full overflow-hidden bg-background-light dark:bg-background-dark flex flex-col">
-            {/* Mobile Header */}
             <header className="md:hidden flex items-center justify-between p-4 border-b border-gray-200/50 dark:border-gray-800/50 bg-panel-left-light dark:bg-panel-left-dark z-50">
                 <div className="flex items-center space-x-3">
                     <button
@@ -135,71 +200,13 @@ export default function DashboardClient({
             </header>
 
             <div className="flex-1 flex flex-col md:flex-row relative overflow-hidden">
-                {/* Sidebar */}
-                <aside className={`
-                    fixed inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out bg-panel-left-light dark:bg-panel-left-dark border-r border-gray-200/50 dark:border-gray-800/50 p-8 md:p-12 flex flex-col justify-between
-                    md:relative md:translate-x-0
-                    ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                `}>
-                    <div className="pt-16 md:pt-0">
-                        <div className="mb-12 hidden md:block">
-                            <h1 className="text-5xl tracking-widest font-light text-gray-900 dark:text-white uppercase leading-none mb-1 font-sans">CHEF'S</h1>
-                            <h1 className="text-6xl font-serif italic font-bold text-gray-900 dark:text-white leading-none">KISS</h1>
-                            <div className="w-12 h-0.5 bg-gray-800 dark:bg-gray-200 mt-6 mb-4"></div>
-                            <p className="text-xs font-bold tracking-[0.2em] text-gray-800 dark:text-gray-300 uppercase font-mono">
-                                Generative Personal<br />Meal Prep AI
-                            </p>
-                        </div>
-                        <nav className="space-y-6">
-                            {[
-                                { id: 'dashboard', label: 'PLAN', icon: 'dashboard' },
-                                { id: 'pantry', label: 'PANTRY', icon: 'kitchen', disabled: true },
-                                { id: 'family', label: 'FAMILY', icon: 'groups', disabled: true },
-                                { id: 'settings', label: 'SETTINGS', icon: 'settings' }
-                            ].map((item) => (
-                                <a
-                                    key={item.id}
-                                    href="#"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        if (item.disabled) return;
-                                        setActiveTab(item.id);
-                                        setIsSidebarOpen(false);
-                                    }}
-                                    className={`flex items-center space-x-3 text-sm font-medium tracking-wide transition-colors py-1 ${item.disabled
-                                        ? 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
-                                        : activeTab === item.id
-                                            ? 'text-primary border-r-2 border-primary'
-                                            : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
-                                        }`}
-                                >
-                                    <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-                                    <span>{item.label}</span>
-                                    {item.disabled && (
-                                        <span className="bg-gray-100 dark:bg-zinc-800 text-gray-400 dark:text-gray-500 text-[9px] font-bold px-1.5 py-0.5 rounded ml-2 whitespace-nowrap">SOON</span>
-                                    )}
-                                </a>
-                            ))}
-                        </nav>
-                    </div>
-                    <div className="mt-auto hidden md:block">
-                        <blockquote className="text-gray-800 dark:text-gray-300 font-serif italic text-lg leading-relaxed">
-                            {activeTab === 'settings' ? (
-                                <>
-                                    "I'm going through changes."
-                                    <span className="block text-[10px] mt-2 not-italic font-bold font-mono tracking-widest text-gray-400 uppercase">- Black Sabbath</span>
-                                </>
-                            ) : (
-                                // Default Quote
-                                <>
-                                    "Your palate is unique.<br />Your menu should be too."
-                                </>
-                            )}
-                        </blockquote>
-                    </div>
-                </aside>
+                <Sidebar 
+                    activeTab={activeTab} 
+                    setActiveTab={setActiveTab} 
+                    setIsSidebarOpen={setIsSidebarOpen} 
+                    className={isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                />
 
-                {/* Mobile Sidebar Overlay */}
                 {isSidebarOpen && (
                     <div
                         className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm transition-opacity"
@@ -207,8 +214,6 @@ export default function DashboardClient({
                     />
                 )}
 
-
-                {/* Main Content */}
                 <main className="flex-1 flex overflow-hidden bg-white dark:bg-zinc-900">
                     <div className={`w-full ${activeTab === 'dashboard' ? 'lg:w-3/5' : ''} p-6 md:p-12 overflow-y-auto border-r border-gray-100 dark:border-gray-800 flex flex-col`}>
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-6 mb-10 flex-shrink-0">
@@ -220,11 +225,8 @@ export default function DashboardClient({
                                     {activeTab === 'settings' ? 'Settings' : 'Your Menu'}
                                 </h3>
                             </div>
-                            {/* Action Buttons */}
-
                         </div>
 
-                        {/* Content Area */}
                         {isGenerating ? (
                             <div className="flex-1 flex flex-col">
                                 <div className="mb-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -242,7 +244,6 @@ export default function DashboardClient({
                                 <DashboardSkeleton />
                             </div>
                         ) : !hasPlan && activeTab !== 'settings' ? (
-                            // EMPTY STATE
                             <div className="flex-1 flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-3xl bg-gray-50/50 dark:bg-zinc-800/30 text-center">
                                 <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
                                     <span className="material-symbols-outlined text-4xl">restaurant_menu</span>
@@ -269,16 +270,13 @@ export default function DashboardClient({
                             activeTab === 'settings' ? (
                                 <SettingsView />
                             ) : (
-                                <DashboardOverview mealPlan={mealPlan} onPlanComplete={handlePlanComplete} />
+                                <MemoizedDashboardOverview mealPlan={deferredMealPlan} onPlanComplete={handlePlanComplete} />
                             )
                         )}
-
                     </div>
 
-                    {/* Right Panel - Configuration */}
                     {activeTab === 'dashboard' && (
                         <>
-                            {/* Mobile Config Drawer Overlay */}
                             {isConfigOpen && (
                                 <div
                                     className="fixed inset-0 bg-black/60 z-[55] lg:hidden backdrop-blur-sm transition-opacity"
@@ -305,7 +303,6 @@ export default function DashboardClient({
                                         </button>
                                     </div>
 
-                                    {/* Family Profiles */}
                                     <section className="relative">
                                         <div className="absolute inset-0 z-10 flex items-center justify-center">
                                             <div className="bg-white/90 dark:bg-zinc-800/90 backdrop-blur px-4 py-2 rounded-full shadow-sm border border-gray-200 dark:border-gray-700 flex items-center space-x-2">
@@ -315,16 +312,14 @@ export default function DashboardClient({
                                         </div>
                                         <div className="opacity-25 pointer-events-none grayscale blur-[2px] select-none">
                                             <div className="flex justify-between items-center mb-6">
-                                                <label className="block text-xs font-bold text-gray-400 result-gray-600 uppercase tracking-widest font-mono">Family Profiles</label>
-                                                <button
-                                                    className="flex items-center space-x-1 text-primary transition-colors text-xs font-bold uppercase font-mono"
-                                                >
+                                                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Family Profiles</label>
+                                                <button className="flex items-center space-x-1 text-primary transition-colors text-xs font-bold uppercase font-mono">
                                                     <span className="material-symbols-outlined text-sm">add</span>
                                                     <span>New Profile</span>
                                                 </button>
                                             </div>
                                             <div className="flex items-center space-x-6 overflow-x-auto pb-4 hide-scrollbar">
-                                                <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
+                                                <div className="flex flex-col items-center space-y-2 flex-shrink-0">
                                                     <div className="w-14 h-14 rounded-full bg-white dark:bg-zinc-800 border-2 border-primary flex items-center justify-center text-primary font-serif italic text-xl shadow-md overflow-hidden relative">
                                                         {user?.image ? (
                                                             <ImageWithFallback
@@ -339,19 +334,11 @@ export default function DashboardClient({
                                                         )}
                                                     </div>
                                                     <span className="text-xs font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider font-mono">{user?.name?.split(' ')[0] || 'Chef'}</span>
-                                                </button>
-                                                {/* Placeholders */}
-                                                <button className="flex flex-col items-center space-y-2 flex-shrink-0 group">
-                                                    <div className="w-14 h-14 rounded-full bg-gray-200 border-2 border-transparent flex items-center justify-center text-gray-500 font-serif italic text-xl">
-                                                        <span className="material-symbols-outlined">add</span>
-                                                    </div>
-                                                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider font-mono">Add</span>
-                                                </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </section>
 
-                                    {/* Form Fields */}
                                     <section className="space-y-8">
                                         <PillSelector
                                             label="Dietary Needs"
@@ -397,21 +384,24 @@ export default function DashboardClient({
                                             <div>
                                                 <div className="flex justify-between items-center mb-3">
                                                     <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest font-mono">Household Size</label>
-                                                    <span className="text-primary font-bold font-mono text-sm">{householdSize} {householdSize === 1 ? 'PERSON' : 'PEOPLE'}</span>
+                                                    <span className="text-primary font-bold font-mono text-sm">{sliderValue} {sliderValue === 1 ? 'PERSON' : 'PEOPLE'}</span>
                                                 </div>
                                                 <div className="relative pt-2">
                                                     <input
-                                                        value={householdSize}
-                                                        onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
+                                                        value={sliderValue}
+                                                        onChange={(e) => setSliderValue(parseInt(e.target.value) || 1)}
+                                                        onBlur={() => setHouseholdSize(sliderValue)}
+                                                        onMouseUp={() => setHouseholdSize(sliderValue)}
+                                                        onTouchEnd={() => setHouseholdSize(sliderValue)}
                                                         type="range"
                                                         min="1"
                                                         max="10"
                                                         step="1"
-                                                        className="w-full accent-primary"
+                                                        className="w-full accent-primary cursor-pointer h-2 bg-gray-200 dark:bg-zinc-800 rounded-lg appearance-none"
                                                     />
                                                     <div className="flex justify-between mt-2 px-1">
                                                         {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
-                                                            <span key={n} className={`text-xs font-bold font-mono ${householdSize === n ? 'text-primary' : 'text-gray-400 dark:text-gray-600'}`}>
+                                                            <span key={n} className={`text-[10px] font-bold font-mono ${sliderValue === n ? 'text-primary' : 'text-gray-400 dark:text-gray-600'}`}>
                                                                 {n}
                                                             </span>
                                                         ))}
@@ -427,7 +417,7 @@ export default function DashboardClient({
                                                             onClick={() => !isPlanLocked && setNumDays(days)}
                                                             disabled={isPlanLocked}
                                                             className={`py-2 text-[10px] font-bold tracking-wider uppercase rounded-sm border transition-all font-mono ${numDays === days
-                                                                ? (!isPlanLocked ? 'bg-primary text-white border-primary' : 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent')
+                                                                ? (!isPlanLocked ? 'bg-primary text-white border-primary shadow-md' : 'bg-gray-400 dark:bg-zinc-700 text-white border-transparent')
                                                                 : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-primary hover:text-primary'
                                                                 } ${isPlanLocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                         >
@@ -467,9 +457,9 @@ export default function DashboardClient({
                     )}
                 </main>
             </div>
-            {/* Styles for Material Symbols */}
-            {/* Styles for Material Symbols handled in layout.tsx */}
         </div>
     );
 }
+
+const classNameWrapper = (className: string) => className;
 

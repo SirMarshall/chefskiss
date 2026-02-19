@@ -20,7 +20,7 @@ interface PillSelectorProps {
 }
 
 // --- Tag Input with Suggestions (e.g. Cuisines, Allergens) ---
-export const SuggestionTagInput: React.FC<TagInputProps> = ({
+export const SuggestionTagInput: React.FC<TagInputProps> = React.memo(({
     label,
     placeholder = "Type to add...",
     value,
@@ -129,10 +129,11 @@ export const SuggestionTagInput: React.FC<TagInputProps> = ({
             </div>
         </div>
     );
-};
+});
+SuggestionTagInput.displayName = "SuggestionTagInput";
 
 // --- Pill Selector (e.g. Diet, Spice Level) ---
-export const PillSelector: React.FC<PillSelectorProps> = ({
+export const PillSelector: React.FC<PillSelectorProps> = React.memo(({
     label,
     options,
     value,
@@ -179,4 +180,5 @@ export const PillSelector: React.FC<PillSelectorProps> = ({
             </div>
         </div>
     );
-};
+});
+PillSelector.displayName = "PillSelector";

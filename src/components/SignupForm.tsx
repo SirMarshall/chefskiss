@@ -1,10 +1,8 @@
-"use client";
-
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useToast } from "@/context/ToastContext";
 import { signIn, signUp } from "@/lib/auth-client";
 
-export default function SignupForm() {
+const SignupForm = memo(function SignupForm() {
     const [loading, setLoading] = useState(false);
     const [googleLoading, setGoogleLoading] = useState(false);
     const [formData, setFormData] = useState({
@@ -161,4 +159,6 @@ export default function SignupForm() {
             </button>
         </div>
     );
-}
+});
+
+export default SignupForm;
