@@ -3,10 +3,10 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import dbConnect from "@/lib/db";
 import User from "@/models/User";
-import { 
-    checkMealPlanStatus, 
-    getActiveMealPlan, 
-    getUserProfile 
+import {
+    checkMealPlanStatus,
+    getActiveMealPlan,
+    getUserProfile
 } from "@/app/actions/mealPlan";
 import DashboardClient from "./DashboardClient";
 
@@ -42,8 +42,8 @@ export default async function DashboardPage() {
 
     // 3. Render the client component with pre-fetched data
     return (
-        <DashboardClient 
-            user={session.user}
+        <DashboardClient
+            user={JSON.parse(JSON.stringify(user))}
             initialMealPlan={activePlan}
             initialStatus={status}
             initialProfile={profile}
