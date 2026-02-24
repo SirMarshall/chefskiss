@@ -26,8 +26,8 @@ interface DashboardClientProps {
 // Memoized Sub-components
 const MemoizedDashboardOverview = memo(DashboardOverview);
 
-const Sidebar = memo(({ activeTab, setActiveTab, setIsSidebarOpen }: any) => (
-    <aside className="fixed inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out bg-panel-left-light dark:bg-panel-left-dark border-r border-gray-200/50 dark:border-gray-800/50 p-8 md:p-12 flex flex-col justify-between md:relative md:translate-x-0">
+const Sidebar = memo(({ activeTab, setActiveTab, setIsSidebarOpen, className }: any) => (
+    <aside className={`fixed inset-y-0 left-0 z-40 w-80 transform transition-transform duration-300 ease-in-out bg-panel-left-light dark:bg-panel-left-dark border-r border-gray-200/50 dark:border-gray-800/50 p-8 md:p-12 flex flex-col justify-between md:relative md:translate-x-0 ${className}`}>
         <div className="pt-16 md:pt-0">
             <div className="mb-12 hidden md:block">
                 <h1 className="text-5xl tracking-widest font-light text-gray-900 dark:text-white uppercase leading-none mb-1 font-sans">CHEF'S</h1>
@@ -204,7 +204,7 @@ export default function DashboardClient({
                     activeTab={activeTab} 
                     setActiveTab={setActiveTab} 
                     setIsSidebarOpen={setIsSidebarOpen} 
-                    className={isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                    className={isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
                 />
 
                 {isSidebarOpen && (
