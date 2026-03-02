@@ -214,7 +214,7 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
     };
 
     // Construct Prompt
-        const prompt = `
+    const prompt = `
         Generate a meal plan for exactly ${days} days for a user with the following profile:
         Name: ${user.name}
         Dietary Restrictions: ${user.dietaryRestrictions?.join(", ") || "None"}
@@ -230,6 +230,7 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
         For each day in the 'days' array, provide the correct day name (e.g. ${todayName} for the first day, then the next day, etc.).
         Provide colorful, appetizing color codes for 'imageColor' (hex).
         Ensure nutritional balance.
+        KEEP descriptions and instructions concise to ensure the entire ${days}-day plan fits within the response limit.
     `;
 
     try {
@@ -238,6 +239,8 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
             config: {
                 responseMimeType: 'application/json',
                 responseSchema: WeeklyPlanResponseSchema,
+                maxOutputTokens: 8192, // Increased to accommodate full 7-day plan with metadata
+                temperature: 0.7,
             },
             contents: [
                 {

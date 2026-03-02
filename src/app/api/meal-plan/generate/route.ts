@@ -70,6 +70,7 @@ export async function POST(req: Request) {
       For each day in the 'days' array, provide the correct day name (e.g. ${todayName} for the first day, then the next day, etc.).
       Provide colorful, appetizing color codes for 'imageColor' (hex).
       Ensure nutritional balance.
+      KEEP descriptions and instructions concise to ensure the entire ${numDays || 7}-day plan fits within the response limit.
     `;
 
     const result = streamObject({
