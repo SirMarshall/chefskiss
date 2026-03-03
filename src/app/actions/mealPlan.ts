@@ -235,7 +235,7 @@ export async function generateInitialMealPlan(days: number = 7, profileUpdates?:
 
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-flash-lite-latest',
+            model: 'gemini-3.1-flash-lite-preview',
             config: {
                 responseMimeType: 'application/json',
                 responseSchema: WeeklyPlanResponseSchema,

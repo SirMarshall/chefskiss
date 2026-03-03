@@ -74,7 +74,7 @@ export async function POST(req: Request) {
     `;
 
     const result = streamObject({
-      model: google('gemini-flash-lite-latest'),
+      model: google('gemini-3.1-flash-lite-preview'),
       schema: WeeklyPlanSchema,
       prompt,
       onFinish: async ({ object }) => {
